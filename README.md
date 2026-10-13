@@ -33,13 +33,23 @@ cmake --build llama.cpp/build --config Release --target llama-server -j 4
 
 ### 3. 准备模型
 
-将 Qwen3.8-27B 的 `Q4_K_M` GGUF 放入项目的 `models/` 目录。模型文件不会提交到 GitHub。
+将 Qwen3.8-27B 的 `Q4_K_M` GGUF 放入项目的 `models/` 目录。
 
 ```bash
 mkdir -p models
 curl --location --fail --retry 5 --continue-at - \
   --output models/Qwen3.8-27B-Q4_K_M.gguf \
   https://huggingface.co/bartowski/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-Q4_K_M.gguf
+```
+
+需要在网页切换到 Q5 时，再下载 `Q5_K_M`（约 20.9 GB）。保留 Q4 文件：
+
+```bash
+curl --location --fail --retry 20 --retry-all-errors \
+  --retry-delay 5 --connect-timeout 20 --continue-at - \
+  --output models/Qwen3.8-27B-Q5_K_M.gguf.part \
+  https://huggingface.co/bartowski/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-Q5_K_M.gguf \
+&& mv models/Qwen3.8-27B-Q5_K_M.gguf.part models/Qwen3.8-27B-Q5_K_M.gguf
 ```
 
 ### 4. 配置项目
@@ -64,12 +74,34 @@ LLAMA_SERVER_BIN=/absolute/path/to/llama.cpp/build/bin/llama-server
 ```bash
 conda activate paper-agent
 cd Paper-Research-Agent
-python deploy/serve_gguf.py
+python deploy/serve_gguf.py --managed
 ```
 
-保持该进程运行。程序只监听 `127.0.0.1:8000`。
+保持该进程运行。推理监听 `127.0.0.1:8000`，模型切换接口监听 `127.0.0.1:8001`。已有旧模型服务时，先等待研究任务结束，在旧服务终端按 Ctrl+C，再执行上述命令。省略 `--managed` 仍可使用原来的固定模型模式。
 
-### 6. 运行 Agent
+### 6. 打开网页界面
+
+网页运行示例：
+
+![Paper Research Agent 网页运行示例](demo.png)
+
+在同一台服务器的第二个终端中运行：
+
+```bash
+conda activate paper-agent
+cd Paper-Research-Agent
+python web_app.py --port 7860
+```
+
+浏览器打开 `http://127.0.0.1:7860`，输入研究想法即可开始。
+
+如果运行在远程服务器，可用编辑器的端口转发功能，或在自己的电脑上运行：
+
+```bash
+ssh -N -L 7860:127.0.0.1:7860 用户名@运行网页的服务器
+```
+
+### 命令行运行（可选）
 
 在同一台服务器的第二个终端中运行：
 
@@ -84,7 +116,7 @@ python main_agent.py \
   --concurrent
 ```
 
-结果保存在 `outputs/<run_id>/`：
+命令行结果保存在 `outputs/<run_id>/`：
 
 - `report.md`：最终研究报告
 - `topk.json`：Top-K 论文和处理状态

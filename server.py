@@ -1,6 +1,7 @@
 """Our own MCP service. Run through main_agent.py, not as a separate first step."""
 import argparse
 import json
+import os
 import sys
 import time
 import uuid
@@ -30,8 +31,12 @@ async def search_papers(query: str, max_per_source: int = 8) -> dict:
     if not query.strip() or not 1 <= max_per_source <= 20:
         raise ValueError("需要非空检索词，每源候选数量 1~20")
     run_id = uuid.uuid4().hex[:12]
-    output = Path("outputs") / run_id
+    output = Path(os.getenv("PAPER_OUTPUT_ROOT", "outputs")) / run_id
     output.mkdir(parents=True)
+    save_json(output / "run_meta.json", {"run_id": run_id, "query": query,
+                                        "mode": "mock" if config["mock"] else "live",
+                                        "created_at": time.time()})
+    trace(output, "search_started", {"query": query})
     started = time.perf_counter()
     papers, sources = await retrieve(query, max_per_source, **config)
     elapsed = time.perf_counter() - started
@@ -59,6 +64,11 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
     if not papers:
         raise ValueError("没有候选论文，请缩短英文检索词后重新检索")
     started = time.perf_counter()
+    metadata = json.loads((output / "run_meta.json").read_text(encoding="utf-8"))
+    metadata.update(idea=idea, requested_top_k=top_k, concurrent=config["concurrent"],
+                    model_id=os.getenv("PAPER_MODEL_ID"), model_label=os.getenv("PAPER_MODEL_LABEL"))
+    save_json(output / "run_meta.json", metadata)
+    trace(output, "selection_started", {"requested_top_k": top_k})
     agent = TaskAgent(config["mock"])
     selected = await agent.select(idea, papers, top_k)
     for paper in selected:
@@ -68,6 +78,7 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
     results, metrics = await process_papers(selected, output, agent, config["concurrent"],
                                             lambda e, d: trace(output, e, d))
     save_json(output / "topk.json", results)
+    trace(output, "report_started", {"completed_count": metrics["completed_count"]})
     if not any(r["status"] == "ok" for r in results):
         report = "# 未完成研究报告\n\n全部 Top-k 全文处理/总结失败；请查看 topk.json 中的错误。"
         report_success = False
@@ -82,7 +93,9 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
     metrics.update(search_seconds=round(run["search_seconds"], 3),
                    server_total_seconds=round(run["search_seconds"] + time.perf_counter() - started, 3),
                    report_success=report_success,
-                   task_success=(report_success and metrics["completed_count"] == len(selected)
+                   requested_top_k=top_k,
+                   model_id=os.getenv("PAPER_MODEL_ID"), model_label=os.getenv("PAPER_MODEL_LABEL"),
+                   task_success=(report_success and metrics["completed_count"] == len(selected) == top_k
                                  and all(s["status"] in ("ok", "mock") for s in run["sources"].values())),
                    sources=run["sources"])
     save_json(output / "metrics.json", metrics)

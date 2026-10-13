@@ -5,6 +5,7 @@ from pathlib import Path
 import shlex
 import shutil
 import subprocess
+import sys
 from dotenv import load_dotenv
 
 
@@ -47,9 +48,22 @@ def main():
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--gpu-layers", type=int, default=99, help="GPU 层数；99 尝试完整卸载到 GPU")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--managed", action="store_true", help="启用网页 Q4/Q5 模型切换")
+    parser.add_argument("--model-id", choices=["q4_k_m", "q5_k_m"], help="可切换模式的初始模型")
+    parser.add_argument("--control-port", type=int, default=8001, help="仅监听本机的模型切换端口")
     args = parser.parse_args()
+    if args.managed:
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+        from research.model_manager import create_control_app, model_profiles
+        profiles = model_profiles(args=args)
+        initial_id = args.model_id or ("q5_k_m" if "Q5_K_M" in (args.model or "") else "q4_k_m")
+        initial_args = profiles[initial_id]["args"]
+    else:
+        initial_args = args
     try:
-        command = build_command(args)
+        command = build_command(initial_args)
+        if args.managed and (not 1 <= args.control_port <= 65535 or args.control_port == args.port):
+            raise ValueError("control-port 必须是与推理端口不同的有效端口")
     except (ValueError, OSError) as exc:
         parser.error(str(exc))
     print("CUDA_VISIBLE_DEVICES=" + os.getenv("CUDA_VISIBLE_DEVICES", "<未设置，使用可见设备中的逻辑 GPU 0>"), flush=True)
@@ -58,6 +72,11 @@ def main():
         return
     if not shutil.which(args.server_bin):
         parser.error("找不到 llama-server；请用 --server-bin 指定支持该模型的 CUDA 版本可执行文件")
+    if args.managed:
+        import uvicorn
+        print("网页模型切换已启用；Q4/Q5 共享一份 GPU，推理别名仍为 qwen-local。", flush=True)
+        uvicorn.run(create_control_app(args, initial_id), host="127.0.0.1", port=args.control_port)
+        return
     # Pass the inherited environment unchanged; Slurm owns the GPU mask.
     raise SystemExit(subprocess.call(command))
 

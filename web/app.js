@@ -1,0 +1,441 @@
+/* Local, dependency-free research workspace. All paper/model text is untrusted. */
+"use strict";
+
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+const activeStatuses = new Set(["queued", "running"]);
+const statusLabels = { queued: "等待开始", running: "研究中", completed: "已完成", partial: "部分完成", failed: "未完成", cancelled: "已停止" };
+const phases = [
+  { id: "search", title: "多源检索", description: "连接公开学术文献" },
+  { id: "select", title: "智能筛选", description: "寻找相关的研究证据" },
+  { id: "read", title: "全文阅读", description: "提取方法、发现与局限" },
+  { id: "report", title: "形成报告", description: "梳理线索与研究建议" },
+];
+const state = { jobs: [], job: null, currentId: null, activeJobId: null, mock: false, submitting: false, model: null, models: null, switching: false, modelPoll: null, statusRefreshing: false, view: "home", tab: "papers", poll: null, requestVersion: 0 };
+const modelBusy = (catalog = state.models) => Boolean(catalog?.managed && ["unloading", "loading", "recovering"].includes(catalog.status));
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
+}
+function icon(name) { return `<svg class="icon" aria-hidden="true"><use href="#i-${name}"/></svg>`; }
+function safeUrl(value) {
+  try { const parsed = new URL(String(value)); return ["https:", "http:"].includes(parsed.protocol) ? parsed.href : null; }
+  catch { return null; }
+}
+function badge(status) { return `<span class="status-pill ${Object.hasOwn(statusLabels, status) ? status : "failed"}">${status === "running" ? '<span class="status-dot connected"></span>' : ""}${escapeHtml(statusLabels[status] || "未知状态")}</span>`; }
+function parseDate(value) { return new Date(typeof value === "number" ? value * 1000 : value); }
+function dateLabel(value) {
+  const date = parseDate(value);
+  return Number.isNaN(date.getTime()) ? "时间未知" : new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(date);
+}
+function duration(value) {
+  const seconds = Math.max(0, Math.floor(Number(value) || 0));
+  return seconds < 60 ? `${seconds} 秒` : seconds < 3600 ? `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒` : `${Math.floor(seconds / 3600)} 时 ${Math.floor(seconds % 3600 / 60)} 分`;
+}
+function toast(message, type = "info") {
+  const item = document.createElement("div");
+  item.className = `toast ${type}`;
+  item.textContent = message;
+  $("#toasts").append(item);
+  setTimeout(() => item.remove(), 5500);
+}
+async function api(path, options = {}) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 20000);
+  try {
+    const response = await fetch(path, { ...options, signal: controller.signal, headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), ...options.headers } });
+    const body = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(typeof body.error === "string" ? body.error : `请求未完成（HTTP ${response.status}）`);
+    return body;
+  } catch (error) {
+    if (error.name === "AbortError") throw new Error("请求超时，请检查网页服务是否仍在运行。");
+    if (error instanceof TypeError) throw new Error("无法连接网页服务，请检查连接后重试。");
+    throw error;
+  } finally { clearTimeout(timeout); }
+}
+
+// Only generated tags are allowed. Raw HTML is always escaped; links accept HTTP(S).
+function inlineMarkdown(value, depth = 0) {
+  const text = String(value ?? "");
+  if (depth > 4) return escapeHtml(text);
+  const pattern = /(`[^`\n]+`|\[[^\]\n]+\]\([^\s)]+\)|\*\*[^*\n]+\*\*|\*[^*\n]+\*)/g;
+  let result = "", position = 0;
+  for (const match of text.matchAll(pattern)) {
+    result += escapeHtml(text.slice(position, match.index));
+    const token = match[0];
+    if (token.startsWith("`")) result += `<code>${escapeHtml(token.slice(1, -1))}</code>`;
+    else if (token.startsWith("[")) {
+      const split = token.indexOf("](");
+      const href = safeUrl(token.slice(split + 2, -1));
+      const label = inlineMarkdown(token.slice(1, split), depth + 1);
+      result += href ? `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${label}</a>` : label;
+    } else if (token.startsWith("**")) result += `<strong>${inlineMarkdown(token.slice(2, -2), depth + 1)}</strong>`;
+    else result += `<em>${inlineMarkdown(token.slice(1, -1), depth + 1)}</em>`;
+    position = match.index + token.length;
+  }
+  return result + escapeHtml(text.slice(position));
+}
+function markdown(value) {
+  const lines = String(value || "").replace(/\r\n?/g, "\n").split("\n");
+  let html = "", i = 0;
+  const tableSeparator = (line) => /^\s*\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line || "");
+  const cells = (line) => line.trim().replace(/^\||\|$/g, "").split("|").map((cell) => cell.trim());
+  const blockStart = (line) => /^\s*(#{1,6}\s|```|[-*+]\s|\d+[.)]\s|>\s?|---+$)/.test(line);
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i++; continue; }
+    if (/^\s*```/.test(line)) {
+      const code = []; i++;
+      while (i < lines.length && !/^\s*```/.test(lines[i])) code.push(lines[i++]);
+      html += `<pre><code>${escapeHtml(code.join("\n"))}</code></pre>`; i++; continue;
+    }
+    const heading = line.match(/^\s*(#{1,6})\s+(.+)$/);
+    if (heading) { html += `<h${heading[1].length}>${inlineMarkdown(heading[2])}</h${heading[1].length}>`; i++; continue; }
+    if (/^\s*([-*_])(?:\s*\1){2,}\s*$/.test(line)) { html += "<hr>"; i++; continue; }
+    if (line.includes("|") && tableSeparator(lines[i + 1])) {
+      html += `<div class="table-scroll"><table><thead><tr>${cells(line).map((cell) => `<th>${inlineMarkdown(cell)}</th>`).join("")}</tr></thead><tbody>`;
+      i += 2;
+      while (i < lines.length && lines[i].includes("|") && lines[i].trim()) html += `<tr>${cells(lines[i++]).map((cell) => `<td>${inlineMarkdown(cell)}</td>`).join("")}</tr>`;
+      html += "</tbody></table></div>"; continue;
+    }
+    if (/^\s*>/.test(line)) {
+      const quote = [];
+      while (i < lines.length && /^\s*>/.test(lines[i])) quote.push(lines[i++].replace(/^\s*>\s?/, ""));
+      html += `<blockquote>${quote.map((item) => inlineMarkdown(item)).join("<br>")}</blockquote>`; continue;
+    }
+    const unordered = /^\s*[-*+]\s+/.test(line), ordered = /^\s*\d+[.)]\s+/.test(line);
+    if (unordered || ordered) {
+      const tag = ordered ? "ol" : "ul", expression = ordered ? /^\s*\d+[.)]\s+/ : /^\s*[-*+]\s+/;
+      html += `<${tag}>`;
+      while (i < lines.length && expression.test(lines[i])) html += `<li>${inlineMarkdown(lines[i++].replace(expression, ""))}</li>`;
+      html += `</${tag}>`; continue;
+    }
+    const paragraph = [line]; i++;
+    while (i < lines.length && lines[i].trim() && !blockStart(lines[i]) && !tableSeparator(lines[i + 1])) paragraph.push(lines[i++]);
+    html += `<p>${paragraph.map((item) => inlineMarkdown(item)).join("<br>")}</p>`;
+  }
+  return html;
+}
+
+function closeSidebar() {
+  $("#sidebar").classList.remove("is-open");
+  $("#mobile-overlay").hidden = true;
+  $("#mobile-menu").setAttribute("aria-expanded", "false");
+}
+function showView(view) {
+  state.view = view;
+  for (const name of ["home", "history", "run"]) $(`#${name}-view`).hidden = name !== view;
+  $("#breadcrumb-current").textContent = { home: "工作台", history: "研究记录", run: "研究详情" }[view];
+  for (const name of ["home", "history"]) {
+    const button = $(`#nav-${name}`);
+    button.classList.toggle("active", name === view);
+    if (name === view) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
+  }
+  if (view !== "run") { clearTimeout(state.poll); state.requestVersion++; }
+  closeSidebar();
+  window.scrollTo({ top: 0, behavior: "instant" });
+}
+function updateComposer() {
+  const characters = $("#idea").value.length;
+  $("#idea-count").textContent = `${characters} / 2000`;
+  $("#live-mode").classList.toggle("active", !state.mock);
+  $("#mock-mode").classList.toggle("active", state.mock);
+  $("#live-mode").setAttribute("aria-pressed", String(!state.mock));
+  $("#mock-mode").setAttribute("aria-pressed", String(state.mock));
+  const busy = Boolean(state.activeJobId);
+  const unavailable = !state.mock && (!state.model?.connected || state.switching || (state.models?.managed && state.models.status !== "ready"));
+  $("#start-button").disabled = state.submitting || busy || unavailable;
+  $("#start-button span").textContent = state.submitting ? "正在开始…" : busy ? "已有研究运行中" : "开始研究";
+  $("#mode-hint").textContent = busy ? "有一项研究正在运行，可从研究记录查看进度。" : state.mock ? "合成论文与固定分析，仅演示流程 · 无需模型" : modelBusy() || state.switching ? "正在加载模型，完成后即可开始真实研究。" : unavailable ? "本地模型尚未连接，可先选择「离线演示」体验。" : "检索真实论文 · 由本地模型完成分析";
+}
+function setMode(mock) { state.mock = mock; updateComposer(); }
+function newResearch() {
+  showView("home");
+  $("#idea").value = "";
+  state.currentId = null;
+  updateComposer();
+  renderHistory();
+  $("#idea").focus({ preventScroll: true });
+}
+async function refreshStatus() {
+  if (state.statusRefreshing) return;
+  state.statusRefreshing = true;
+  clearTimeout(state.modelPoll);
+  try {
+    const [health, catalog] = await Promise.allSettled([api("/api/status"), api("/api/models")]);
+    state.models = catalog.status === "fulfilled" ? catalog.value : null;
+    if (health.status !== "fulfilled") throw health.reason;
+    const data = health.value;
+    state.model = data.model || { connected: false };
+    state.activeJobId = data.active_job_id || null;
+    const current = state.models?.models?.find((m) => m.id === state.models.current_id);
+    $("#model-name").textContent = current ? `${current.id.toUpperCase()} · Qwen3.8-27B` : state.model.name || "本地模型";
+    const connected = state.model.connected && !modelBusy();
+    $("#model-state").innerHTML = `<span class="status-dot ${connected ? "connected" : "offline"}"></span>${modelBusy() ? "模型切换中…" : connected ? "已连接 · 就绪" : "尚未连接"}`;
+    $("#refresh-status").title = state.model.detail || "重新检查模型连接";
+  } catch {
+    state.model = { connected: false };
+    $("#model-state").innerHTML = '<span class="status-dot offline"></span>网页服务未连接';
+  } finally {
+    state.statusRefreshing = false;
+  }
+  renderModelControls();
+  updateComposer();
+  if (modelBusy() || (state.models?.managed && state.models.status === "ready" && !state.model?.connected)) state.modelPoll = setTimeout(refreshStatus, 1200);
+}
+function renderModelControls() {
+  const catalog = state.models, select = $("#model-select");
+  const entries = Array.isArray(catalog?.models) ? catalog.models : [];
+  const chosen = select.value || catalog?.target_id || catalog?.current_id || "q4_k_m";
+  select.innerHTML = entries.length ? entries.map((m) => {
+    const percent = Math.min(99, Math.floor(100 * Number(m.downloaded_bytes || 0) / Number(m.expected_bytes || 1)));
+    const suffix = m.id === catalog.current_id ? " · 当前" : m.file_status === "downloading" ? ` · 下载中 ${percent}%` : !m.available ? " · 文件未就绪" : "";
+    return `<option value="${escapeHtml(m.id)}" ${!m.available ? "disabled" : ""}>${escapeHtml(m.label + suffix)}</option>`;
+  }).join("") : '<option value="">模型切换尚未连接</option>';
+  if (entries.some((m) => m.id === chosen)) select.value = chosen;
+  const pending = state.switching || modelBusy(catalog), occupied = Boolean(state.activeJobId || catalog?.blocked_by_job);
+  select.disabled = !catalog?.managed || pending || occupied;
+  const selected = entries.find((m) => m.id === select.value);
+  $("#switch-model").disabled = !catalog?.managed || pending || occupied || !selected?.available || (catalog.status === "ready" && selected.id === catalog.current_id);
+  $("#switch-model").textContent = pending ? "正在加载…" : "加载模型";
+  const target = entries.find((m) => m.id === catalog?.target_id);
+  $("#model-loading-label").textContent = pending ? `${catalog?.status === "recovering" ? "正在恢复原模型" : "正在切换模型"}${target ? ` · ${target.id.toUpperCase()}` : ""}` : catalog?.current_id ? `当前 ${catalog.current_id.toUpperCase()}` : "";
+  $("#model-switch-hint").textContent = catalog?.error || (!catalog?.managed ? "网页切换需启用模型服务：python deploy/serve_gguf.py --managed" : occupied ? "研究运行期间锁定模型；完成或停止任务后可切换。" : pending ? "正在卸载和加载模型，请稍候。此过程不会同时加载两份权重。" : "Q5 使用单槽位优先预留显存。未下载完成的模型无法选择；点击左下角刷新可更新文件状态。");
+  $("#model-switch-hint").classList.toggle("model-hint-error", Boolean(catalog?.error));
+}
+async function switchModel() {
+  if ($("#switch-model").disabled) return;
+  state.switching = true;
+  renderModelControls(); updateComposer();
+  try {
+    state.models = await api("/api/models/switch", { method: "POST", body: JSON.stringify({ model_id: $("#model-select").value }) });
+    toast("已开始切换模型，加载状态会自动更新。");
+  } catch (error) { toast(error.message, "error"); }
+  finally { state.switching = false; renderModelControls(); updateComposer(); await refreshStatus(); }
+}
+function jobCard(job) {
+  const count = Number(job.completed_count || 0);
+  return `<button class="research-card" data-job-id="${escapeHtml(job.id)}"><span class="research-card-top"><span class="tag">${icon(job.mock ? "flask" : "paper")}${job.mock ? "离线演示" : "文献研究"}</span>${badge(job.status)}</span><span class="research-card-title">${escapeHtml(job.idea || "未命名研究")}</span><span class="research-card-meta"><span>${icon("clock")}${escapeHtml(dateLabel(job.created_at))}</span><span>${count} 篇已读 ${icon("arrow")}</span></span></button>`;
+}
+function emptyState(title, description) { return `<div class="empty-state"><span class="empty-icon">${icon("book")}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div>`; }
+function renderHistory() {
+  $("#history-count").textContent = state.jobs.length;
+  $("#stat-papers").textContent = state.jobs.filter((job) => !job.mock).reduce((total, job) => total + Number(job.completed_count || 0), 0);
+  $("#stat-research").textContent = state.jobs.filter((job) => !job.mock && job.status === "completed").length;
+  $("#sidebar-history").innerHTML = state.jobs.length ? state.jobs.slice(0, 7).map((job) => `<button class="history-button ${job.id === state.currentId ? "selected" : ""}" data-job-id="${escapeHtml(job.id)}"><span class="history-title">${icon(job.mock ? "flask" : "paper")}${escapeHtml(job.idea || "未命名研究")}</span><span class="history-meta">${escapeHtml(dateLabel(job.created_at))}<span class="history-status ${activeStatuses.has(job.status) ? "running" : ""}">${escapeHtml(statusLabels[job.status] || "未完成")}</span></span></button>`).join("") : '<p class="sidebar-empty">每一个好问题，都值得留下。</p>';
+  $("#recent-jobs").innerHTML = state.jobs.length ? state.jobs.slice(0, 4).map(jobCard).join("") : emptyState("你的研究旅程，从这里开始", "输入一个想法，或者先试试无需模型的离线演示。");
+  const query = $("#history-search").value.trim().toLocaleLowerCase();
+  const filtered = state.jobs.filter((job) => String(job.idea || "").toLocaleLowerCase().includes(query));
+  $("#all-jobs").innerHTML = filtered.length ? filtered.map(jobCard).join("") : emptyState(query ? "没有找到匹配的研究" : "还没有研究记录", query ? "换一个关键词试试。" : "完成的研究将自动保存在这里。");
+}
+async function refreshHistory(announce = false) {
+  try {
+    const data = await api("/api/jobs");
+    state.jobs = Array.isArray(data.jobs) ? data.jobs : [];
+    renderHistory();
+    if (announce) toast("研究记录已更新");
+  } catch (error) { if (announce) toast(error.message, "error"); }
+}
+
+function switchTab(tab) {
+  state.tab = tab;
+  for (const name of ["papers", "report", "logs"]) {
+    const button = $(`#tab-${name}`);
+    button.classList.toggle("active", name === tab);
+    button.setAttribute("aria-selected", String(name === tab));
+    button.tabIndex = name === tab ? 0 : -1;
+    $(`#${name}-panel`).hidden = name !== tab;
+  }
+}
+function renderProgress(job) {
+  const terminal = !activeStatuses.has(job.status);
+  let current = phases.findIndex((phase) => phase.id === job.stage);
+  if (job.stage === "done" || job.report) current = 4;
+  if (current < 0) current = 0;
+  $("#progress-label").textContent = terminal ? ({ completed: "研究已完成，发现已经就绪", partial: "研究部分完成，请查看下方说明", failed: "研究未完成，请查看错误与日志", cancelled: "研究已停止，已生成的结果仍会保留" }[job.status] || "研究已结束") : job.status === "queued" ? "正在准备研究任务" : `${phases[Math.min(current, 3)].title}中…`;
+  $("#progress-count").textContent = `${Number(job.completed_count || 0)} / ${Number(job.top_k || 3)} 篇已完成 · ${duration(job.elapsed_seconds)}`;
+  $("#progress-fill").style.width = `${Math.min(100, current * 25 + (terminal ? 0 : 8))}%`;
+  $("#pipeline-steps").innerHTML = phases.map((phase, index) => {
+    const complete = index < current, active = index === current;
+    return `<div class="pipeline-step ${complete ? "complete" : active ? (terminal ? "failed" : "active") : ""}"><span class="step-number">${complete ? icon("check") : index + 1}</span><div><span class="step-label">${phase.title}</span><span class="step-caption">${phase.description}</span></div></div>`;
+  }).join("");
+}
+function renderPapers(job) {
+  const opened = new Set($$(".paper-summary[open]").map((item) => item.dataset.paperId));
+  const papers = Array.isArray(job.papers) ? job.papers : [];
+  $("#paper-count").textContent = papers.length;
+  if (!papers.length) {
+    $("#paper-list").innerHTML = emptyState(activeStatuses.has(job.status) ? "正在寻找与你的问题相关的论文" : "本次尚未生成精选论文", activeStatuses.has(job.status) ? "检索和筛选完成后，论文会出现在这里。进展可在右侧动态中查看。" : "查看运行日志了解原因，或用更简短的主题重新研究。");
+    return;
+  }
+  $("#paper-list").innerHTML = papers.map((paper, index) => {
+    const url = safeUrl(paper.url), year = paper.year || "";
+    const authors = (Array.isArray(paper.authors) ? paper.authors : []).map((author) => typeof author === "string" ? author : author.name || "").filter(Boolean);
+    const sources = Array.isArray(paper.sources) ? paper.sources : [];
+    const title = escapeHtml(paper.title || "未命名论文");
+    const pdf = paper.pdf_available === true || (paper.pdf_available === undefined && paper.status === "ok");
+    const paperStatus = paper.status === "ok" ? "已完成阅读" : paper.status === "failed" ? "处理未完成" : paper.status === "cancelled" ? "已停止处理" : "等待 / 正在分析";
+    return `<article class="paper-card"><div class="paper-rank">${String(index + 1).padStart(2, "0")}</div><div class="paper-content"><div class="paper-meta">${job.mock ? '<span class="tag mock">合成演示材料</span>' : sources.map((source) => `<span class="source-tag">${escapeHtml(source)}</span>`).join("")}${year ? `<span>${escapeHtml(year)}</span>` : ""}<span class="paper-status ${paper.status === "ok" ? "ok" : paper.status === "failed" ? "failed" : "pending"}">${paper.status === "ok" ? icon("check") : icon("clock")}${paperStatus}</span></div><h3 class="paper-title">${title}</h3>${authors.length ? `<p class="paper-authors">${escapeHtml(authors.slice(0, 3).join(" · "))}${authors.length > 3 ? " 等" : ""}</p>` : ""}${paper.selection_reason ? `<div class="paper-reason">${icon("spark")}<p>${escapeHtml(paper.selection_reason)}</p></div>` : ""}${paper.error ? `<div class="notice error">${escapeHtml(paper.error)}</div>` : ""}<div class="paper-actions">${url && !job.mock ? `<a class="text-button" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">论文来源${icon("external")}</a>` : ""}${pdf ? `<a class="text-button" href="/api/jobs/${encodeURIComponent(job.id)}/papers/${encodeURIComponent(paper.id)}/pdf" target="_blank" rel="noopener noreferrer">${icon("paper")}查看 PDF</a>` : ""}<span class="paper-id">${escapeHtml(paper.id)}</span></div>${paper.summary ? `<details class="paper-summary" data-paper-id="${escapeHtml(paper.id)}" ${opened.has(String(paper.id)) ? "open" : ""}><summary>${icon("book")}阅读全文总结${icon("chevron")}</summary><div class="markdown">${markdown(paper.summary)}</div></details>` : ""}</div></article>`;
+  }).join("");
+}
+function eventDescription(item) {
+  const id = item.id ? `${item.id} · ` : "";
+  const descriptions = {
+    search_started: ["正在检索学术文献", item.query || "查询 arXiv 与 OpenAlex"],
+    sources_searched: ["多源检索完成", `合并去重后找到 ${Number(item.deduplicated_count || 0)} 篇候选论文`],
+    selection_started: ["正在筛选候选论文", `任务 Agent 正在选择 Top ${Number(item.requested_top_k || 3)}`],
+    task_agent_selected: ["确定精选论文", `任务 Agent 已完成 ${Array.isArray(item.selection) ? item.selection.length : ""} 篇论文的筛选`],
+    paper_started: [`${id}开始阅读`, item.title || "准备论文全文"],
+    pdf_download_started: [`${id}正在下载全文`, "获取公开可访问的 PDF"],
+    pdf_download_progress: [`${id}全文下载中`, `已下载 ${(Number(item.downloaded_bytes || 0) / 1024 / 1024).toFixed(1)} MB${item.total_bytes ? ` / ${(Number(item.total_bytes) / 1024 / 1024).toFixed(1)} MB` : ""}`],
+    pdf_download_completed: [`${id}全文下载完成`, `${(Number(item.pdf_bytes || 0) / 1024 / 1024).toFixed(1)} MB`],
+    paper_cache_hit: [`${id}复用已缓存全文`, "继续进行本次模型分析"],
+    pdf_conversion_started: [`${id}正在解析 PDF`, "提取全文文字，准备阅读材料"],
+    pdf_conversion_completed: [`${id}全文解析完成`, `${Number(item.markdown_chars || 0).toLocaleString("zh-CN")} 个字符`],
+    summary_started: [`${id}开始深度阅读`, "分段整理论文中的证据"],
+    summary_chunk_started: [`${id}正在阅读第 ${Number(item.chunk || 1)} 段`, "等待本地模型生成该片段的事实笔记"],
+    summary_chunk_completed: [`${id}完成第 ${Number(item.chunk || 1)} 段阅读`, "已提取该片段的事实笔记"],
+    summary_completed: [`${id}论文总结完成`, "已整合方法、实验与局限"],
+    paper_processed: [`${id}${item.status === "ok" ? "处理完成" : "处理未完成"}`, item.error || "论文总结已保存"],
+    report_started: ["正在撰写研究报告", "综合论文证据，梳理研究方向"],
+    report_completed: ["报告阶段结束", item.metrics?.task_success ? "所有请求的环节已完成" : "请结合论文数量与失败情况查看结果"],
+  };
+  return descriptions[item.event] || null;
+}
+function renderActivity(job) {
+  const events = (Array.isArray(job.events) ? job.events : []).map((item) => ({ item, description: eventDescription(item) })).filter((entry) => entry.description).slice(-18).reverse();
+  $("#activity-live").hidden = !activeStatuses.has(job.status);
+  $("#activity-list").innerHTML = events.length ? events.map(({ item, description }) => `<div class="activity-item"><span class="activity-dot ${item.status === "failed" ? "failed" : ""}"></span><div class="activity-content"><strong>${escapeHtml(description[0])}</strong><p>${escapeHtml(description[1])}</p><time class="activity-time">${escapeHtml(dateLabel(item.time))}</time></div></div>`).join("") : '<p class="activity-empty">任务启动后，实际执行进展会显示在这里。</p>';
+  const sources = job.metrics?.sources || {};
+  $("#source-health").innerHTML = Object.keys(sources).length ? `<div class="sidebar-label">来源状态</div>${Object.entries(sources).map(([name, source]) => `<div class="source-health-row"><span>${escapeHtml(name)}</span><span class="source-result ${source.status === "failed" ? "failed" : ""}">${source.status === "failed" ? "请求失败" : `${Number(source.count || 0)} 篇${source.status === "mock" ? " · 演示" : ""}`}</span></div>`).join("")}` : "";
+}
+function renderJob(job) {
+  state.job = job;
+  $("#run-title").textContent = job.idea || "文献研究";
+  $("#run-eyebrow").textContent = activeStatuses.has(job.status) ? "FOLLOW THE EVIDENCE" : "YOUR RESEARCH, COLLECTED";
+  $("#run-meta").innerHTML = `${badge(job.status)}<span>${job.mock ? "离线演示 · 合成材料" : "真实文献研究"}</span>${job.model_id ? `<span>${escapeHtml(job.model_id.toUpperCase())}</span>` : ""}<span>Top ${Number(job.top_k || 3)}</span><span>${escapeHtml(dateLabel(job.created_at))}</span>`;
+  $("#cancel-job").hidden = !activeStatuses.has(job.status);
+  $("#cancel-job").disabled = false;
+  $("#download-report").disabled = !job.report;
+  const messages = [];
+  if (job.mock) messages.push("本次为离线演示：论文和分析为合成测试材料，不代表真实检索或模型推理。");
+  if (job.status === "partial") messages.push("本次部分完成。请核对已完成论文数量、来源状态和报告内容。");
+  if (job.status === "failed") messages.push(job.error || "研究未完成，请查看运行日志与模型连接状态。");
+  if (job.status === "cancelled") messages.push("研究已停止，已生成的论文与分析结果仍可查看。");
+  $("#run-notice").hidden = !messages.length;
+  $("#run-notice").className = `notice ${job.status === "failed" ? "error" : job.status === "partial" ? "warning" : job.mock ? "mock" : ""}`;
+  $("#run-notice").textContent = messages.join(" ");
+  renderProgress(job);
+  renderPapers(job);
+  renderActivity(job);
+  $("#report-content").innerHTML = job.report ? markdown(job.report) : emptyState("让发现慢慢汇成报告", activeStatuses.has(job.status) ? "全文阅读完成后，Agent 会整合论文证据和研究建议。" : "本次没有生成研究报告，可查看日志了解原因。");
+  const log = $("#log-output"), nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 50;
+  log.textContent = (Array.isArray(job.logs) ? job.logs : []).join("\n") || "等待运行日志…";
+  if (nearBottom) log.scrollTop = log.scrollHeight;
+  document.title = `${activeStatuses.has(job.status) ? "研究中" : statusLabels[job.status] || "研究详情"} · Paper`;
+}
+async function loadJob(id) {
+  clearTimeout(state.poll);
+  const version = ++state.requestVersion;
+  state.currentId = id;
+  try {
+    const job = await api(`/api/jobs/${encodeURIComponent(id)}`);
+    if (version !== state.requestVersion) return;
+    showView("run");
+    renderJob(job);
+    renderHistory();
+    switchTab("papers");
+    if (activeStatuses.has(job.status)) schedulePoll(id, version);
+  } catch (error) { toast(error.message, "error"); }
+}
+function schedulePoll(id, version) {
+  clearTimeout(state.poll);
+  state.poll = setTimeout(async () => {
+    if (state.currentId !== id || state.requestVersion !== version || state.view !== "run") return;
+    try {
+      const job = await api(`/api/jobs/${encodeURIComponent(id)}`);
+      if (state.currentId !== id || state.requestVersion !== version) return;
+      renderJob(job);
+      if (activeStatuses.has(job.status)) schedulePoll(id, version);
+      else { state.activeJobId = null; await Promise.allSettled([refreshHistory(), refreshStatus()]); }
+    } catch (error) { toast(error.message, "error"); schedulePoll(id, version); }
+  }, 1200);
+}
+async function startResearch(event) {
+  event.preventDefault();
+  const idea = $("#idea").value.trim();
+  if (!idea || state.submitting) { $("#idea").focus(); return; }
+  state.submitting = true; updateComposer();
+  try {
+    const job = await api("/api/jobs", { method: "POST", body: JSON.stringify({ idea, top_k: Number($("#top-k").value), mock: state.mock, concurrent: true }) });
+    state.activeJobId = job.id;
+    renderModelControls();
+    await refreshHistory();
+    await loadJob(job.id);
+  } catch (error) { toast(error.message, "error"); await refreshStatus(); }
+  finally { state.submitting = false; updateComposer(); }
+}
+
+$("#research-form").addEventListener("submit", startResearch);
+$("#model-select").addEventListener("change", renderModelControls);
+$("#switch-model").addEventListener("click", switchModel);
+$("#idea").addEventListener("input", updateComposer);
+$("#live-mode").addEventListener("click", () => setMode(false));
+$("#mock-mode").addEventListener("click", () => setMode(true));
+$("#new-research").addEventListener("click", newResearch);
+$("#brand-home").addEventListener("click", (event) => { event.preventDefault(); showView("home"); });
+$("#nav-home").addEventListener("click", () => showView("home"));
+$("#back-home").addEventListener("click", () => showView("home"));
+for (const element of [$("#nav-history"), $("#view-all")]) element.addEventListener("click", () => { showView("history"); refreshHistory(); });
+$("#history-search").addEventListener("input", renderHistory);
+$("#history-refresh").addEventListener("click", () => refreshHistory(true));
+$("#refresh-status").addEventListener("click", async () => { await refreshStatus(); toast(state.model?.connected ? "本地模型连接正常" : "尚未连接模型；可先使用离线演示。"); });
+$$("[data-idea]").forEach((button) => button.addEventListener("click", () => { $("#idea").value = button.dataset.idea; updateComposer(); $("#idea").focus(); }));
+document.addEventListener("click", (event) => { const button = event.target.closest("[data-job-id]"); if (button) loadJob(button.dataset.jobId); });
+$$("[data-tab]").forEach((button) => button.addEventListener("click", () => switchTab(button.dataset.tab)));
+$(".tabs").addEventListener("keydown", (event) => {
+  if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+  event.preventDefault();
+  const tabs = ["papers", "report", "logs"], current = tabs.indexOf(state.tab);
+  const next = event.key === "Home" ? 0 : event.key === "End" ? 2 : (current + (event.key === "ArrowRight" ? 1 : -1) + 3) % 3;
+  switchTab(tabs[next]); $(`#tab-${tabs[next]}`).focus();
+});
+$("#reuse-idea").addEventListener("click", () => {
+  if (!state.job) return;
+  const job = state.job;
+  newResearch();
+  $("#idea").value = job.idea || "";
+  $("#top-k").value = String(job.top_k || 3);
+  setMode(Boolean(job.mock));
+});
+$("#cancel-job").addEventListener("click", async () => {
+  if (!state.currentId) return;
+  $("#cancel-job").disabled = true;
+  try {
+    const job = await api(`/api/jobs/${encodeURIComponent(state.currentId)}/cancel`, { method: "POST", body: "{}" });
+    clearTimeout(state.poll);
+    renderJob(job);
+    await Promise.allSettled([refreshHistory(), refreshStatus()]);
+  } catch (error) { toast(error.message, "error"); $("#cancel-job").disabled = false; }
+});
+$("#download-report").addEventListener("click", () => { if (state.job?.report) window.location.assign(`/api/jobs/${encodeURIComponent(state.job.id)}/report`); });
+$("#copy-logs").addEventListener("click", async () => {
+  try { await navigator.clipboard.writeText($("#log-output").textContent); toast("运行日志已复制"); }
+  catch { toast("浏览器未允许访问剪贴板，可直接选中日志复制。", "error"); }
+});
+$("#help-button").addEventListener("click", () => $("#help-dialog").showModal());
+$("#close-help").addEventListener("click", () => $("#help-dialog").close());
+$("#help-dialog").addEventListener("click", (event) => { if (event.target === $("#help-dialog")) { const rect = event.target.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) event.target.close(); } });
+$("#mobile-menu").addEventListener("click", () => { const open = $("#sidebar").classList.toggle("is-open"); $("#mobile-overlay").hidden = !open; $("#mobile-menu").setAttribute("aria-expanded", String(open)); });
+$("#mobile-overlay").addEventListener("click", closeSidebar);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") closeSidebar();
+  if ($(":modal")) return;
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && state.view === "home") { event.preventDefault(); if (!$("#start-button").disabled) $("#research-form").requestSubmit(); }
+  const editing = event.target.matches("input, textarea, select, [contenteditable]");
+  if (!editing && !event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === "n") { event.preventDefault(); newResearch(); }
+});
+window.addEventListener("beforeunload", () => { clearTimeout(state.poll); clearTimeout(state.modelPoll); });
+updateComposer();
+Promise.allSettled([refreshStatus(), refreshHistory()]);
+setInterval(() => { if (!document.hidden) { refreshStatus(); refreshHistory(); } }, 15000);

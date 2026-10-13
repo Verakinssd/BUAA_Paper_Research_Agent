@@ -3,6 +3,7 @@ import argparse
 import asyncio
 import json
 import os
+import signal
 import sys
 import time
 from datetime import timedelta
@@ -24,6 +25,10 @@ def decode(result):
 
 async def run(args):
     load_dotenv()
+    if os.getenv("PAPER_WEB_JOB_ID") and os.name == "posix":
+        # Cancelling the main task lets MCP terminate its separate subprocess
+        # session cleanly when the web UI stops a job or shuts down.
+        asyncio.get_running_loop().add_signal_handler(signal.SIGTERM, asyncio.current_task().cancel)
     started = time.perf_counter()
     params = StdioServerParameters(command=sys.executable, args=["server.py"] +
                                   (["--mock"] if args.mock else []) +
