@@ -1,0 +1,21 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.vscode/
+*.log
+outputs/
+models/
+*.gguf
+third_party/
+/llama.cpp/
+/deploy/run_with_manager_proxy.sh
+/Agent（智能体）.pdf
+# Only publish the public README; keep local handoff/validation notes private.
+/*.md
+!/README.md
+.DS_Store
