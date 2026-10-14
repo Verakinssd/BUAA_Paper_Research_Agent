@@ -65,9 +65,7 @@ class LocalLLMTests(unittest.IsolatedAsyncioTestCase):
                 return "短笔记"
             async def merge_notes(self, system, label, notes, max_tokens=None, reduce_max_tokens=None):
                 return await LLM.merge_notes(self, system, label, notes, max_tokens, reduce_max_tokens)
-        agent = TaskAgent(mock=True)
-        agent.mock = False
-        agent.llm = SmallContextLLM()
+        agent = TaskAgent(llm=SmallContextLLM())
         markdown = "abcdefghijklmnop" * 1800
         await agent.summarize({"id": "P1", "title": "Document"}, markdown)
         fragments = [text.split("\n", 2)[2] for text in agent.llm.inputs if "\n片段 " in text]
@@ -88,9 +86,7 @@ class LocalLLMTests(unittest.IsolatedAsyncioTestCase):
                 return "短笔记"
             async def merge_notes(self, system, label, notes, max_tokens=None, reduce_max_tokens=None):
                 return "完整总结"
-        agent = TaskAgent(mock=True)
-        agent.mock = False
-        agent.llm = LargeContextLLM()
+        agent = TaskAgent(llm=LargeContextLLM())
         markdown = "x" * 49000
         await agent.summarize({"id": "P1", "title": "Document"}, markdown)
         fragments = [text.split("\n", 2)[2] for text in agent.llm.inputs if "\n片段 " in text]

@@ -9,6 +9,7 @@ from unittest.mock import AsyncMock, patch
 import httpx
 
 from web_app import create_app, JobManager, now_iso, PROJECT
+from support import FakeTaskAgent, sample_papers, fake_download
 
 
 class WebTests(unittest.IsolatedAsyncioTestCase):
@@ -18,11 +19,22 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
         self.app = create_app(output_root=self.root)
         self.manager = self.app.state.manager
         await self.manager.startup()
+        self.real_health = self.manager.health
+        self.manager.health = AsyncMock(return_value={"model": {"connected": True}})
+        self.manager.model_control.catalog = AsyncMock(return_value={"managed": False})
+        self.real_spawn = asyncio.create_subprocess_exec
+        async def spawn_fixture(*command, **kwargs):
+            command = [str(PROJECT / "tests/run_agent_fixture.py") if arg == str(PROJECT / "main_agent.py") else arg
+                       for arg in command]
+            return await self.real_spawn(*command, **kwargs)
+        self.spawn_patch = patch("web_app.asyncio.create_subprocess_exec", new=spawn_fixture)
+        self.spawn_patch.start()
         self.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app), base_url="http://testserver")
 
     async def asyncTearDown(self):
         await self.manager.shutdown()
         await self.client.aclose()
+        self.spawn_patch.stop()
         self.temp.cleanup()
 
     async def wait_job(self, job_id):
@@ -33,17 +45,17 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 200)
         return response.json()
 
-    async def test_mock_job_runs_real_mcp_and_produces_downloadable_artifacts(self):
-        response = await self.client.post("/api/jobs", json={"idea": "空间关系建模", "top_k": 3, "mock": True, "concurrent": True})
+    async def test_cli_mcp_job_produces_downloadable_artifacts(self):
+        response = await self.client.post("/api/jobs", json={"idea": "论文检索与总结", "top_k": 3, "concurrent": True})
         self.assertEqual(response.status_code, 202)
         job_id = response.json()["id"]
         snapshot = await self.wait_job(job_id)
         self.assertEqual(snapshot["status"], "completed", snapshot)
-        self.assertTrue(snapshot["mock"])
+        self.assertNotIn("mock", snapshot)
         self.assertEqual(snapshot["completed_count"], 3)
         self.assertEqual(snapshot["metrics"]["requested_top_k"], 3)
         self.assertEqual(snapshot["stage"], "done")
-        self.assertIn("MOCK", snapshot["report"])
+        self.assertIn("TEST report", snapshot["report"])
         self.assertIn("report_completed", [e["event"] for e in snapshot["events"]])
         self.assertNotIn(str(PROJECT), json.dumps(snapshot))
         self.assertNotIn("fixture_text", json.dumps(snapshot))
@@ -72,17 +84,38 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 415)
         self.assertEqual((await self.client.get("/api/jobs/not-an-id")).status_code, 404)
 
+    async def test_removed_mode_parameter_cannot_create_a_job(self):
+        for value in (True, False):
+            response = await self.client.post("/api/jobs", json={"idea": "test", "mock": value})
+            self.assertEqual(response.status_code, 400)
+        self.assertFalse(self.manager.jobs)
+
+    async def test_archived_demo_runs_are_hidden_but_files_are_preserved(self):
+        job = dict(id="c" * 32, idea="archived test", top_k=3, mock=True, status="completed",
+                   created_at=now_iso(), updated_at=now_iso(), logs=[])
+        self.manager.persist(job)
+        run = self.root / ("d" * 12)
+        run.mkdir()
+        metrics = run / "metrics.json"
+        metrics.write_text(json.dumps({"mode": "mock", "task_success": True, "completed_count": 3}))
+        await self.manager.startup()
+        self.assertEqual((await self.client.get("/api/jobs")).json()["jobs"], [])
+        self.assertEqual((await self.client.get(f'/api/jobs/{job["id"]}')).status_code, 404)
+        self.assertEqual((await self.client.get(f'/api/jobs/{run.name}')).status_code, 404)
+        self.assertTrue(metrics.is_file())
+        self.assertTrue((self.manager.manifests / (job["id"] + ".json")).is_file())
+
     async def test_second_active_job_conflicts_and_queued_job_can_cancel(self):
         with patch.object(self.manager, "execute", new_callable=AsyncMock):
-            first = await self.client.post("/api/jobs", json={"idea": "first", "mock": True})
-            second = await self.client.post("/api/jobs", json={"idea": "second", "mock": True})
+            first = await self.client.post("/api/jobs", json={"idea": "first"})
+            second = await self.client.post("/api/jobs", json={"idea": "second"})
             self.assertEqual(second.status_code, 409)
             response = await self.client.post(f'/api/jobs/{first.json()["id"]}/cancel')
             self.assertEqual(response.json()["status"], "cancelled")
             self.assertIsNone(self.manager.active_id)
 
     async def test_running_child_is_stopped(self):
-        response = await self.client.post("/api/jobs", json={"idea": "cancel", "mock": True})
+        response = await self.client.post("/api/jobs", json={"idea": "cancel"})
         job_id = response.json()["id"]
         for _ in range(100):
             process = self.manager.processes.get(job_id)
@@ -97,14 +130,13 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
 
     @unittest.skipUnless(Path("/proc/self").exists(), "process-tree assertion uses Linux /proc")
     async def test_cancel_closes_separate_mcp_session_and_preserves_gpu_mask(self):
-        # A deliberately unavailable local model keeps the CLI idle after MCP
-        # discovery, letting us check cancellation of its separately-led session.
-        with patch.dict(os.environ, {"LLM_BASE_URL": "http://127.0.0.1:1/v1",
+        # Delay the test model after MCP discovery to inspect separate-session cleanup.
+        with patch.dict(os.environ, {"TEST_AGENT_DELAY": "30", "LLM_BASE_URL": "http://127.0.0.1:1/v1",
                                      "LLM_MODEL": "fixture", "LLM_TOKENIZE": "0",
                                      "LLM_ALLOW_NO_KEY": "1", "LLM_TRUST_ENV": "0",
                                      "CUDA_VISIBLE_DEVICES": "5,7"}), \
                 patch("web_app.asyncio.create_subprocess_exec", wraps=asyncio.create_subprocess_exec) as spawn:
-            response = await self.client.post("/api/jobs", json={"idea": "cancel MCP", "mock": False})
+            response = await self.client.post("/api/jobs", json={"idea": "cancel MCP"})
             job_id = response.json()["id"]
             for _ in range(200):
                 if any("已通过 MCP" in line for line in self.manager.jobs[job_id]["logs"]):
@@ -122,7 +154,7 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(Path(f"/proc/{pid}").exists(), f"MCP child {pid} survived cancellation")
 
     async def test_restart_marks_unfinished_job_failed(self):
-        job = dict(id="a" * 32, idea="interrupted", top_k=3, mock=True, concurrent=False,
+        job = dict(id="a" * 32, idea="interrupted", top_k=3, concurrent=False,
                    status="running", created_at=now_iso(), updated_at=now_iso(), logs=[])
         self.manager.persist(job)
         restored = JobManager(output_root=self.root)
@@ -133,7 +165,7 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
     async def test_history_shortfall_is_partial_and_paths_cannot_escape(self):
         run = self.root / ("b" * 12)
         run.mkdir()
-        (run / "metrics.json").write_text(json.dumps({"task_success": True, "mode": "mock", "completed_count": 2, "selected_count": 2}))
+        (run / "metrics.json").write_text(json.dumps({"task_success": True, "mode": "live", "completed_count": 2, "selected_count": 2}))
         (run / "main_trace.json").write_text(json.dumps([{"tool": "build_report", "arguments": {"idea": "shortfall", "top_k": 3}}]))
         (run / "selection.json").write_text(json.dumps([{"id": "P1", "title": "A"}]))
         secret = self.root / "secret.txt"
@@ -141,7 +173,7 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
         (run / "report.md").symlink_to(secret)
         response = await self.client.get("/api/jobs")
         job = response.json()["jobs"][0]
-        self.assertTrue(job["mock"])
+        self.assertNotIn("mock", job)
         self.assertEqual(job["status"], "partial")
         self.assertEqual((await self.client.get(f'/api/jobs/{job["id"]}/report')).status_code, 404)
         self.assertEqual((await self.client.get(f'/api/jobs/{job["id"]}/papers/P999/pdf')).status_code, 404)
@@ -151,11 +183,11 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
         with patch.dict(os.environ, {"LLM_BASE_URL": "http://127.0.0.1:8000/v1", "LLM_MODEL": "test-model"}), \
                 patch("web_app.httpx.AsyncClient") as client:
             client.return_value.__aenter__.return_value.get = AsyncMock(return_value=response)
-            health = await self.manager.health()
+            health = await self.real_health()
             self.assertTrue(health["model"]["connected"])
             self.assertFalse(client.call_args.kwargs["trust_env"])
             self.assertLessEqual(client.call_args.kwargs["timeout"], 2)
-            await self.manager.health()
+            await self.real_health()
             self.assertEqual(client.call_count, 1)
 
     async def test_redaction_removes_keys_credentials_and_local_paths(self):
@@ -169,13 +201,14 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
 class TopKRegressionTests(unittest.IsolatedAsyncioTestCase):
     async def test_two_candidates_cannot_fulfill_requested_top_three(self):
         import server
-        fixture = [dict(id=f"P{i}", title=f"Fixture {i}", url="", sources=["mock"],
-                        fixture_text="synthetic text " * 40) for i in (1, 2)]
-        sources = {"arxiv": {"status": "mock"}, "openalex": {"status": "mock"}}
+        fixture = sample_papers(2)
+        sources = {"arxiv": {"status": "ok"}, "openalex": {"status": "ok"}}
         with tempfile.TemporaryDirectory() as folder, \
-                patch.dict(os.environ, {"PAPER_OUTPUT_ROOT": folder}), \
-                patch.dict(server.config, {"mock": True, "concurrent": False}), \
-                patch("server.retrieve", new=AsyncMock(return_value=(fixture, sources))):
+                patch.dict(os.environ, {"PAPER_OUTPUT_ROOT": folder, "PAPER_CACHE_DIR": folder + "/cache"}), \
+                patch.dict(server.config, {"concurrent": False}), \
+                patch("server.retrieve", new=AsyncMock(return_value=(fixture, sources))), \
+                patch("server.TaskAgent", FakeTaskAgent), \
+                patch("research.pipeline.download_pdf", fake_download):
             found = await server.search_papers("test")
             result = await server.build_report(found["run_id"], "test", 3)
             self.assertEqual(result["metrics"]["completed_count"], 2)

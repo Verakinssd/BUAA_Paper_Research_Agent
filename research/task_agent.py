@@ -1,4 +1,4 @@
-"""Task Agent runs INSIDE the MCP process. Mock mode has no LLM reasoning."""
+"""Task Agent runs inside the MCP process and uses the configured model."""
 import json
 import os
 import time
@@ -28,13 +28,10 @@ def validate_selection(value, papers, k):
 
 
 class TaskAgent:
-    def __init__(self, mock=False):
-        self.mock = mock
-        self.llm = None if mock else LLM()
+    def __init__(self, llm=None):
+        self.llm = LLM() if llm is None else llm
 
     async def select(self, idea, papers, k):
-        if self.mock:
-            return [dict(p, selection_reason="MOCK：按基础分排序，未调用 LLM。") for p in papers[:k]]
         candidates = [{key: p.get(key) for key in ("id", "title", "abstract", "year", "basic_score")}
                       for p in papers]
         for candidate in candidates:
@@ -55,10 +52,6 @@ class TaskAgent:
                 prompt += "\n上次输出格式无效，请严格按指定 JSON 返回。"
 
     async def summarize(self, paper, markdown, progress=None):
-        if self.mock:
-            return (f'# MOCK 摘要：{paper["title"]}\n\n'
-                    f'**合成测试材料，不是真实文献或 LLM 分析。**\n\n'
-                    f'{markdown}\n\n与研究想法的关联：仅演示输出结构。')
         # Cover the whole extracted text; never silently summarize only its beginning.
         notes = []
         position, index = 0, 1
@@ -135,10 +128,6 @@ class TaskAgent:
         return result
 
     async def report(self, idea, results):
-        if self.mock:
-            return ("# MOCK 综合研究报告\n\n**合成材料和固定输出，不作为课程最终 Agent 结果。**\n\n"
-                    "研究想法：" + idea + "\n\n" + "\n".join(
-                        f'- [{r["id"]}] {r["title"]}：{r["status"]}' for r in results))
         evidence = [{k: r.get(k) for k in ("id", "title", "status", "summary", "error", "evidence")}
                     for r in results]
         return await self.llm.merge_notes(

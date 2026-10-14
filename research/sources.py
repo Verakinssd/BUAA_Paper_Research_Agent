@@ -1,11 +1,9 @@
 """Two real public metadata APIs, normalized to one paper schema."""
 import asyncio
-import json
 import os
 import re
 import time
 import xml.etree.ElementTree as ET
-from pathlib import Path
 import httpx
 
 _arxiv_lock = asyncio.Lock()
@@ -171,7 +169,7 @@ def merge_dedup(papers):
             keys |= old_keys
             merged["sources"] = sorted(set(merged["sources"] + old["sources"]))
             merged["pdf_urls"] = list(dict.fromkeys(merged["pdf_urls"] + old.get("pdf_urls", [])))
-            for field in ("abstract", "doi", "arxiv_id", "fixture_text"):
+            for field in ("abstract", "doi", "arxiv_id"):
                 if not merged.get(field) and old.get(field):
                     merged[field] = old[field]
         groups.append((keys, merged))
@@ -190,27 +188,22 @@ def basic_rank(query, papers):
     return ranked
 
 
-async def retrieve(query, limit=8, mock=False, concurrent=False):
+async def retrieve(query, limit=8, concurrent=False):
     stats = {}
-    if mock:
-        papers = json.loads((Path(__file__).parent.parent / "fixtures/papers.json").read_text())
-        stats = {s: {"status": "mock", "count": sum(s in p["sources"] for p in papers)}
-                 for s in ("arxiv", "openalex")}
+    async def one(name, func):
+        started = time.perf_counter()
+        try:
+            data = await func(query, limit)
+            stats[name] = {"status": "ok", "count": len(data)}
+        except Exception as exc:
+            data = []
+            stats[name] = {"status": "failed", "count": 0, "error": str(exc)}
+        stats[name]["seconds"] = round(time.perf_counter() - started, 3)
+        return data
+    jobs = [("arxiv", arxiv_search), ("openalex", openalex_search)]
+    if concurrent:
+        parts = await asyncio.gather(*(one(name, fn) for name, fn in jobs))
     else:
-        async def one(name, func):
-            started = time.perf_counter()
-            try:
-                data = await func(query, limit)
-                stats[name] = {"status": "ok", "count": len(data)}
-            except Exception as exc:
-                data = []
-                stats[name] = {"status": "failed", "count": 0, "error": str(exc)}
-            stats[name]["seconds"] = round(time.perf_counter() - started, 3)
-            return data
-        jobs = [("arxiv", arxiv_search), ("openalex", openalex_search)]
-        if concurrent:
-            parts = await asyncio.gather(*(one(name, fn) for name, fn in jobs))
-        else:
-            parts = [await one(name, fn) for name, fn in jobs]
-        papers = [p for part in parts for p in part]
+        parts = [await one(name, fn) for name, fn in jobs]
+    papers = [p for part in parts for p in part]
     return basic_rank(query, merge_dedup(papers)), stats

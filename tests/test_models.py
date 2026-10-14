@@ -186,6 +186,7 @@ class ModelWebTests(unittest.IsolatedAsyncioTestCase):
                     dict(id="q5_k_m", label="Qwen Q5", available=True)])
         self.manager.model_control.catalog = AsyncMock(return_value=self.catalog)
         self.manager.model_control.switch = AsyncMock(return_value=dict(self.catalog, status="loading", target_id="q5_k_m"))
+        self.manager.health = AsyncMock(return_value={"model": {"connected": True}})
 
     async def asyncTearDown(self):
         await self.manager.shutdown()
@@ -222,6 +223,13 @@ class ModelWebTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(job["model_id"], "q5_k_m")
             saved = json.loads((self.manager.manifests / (job["id"] + ".json")).read_text())
             self.assertEqual(saved["model_label"], "Qwen Q5")
+
+    async def test_disconnected_model_cannot_create_research_job(self):
+        self.manager.health.return_value = {"model": {"connected": False}}
+        response = await self.client.post("/api/jobs", json={"idea": "test"})
+        self.assertEqual(response.status_code, 409)
+        self.assertIn("模型未连接", response.json()["error"])
+        self.assertFalse(self.manager.jobs)
 
     async def test_control_client_ignores_proxy_and_keeps_unmanaged_compatible(self):
         controller = ModelControlClient(Path(self.folder.name))

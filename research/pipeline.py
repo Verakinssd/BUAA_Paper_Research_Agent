@@ -58,18 +58,13 @@ def store_cached_fulltext(url, pdf, text):
         temp_md.unlink(missing_ok=True)
 
 
-def convert_pdf(path, fixture_text=None):
+def convert_pdf(path):
     layout_mode = os.getenv("PDF_LAYOUT_MODE", "legacy").lower()
     if layout_mode not in ("legacy", "onnx"):
         raise ValueError("PDF_LAYOUT_MODE 必须为 legacy 或 onnx")
     # Keep third-party progress/informational prints out of MCP's stdio stdout.
     with contextlib.redirect_stdout(io.StringIO()):
         import pymupdf
-        if fixture_text is not None:
-            with pymupdf.open() as doc:
-                page = doc.new_page()
-                page.insert_textbox(pymupdf.Rect(40, 40, 560, 800), fixture_text, fontsize=11)
-                doc.save(str(path))
         with pymupdf.open(str(path)) as doc:
             if doc.page_count > 120:
                 raise ValueError("初版限制为 120 页以内；请人工处理超长文档")
@@ -156,57 +151,51 @@ async def process_papers(papers, output, agent, concurrent=False, trace=None):
             errors = []
             emit("paper_started", {"id": p["id"], "title": p["title"]})
             try:
-                if agent.mock:
-                    emit("pdf_conversion_started", {"id": p["id"], "mode": "fixture"})
-                    async with _convert_lock:
-                        text = await asyncio.to_thread(convert_pdf, pdf, p["fixture_text"])
-                    emit("pdf_conversion_completed", {"id": p["id"], "markdown_chars": len(text)})
-                else:
-                    text = None
-                    pdf_urls = p.get("pdf_urls", [])[:3]
-                    # Check every equivalent source before downloading any of them.
-                    # This lets a cached arXiv copy satisfy a paper even when a new
-                    # publisher/CVF URL has since become the preferred first choice.
-                    for url in pdf_urls:
-                        cache_started = time.perf_counter()
-                        text = await asyncio.to_thread(restore_cached_fulltext, url, pdf)
-                        if text is not None:
-                            emit("paper_cache_hit", {"id": p["id"], "pdf_url": url,
-                                                     "pdf_bytes": pdf.stat().st_size,
-                                                     "markdown_chars": len(text),
-                                                     "seconds": round(time.perf_counter() - cache_started, 3)})
-                            break
-                    for url in ([] if text is not None else pdf_urls):
-                        try:
-                            download_started = time.perf_counter()
-                            emit("pdf_download_started", {"id": p["id"], "pdf_url": url})
-                            await download_pdf(
-                                url, pdf,
-                                lambda downloaded, expected: emit(
-                                    "pdf_download_progress",
-                                    {"id": p["id"], "pdf_url": url,
-                                     "downloaded_bytes": downloaded,
-                                     "total_bytes": expected},
-                                ),
-                            )
-                            emit("pdf_download_completed", {"id": p["id"], "pdf_url": url,
-                                                             "pdf_bytes": pdf.stat().st_size,
-                                                             "seconds": round(time.perf_counter() - download_started, 3)})
-                            convert_started = time.perf_counter()
-                            emit("pdf_conversion_started", {"id": p["id"],
-                                                             "mode": os.getenv("PDF_LAYOUT_MODE", "legacy")})
-                            async with _convert_lock:
-                                text = await asyncio.to_thread(convert_pdf, pdf)
-                            emit("pdf_conversion_completed", {"id": p["id"],
-                                                               "markdown_chars": len(text),
-                                                               "seconds": round(time.perf_counter() - convert_started, 3)})
-                            await asyncio.to_thread(store_cached_fulltext, url, pdf, text)
-                            break
-                        except Exception as exc:
-                            errors.append(str(exc))
-                            pdf.unlink(missing_ok=True)
-                    if text is None:
-                        raise ValueError("没有可用的公开 PDF；" + "; ".join(errors))
+                text = None
+                pdf_urls = p.get("pdf_urls", [])[:3]
+                # Check every equivalent source before downloading any of them.
+                # This lets a cached arXiv copy satisfy a paper even when a new
+                # publisher/CVF URL has since become the preferred first choice.
+                for url in pdf_urls:
+                    cache_started = time.perf_counter()
+                    text = await asyncio.to_thread(restore_cached_fulltext, url, pdf)
+                    if text is not None:
+                        emit("paper_cache_hit", {"id": p["id"], "pdf_url": url,
+                                                 "pdf_bytes": pdf.stat().st_size,
+                                                 "markdown_chars": len(text),
+                                                 "seconds": round(time.perf_counter() - cache_started, 3)})
+                        break
+                for url in ([] if text is not None else pdf_urls):
+                    try:
+                        download_started = time.perf_counter()
+                        emit("pdf_download_started", {"id": p["id"], "pdf_url": url})
+                        await download_pdf(
+                            url, pdf,
+                            lambda downloaded, expected: emit(
+                                "pdf_download_progress",
+                                {"id": p["id"], "pdf_url": url,
+                                 "downloaded_bytes": downloaded,
+                                 "total_bytes": expected},
+                            ),
+                        )
+                        emit("pdf_download_completed", {"id": p["id"], "pdf_url": url,
+                                                         "pdf_bytes": pdf.stat().st_size,
+                                                         "seconds": round(time.perf_counter() - download_started, 3)})
+                        convert_started = time.perf_counter()
+                        emit("pdf_conversion_started", {"id": p["id"],
+                                                         "mode": os.getenv("PDF_LAYOUT_MODE", "legacy")})
+                        async with _convert_lock:
+                            text = await asyncio.to_thread(convert_pdf, pdf)
+                        emit("pdf_conversion_completed", {"id": p["id"],
+                                                           "markdown_chars": len(text),
+                                                           "seconds": round(time.perf_counter() - convert_started, 3)})
+                        await asyncio.to_thread(store_cached_fulltext, url, pdf, text)
+                        break
+                    except Exception as exc:
+                        errors.append(str(exc))
+                        pdf.unlink(missing_ok=True)
+                if text is None:
+                    raise ValueError("没有可用的公开 PDF；" + "; ".join(errors))
                 md = output / "fulltext" / (p["id"] + ".md")
                 md.write_text(text, encoding="utf-8")
                 result["markdown_path"] = str(md)
@@ -214,7 +203,7 @@ async def process_papers(papers, output, agent, concurrent=False, trace=None):
                 summary = output / "summaries" / (p["id"] + ".md")
                 summary.write_text(result["summary"], encoding="utf-8")
                 result.update(status="ok", summary_path=str(summary),
-                              evidence="synthetic_fixture_fulltext" if agent.mock else "extracted_fulltext")
+                              evidence="extracted_fulltext")
             except Exception as exc:
                 result["error"] = str(exc)
                 result["evidence"] = "no_completed_summary"
@@ -227,7 +216,7 @@ async def process_papers(papers, output, agent, concurrent=False, trace=None):
         "processing_seconds": round(time.perf_counter() - started, 3),
         "selected_count": len(papers), "completed_count": sum(r["status"] == "ok" for r in results),
         "paper_success_rate": sum(r["status"] == "ok" for r in results) / max(1, len(papers)),
-        "concurrent": concurrent, "mode": "mock" if agent.mock else "live",
+        "concurrent": concurrent,
         "measured_scope": "PDF download + Markdown conversion + per-paper summaries",
     }
     return results, metrics

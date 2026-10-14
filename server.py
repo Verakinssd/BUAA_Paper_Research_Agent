@@ -15,7 +15,7 @@ from research.task_agent import TaskAgent
 load_dotenv()
 mcp = FastMCP("Paper Research MCP")
 state = {}
-config = {"mock": False, "concurrent": False}
+config = {"concurrent": False}
 
 
 def trace(output, event, data):
@@ -34,7 +34,6 @@ async def search_papers(query: str, max_per_source: int = 8) -> dict:
     output = Path(os.getenv("PAPER_OUTPUT_ROOT", "outputs")) / run_id
     output.mkdir(parents=True)
     save_json(output / "run_meta.json", {"run_id": run_id, "query": query,
-                                        "mode": "mock" if config["mock"] else "live",
                                         "created_at": time.time()})
     trace(output, "search_started", {"query": query})
     started = time.perf_counter()
@@ -43,15 +42,14 @@ async def search_papers(query: str, max_per_source: int = 8) -> dict:
     state[run_id] = {"papers": papers, "output": output, "sources": sources, "search_seconds": elapsed}
     save_json(output / "candidates.json", papers)
     trace(output, "sources_searched", {"sources": sources, "deduplicated_count": len(papers)})
-    # Full fixture content stays server-side; main Agent only receives metadata.
+    # Main Agent receives bounded candidate metadata; full records remain server-side.
     candidates = [{k: p.get(k) for k in ("id", "title", "abstract", "year", "sources", "basic_score")}
                   for p in papers]
     for candidate in candidates:
         abstract = candidate.get("abstract") or ""
         candidate["abstract_is_excerpt"] = len(abstract) > 1000
         candidate["abstract"] = abstract[:1000]
-    return {"run_id": run_id, "sources": sources, "candidates": candidates,
-            "mode": "mock" if config["mock"] else "live"}
+    return {"run_id": run_id, "sources": sources, "candidates": candidates}
 
 
 @mcp.tool()
@@ -69,7 +67,7 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
                     model_id=os.getenv("PAPER_MODEL_ID"), model_label=os.getenv("PAPER_MODEL_LABEL"))
     save_json(output / "run_meta.json", metadata)
     trace(output, "selection_started", {"requested_top_k": top_k})
-    agent = TaskAgent(config["mock"])
+    agent = TaskAgent()
     selected = await agent.select(idea, papers, top_k)
     for paper in selected:
         paper["research_idea"] = idea
@@ -96,7 +94,7 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
                    requested_top_k=top_k,
                    model_id=os.getenv("PAPER_MODEL_ID"), model_label=os.getenv("PAPER_MODEL_LABEL"),
                    task_success=(report_success and metrics["completed_count"] == len(selected) == top_k
-                                 and all(s["status"] in ("ok", "mock") for s in run["sources"].values())),
+                                 and all(s["status"] == "ok" for s in run["sources"].values())),
                    sources=run["sources"])
     save_json(output / "metrics.json", metrics)
     trace(output, "report_completed", {"metrics": metrics})
@@ -107,8 +105,7 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--mock", action="store_true")
     parser.add_argument("--concurrent", action="store_true")
     args = parser.parse_args()
-    config.update(mock=args.mock, concurrent=args.concurrent)
+    config.update(concurrent=args.concurrent)
     mcp.run(transport="stdio")

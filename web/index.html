@@ -31,7 +31,6 @@
       <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-1.2.7-1.7 1.1-1.7 2.7M12 17h.01"/></symbol>
       <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="3"/><rect x="9" y="9" width="6" height="6" rx="1"/><path d="M9 3v3m6-3v3M9 18v3m6-3v3M3 9h3m-3 6h3m12-6h3m-3 6h3"/></symbol>
       <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
-      <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v7l-6 9a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2l-6-9V3M7 15h10"/></symbol>
       <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
       <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7h.01"/></symbol>
       <symbol id="i-terminal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3m6 0h4"/></symbol>
@@ -92,20 +91,20 @@
             <p id="model-switch-hint">正在检查模型文件和服务状态…</p>
           </div>
           <div class="composer-heading"><label for="idea"><svg class="icon" aria-hidden="true"><use href="#i-spark"/></svg>你想探索什么？</label><span id="idea-count">0 / 2000</span></div>
-          <textarea class="idea-input" id="idea" name="idea" rows="3" maxlength="2000" required placeholder="描述你的研究想法，例如：如何用 LoRA 高效微调大语言模型？我想了解代表性方法、实验结论和可能的改进方向。" aria-describedby="mode-hint"></textarea>
+          <textarea class="idea-input" id="idea" name="idea" rows="3" maxlength="2000" required placeholder="描述你的研究想法，例如：如何用 LoRA 高效微调大语言模型？我想了解代表性方法、实验结论和可能的改进方向。" aria-describedby="research-hint"></textarea>
           <div class="composer-footer">
-            <div class="composer-options"><label class="select-wrap" for="top-k"><svg class="icon" aria-hidden="true"><use href="#i-paper"/></svg><span>论文数量</span><select id="top-k" name="top_k" aria-label="论文数量"><option value="1">Top 1</option><option value="2">Top 2</option><option value="3" selected>Top 3</option><option value="4">Top 4</option><option value="5">Top 5</option></select></label><div class="mode-switch" role="group" aria-label="研究模式"><button type="button" id="live-mode" class="active" aria-pressed="true">真实研究</button><button type="button" id="mock-mode" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-flask"/></svg>离线演示</button></div></div>
+            <div class="composer-options"><label class="select-wrap" for="top-k"><svg class="icon" aria-hidden="true"><use href="#i-paper"/></svg><span>论文数量</span><select id="top-k" name="top_k" aria-label="论文数量"><option value="1">Top 1</option><option value="2">Top 2</option><option value="3" selected>Top 3</option><option value="4">Top 4</option><option value="5">Top 5</option></select></label></div>
             <button type="submit" class="primary-button" id="start-button"><span>开始研究</span><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </div>
-          <div class="composer-caption"><span id="mode-hint">检索真实论文 · 由本地模型完成分析</span><span class="keyboard-hint">Ctrl / ⌘ + Enter</span></div>
+          <div class="composer-caption"><span id="research-hint">检索真实论文 · 由本地模型完成分析</span><span class="keyboard-hint">Ctrl / ⌘ + Enter</span></div>
         </form>
 
-        <div class="suggestions"><span>试试这些方向</span><button class="suggestion-chip" data-idea="我想研究 LoRA 与参数高效微调，比较代表性方法的效果、资源消耗和适用场景。">参数高效微调<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="suggestion-chip" data-idea="我想研究 3D 视觉定位中目标和参照物的空间关系建模。">3D 视觉定位<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="suggestion-chip" data-idea="我想研究检索增强生成中，如何提高检索结果的相关性并减少回答中的幻觉。">检索增强生成<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
+        <div class="suggestions"><span>试试这些方向</span><button class="suggestion-chip" data-idea="我想研究 LoRA 与参数高效微调，比较代表性方法的效果、资源消耗和适用场景。">参数高效微调<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="suggestion-chip" data-idea="我想研究强化学习中的探索策略，比较代表性方法、实验结论和适用场景。">强化学习<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button><button class="suggestion-chip" data-idea="我想研究检索增强生成中，如何提高检索结果的相关性并减少回答中的幻觉。">检索增强生成<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
 
-        <div class="overview-grid" aria-label="研究概览"><div class="overview-card"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span><div><div class="overview-label">支持文献来源</div><div class="overview-number">2<span>arXiv · OpenAlex</span></div></div></div><div class="overview-card"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><div><div class="overview-label">已完成全文阅读</div><div class="overview-number"><strong id="stat-papers">0</strong><span>篇论文</span></div></div></div><div class="overview-card"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><div><div class="overview-label">已完成真实研究</div><div class="overview-number"><strong id="stat-research">0</strong><span>次探索</span></div></div></div></div>
+        <div class="overview-grid" aria-label="研究概览"><div class="overview-card"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span><div><div class="overview-label">支持文献来源</div><div class="overview-number">2<span>arXiv · OpenAlex</span></div></div></div><div class="overview-card"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><div><div class="overview-label">已完成全文阅读</div><div class="overview-number"><strong id="stat-papers">0</strong><span>篇论文</span></div></div></div><div class="overview-card"><span class="icon-box"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span><div><div class="overview-label">已完成研究</div><div class="overview-number"><strong id="stat-research">0</strong><span>次探索</span></div></div></div></div>
 
         <div class="section-heading"><div><h2 class="section-title">继续你的探索</h2><p class="section-subtitle">每一次阅读，都是下一次发现的起点。</p></div><button class="text-button" id="view-all">查看全部<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button></div>
-        <div class="recent-grid" id="recent-jobs"><div class="empty-state"><span class="empty-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><h3>你的研究旅程，从这里开始</h3><p>输入一个想法，或者先试试无需模型的离线演示。</p></div></div>
+        <div class="recent-grid" id="recent-jobs"><div class="empty-state"><span class="empty-icon"><svg class="icon" aria-hidden="true"><use href="#i-book"/></svg></span><h3>你的研究旅程，从这里开始</h3><p>输入一个研究想法，开始检索和阅读论文。</p></div></div>
       </section>
 
       <section id="history-view" class="view" aria-labelledby="history-title" hidden><div class="section-heading"><div><div class="eyebrow">YOUR RESEARCH LIBRARY</div><h1 class="run-title" id="history-title">研究记录</h1><p class="section-subtitle">回到你的问题、证据和发现。</p></div><button class="secondary-button" id="history-refresh"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>刷新记录</button></div><label class="history-search" for="history-search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="history-search" placeholder="搜索研究想法…" autocomplete="off"></label><div class="recent-grid" id="all-jobs"></div></section>
@@ -124,7 +123,18 @@
     </div>
   </main>
 
-  <dialog class="modal" id="help-dialog" aria-labelledby="help-title"><div class="modal-content"><div class="modal-header"><div><div class="eyebrow">A LITTLE FIELD GUIDE</div><h2 id="help-title">开始你的第一次研究</h2></div><button class="icon-button modal-close" id="close-help" aria-label="关闭使用指南"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div><div class="modal-body"><div class="help-step"><span class="step-number">1</span><div><h3>提出一个具体问题</h3><p>写下研究主题、关注的方法或希望比较的方向，再选择需要的论文数量。</p></div></div><div class="help-step"><span class="step-number">2</span><div><h3>选择研究模式</h3><p>真实研究会检索 arXiv 与 OpenAlex，调用本地模型阅读全文。离线演示使用明确标注的合成论文，无需 GPU 或模型服务。</p></div></div><div class="help-step"><span class="step-number">3</span><div><h3>跟随证据，形成洞察</h3><p>查看论文入选理由、全文总结及来源，完成后可导出 Markdown 研究报告。来源限流或 PDF 不可获取时，会显示实际失败情况。</p></div></div><div class="notice"><svg class="icon" aria-hidden="true"><use href="#i-cpu"/></svg><div>真实研究前，请在同一台服务器启动模型：<code>python deploy/serve_gguf.py</code>模型连接正常后即可开始。</div></div><p class="help-shortcuts">快捷操作：<kbd>Ctrl / ⌘</kbd> + <kbd>Enter</kbd> 开始研究，<kbd>N</kbd> 新建研究。</p></div></div></dialog>
+  <dialog class="modal" id="help-dialog" aria-labelledby="help-title">
+    <div class="modal-content">
+      <div class="modal-header"><div><div class="eyebrow">A LITTLE FIELD GUIDE</div><h2 id="help-title">开始你的第一次研究</h2></div><button class="icon-button modal-close" id="close-help" aria-label="关闭使用指南"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <div class="modal-body">
+        <div class="help-step"><span class="step-number">1</span><div><h3>提出一个具体问题</h3><p>写下研究主题、关注的方法或希望比较的方向，再选择需要的论文数量。</p></div></div>
+        <div class="help-step"><span class="step-number">2</span><div><h3>连接模型，开始研究</h3><p>确认本地模型已连接，点击开始研究。Agent 会检索 arXiv 与 OpenAlex，筛选论文并阅读全文。</p></div></div>
+        <div class="help-step"><span class="step-number">3</span><div><h3>查看论文与研究报告</h3><p>查看论文入选理由、全文总结及来源，完成后可导出 Markdown 研究报告。来源限流或 PDF 不可获取时，会显示实际失败情况。</p></div></div>
+        <div class="notice"><svg class="icon" aria-hidden="true"><use href="#i-cpu"/></svg><div>请在同一台服务器启动模型：<code>python deploy/serve_gguf.py --managed</code>模型连接正常后即可开始。</div></div>
+        <p class="help-shortcuts">快捷操作：<kbd>Ctrl / ⌘</kbd> + <kbd>Enter</kbd> 开始研究，<kbd>N</kbd> 新建研究。</p>
+      </div>
+    </div>
+  </dialog>
   <div class="toast-container" id="toasts" role="status" aria-live="polite"></div>
   <noscript><div class="notice error">此工作台需要启用 JavaScript 才能提交研究任务和显示进度。</div></noscript>
 </body>

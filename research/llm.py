@@ -37,7 +37,7 @@ class LLM:
         if self.max_tokens <= 0 or self.context_tokens <= 0:
             raise ValueError("生成长度和上下文长度必须大于 0")
         if not self.base or not self.model:
-            raise ValueError("请在 .env 设置 LLM_BASE_URL 和 LLM_MODEL；离线调试使用 --mock。")
+            raise ValueError("请在 .env 设置 LLM_BASE_URL 和 LLM_MODEL，并启动模型服务。")
         if not self.key and os.getenv("LLM_ALLOW_NO_KEY") != "1":
             raise ValueError("请设置 LLM_API_KEY；无鉴权本地服务可设置 LLM_ALLOW_NO_KEY=1。")
 

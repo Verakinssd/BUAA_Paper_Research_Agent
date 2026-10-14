@@ -130,7 +130,6 @@ python main_agent.py \
 - 论文检索和 PDF 下载需要服务器能够访问 arXiv 与 OpenAlex。
 - 使用系统代理时，在 `.env` 中设置 `PAPER_TRUST_ENV=1`，并在启动前配置 `HTTP_PROXY`、`HTTPS_PROXY`；也可以直接设置 `PAPER_PROXY_URL=http://代理地址:端口`。
 - `Connection refused` 通常表示模型服务未启动，或 `LLM_BASE_URL` 与监听端口不一致。
-- 可先运行 `python main_agent.py --mock --top-k 3` 检查 MCP、PDF 处理和输出流程。
 
 ## 测试
 

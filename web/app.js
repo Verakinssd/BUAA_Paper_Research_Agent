@@ -11,7 +11,7 @@ const phases = [
   { id: "read", title: "全文阅读", description: "提取方法、发现与局限" },
   { id: "report", title: "形成报告", description: "梳理线索与研究建议" },
 ];
-const state = { jobs: [], job: null, currentId: null, activeJobId: null, mock: false, submitting: false, model: null, models: null, switching: false, modelPoll: null, statusRefreshing: false, view: "home", tab: "papers", poll: null, requestVersion: 0 };
+const state = { jobs: [], job: null, currentId: null, activeJobId: null, submitting: false, model: null, models: null, switching: false, modelPoll: null, statusRefreshing: false, view: "home", tab: "papers", poll: null, requestVersion: 0 };
 const modelBusy = (catalog = state.models) => Boolean(catalog?.managed && ["unloading", "loading", "recovering"].includes(catalog.status));
 
 function escapeHtml(value) {
@@ -138,17 +138,12 @@ function showView(view) {
 function updateComposer() {
   const characters = $("#idea").value.length;
   $("#idea-count").textContent = `${characters} / 2000`;
-  $("#live-mode").classList.toggle("active", !state.mock);
-  $("#mock-mode").classList.toggle("active", state.mock);
-  $("#live-mode").setAttribute("aria-pressed", String(!state.mock));
-  $("#mock-mode").setAttribute("aria-pressed", String(state.mock));
   const busy = Boolean(state.activeJobId);
-  const unavailable = !state.mock && (!state.model?.connected || state.switching || (state.models?.managed && state.models.status !== "ready"));
+  const unavailable = !state.model?.connected || state.switching || (state.models?.managed && state.models.status !== "ready");
   $("#start-button").disabled = state.submitting || busy || unavailable;
   $("#start-button span").textContent = state.submitting ? "正在开始…" : busy ? "已有研究运行中" : "开始研究";
-  $("#mode-hint").textContent = busy ? "有一项研究正在运行，可从研究记录查看进度。" : state.mock ? "合成论文与固定分析，仅演示流程 · 无需模型" : modelBusy() || state.switching ? "正在加载模型，完成后即可开始真实研究。" : unavailable ? "本地模型尚未连接，可先选择「离线演示」体验。" : "检索真实论文 · 由本地模型完成分析";
+  $("#research-hint").textContent = busy ? "有一项研究正在运行，可从研究记录查看进度。" : modelBusy() || state.switching ? "正在加载模型，完成后即可开始研究。" : unavailable ? "本地模型尚未连接，请先启动模型服务。" : "检索真实论文 · 由本地模型完成分析";
 }
-function setMode(mock) { state.mock = mock; updateComposer(); }
 function newResearch() {
   showView("home");
   $("#idea").value = "";
@@ -215,15 +210,15 @@ async function switchModel() {
 }
 function jobCard(job) {
   const count = Number(job.completed_count || 0);
-  return `<button class="research-card" data-job-id="${escapeHtml(job.id)}"><span class="research-card-top"><span class="tag">${icon(job.mock ? "flask" : "paper")}${job.mock ? "离线演示" : "文献研究"}</span>${badge(job.status)}</span><span class="research-card-title">${escapeHtml(job.idea || "未命名研究")}</span><span class="research-card-meta"><span>${icon("clock")}${escapeHtml(dateLabel(job.created_at))}</span><span>${count} 篇已读 ${icon("arrow")}</span></span></button>`;
+  return `<button class="research-card" data-job-id="${escapeHtml(job.id)}"><span class="research-card-top"><span class="tag">${icon("paper")}文献研究</span>${badge(job.status)}</span><span class="research-card-title">${escapeHtml(job.idea || "未命名研究")}</span><span class="research-card-meta"><span>${icon("clock")}${escapeHtml(dateLabel(job.created_at))}</span><span>${count} 篇已读 ${icon("arrow")}</span></span></button>`;
 }
 function emptyState(title, description) { return `<div class="empty-state"><span class="empty-icon">${icon("book")}</span><h3>${escapeHtml(title)}</h3><p>${escapeHtml(description)}</p></div>`; }
 function renderHistory() {
   $("#history-count").textContent = state.jobs.length;
-  $("#stat-papers").textContent = state.jobs.filter((job) => !job.mock).reduce((total, job) => total + Number(job.completed_count || 0), 0);
-  $("#stat-research").textContent = state.jobs.filter((job) => !job.mock && job.status === "completed").length;
-  $("#sidebar-history").innerHTML = state.jobs.length ? state.jobs.slice(0, 7).map((job) => `<button class="history-button ${job.id === state.currentId ? "selected" : ""}" data-job-id="${escapeHtml(job.id)}"><span class="history-title">${icon(job.mock ? "flask" : "paper")}${escapeHtml(job.idea || "未命名研究")}</span><span class="history-meta">${escapeHtml(dateLabel(job.created_at))}<span class="history-status ${activeStatuses.has(job.status) ? "running" : ""}">${escapeHtml(statusLabels[job.status] || "未完成")}</span></span></button>`).join("") : '<p class="sidebar-empty">每一个好问题，都值得留下。</p>';
-  $("#recent-jobs").innerHTML = state.jobs.length ? state.jobs.slice(0, 4).map(jobCard).join("") : emptyState("你的研究旅程，从这里开始", "输入一个想法，或者先试试无需模型的离线演示。");
+  $("#stat-papers").textContent = state.jobs.reduce((total, job) => total + Number(job.completed_count || 0), 0);
+  $("#stat-research").textContent = state.jobs.filter((job) => job.status === "completed").length;
+  $("#sidebar-history").innerHTML = state.jobs.length ? state.jobs.slice(0, 7).map((job) => `<button class="history-button ${job.id === state.currentId ? "selected" : ""}" data-job-id="${escapeHtml(job.id)}"><span class="history-title">${icon("paper")}${escapeHtml(job.idea || "未命名研究")}</span><span class="history-meta">${escapeHtml(dateLabel(job.created_at))}<span class="history-status ${activeStatuses.has(job.status) ? "running" : ""}">${escapeHtml(statusLabels[job.status] || "未完成")}</span></span></button>`).join("") : '<p class="sidebar-empty">每一个好问题，都值得留下。</p>';
+  $("#recent-jobs").innerHTML = state.jobs.length ? state.jobs.slice(0, 4).map(jobCard).join("") : emptyState("你的研究旅程，从这里开始", "输入一个研究想法，开始检索和阅读论文。");
   const query = $("#history-search").value.trim().toLocaleLowerCase();
   const filtered = state.jobs.filter((job) => String(job.idea || "").toLocaleLowerCase().includes(query));
   $("#all-jobs").innerHTML = filtered.length ? filtered.map(jobCard).join("") : emptyState(query ? "没有找到匹配的研究" : "还没有研究记录", query ? "换一个关键词试试。" : "完成的研究将自动保存在这里。");
@@ -231,7 +226,7 @@ function renderHistory() {
 async function refreshHistory(announce = false) {
   try {
     const data = await api("/api/jobs");
-    state.jobs = Array.isArray(data.jobs) ? data.jobs : [];
+    state.jobs = Array.isArray(data.jobs) ? data.jobs.filter((job) => !job.mock) : [];
     renderHistory();
     if (announce) toast("研究记录已更新");
   } catch (error) { if (announce) toast(error.message, "error"); }
@@ -275,7 +270,7 @@ function renderPapers(job) {
     const title = escapeHtml(paper.title || "未命名论文");
     const pdf = paper.pdf_available === true || (paper.pdf_available === undefined && paper.status === "ok");
     const paperStatus = paper.status === "ok" ? "已完成阅读" : paper.status === "failed" ? "处理未完成" : paper.status === "cancelled" ? "已停止处理" : "等待 / 正在分析";
-    return `<article class="paper-card"><div class="paper-rank">${String(index + 1).padStart(2, "0")}</div><div class="paper-content"><div class="paper-meta">${job.mock ? '<span class="tag mock">合成演示材料</span>' : sources.map((source) => `<span class="source-tag">${escapeHtml(source)}</span>`).join("")}${year ? `<span>${escapeHtml(year)}</span>` : ""}<span class="paper-status ${paper.status === "ok" ? "ok" : paper.status === "failed" ? "failed" : "pending"}">${paper.status === "ok" ? icon("check") : icon("clock")}${paperStatus}</span></div><h3 class="paper-title">${title}</h3>${authors.length ? `<p class="paper-authors">${escapeHtml(authors.slice(0, 3).join(" · "))}${authors.length > 3 ? " 等" : ""}</p>` : ""}${paper.selection_reason ? `<div class="paper-reason">${icon("spark")}<p>${escapeHtml(paper.selection_reason)}</p></div>` : ""}${paper.error ? `<div class="notice error">${escapeHtml(paper.error)}</div>` : ""}<div class="paper-actions">${url && !job.mock ? `<a class="text-button" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">论文来源${icon("external")}</a>` : ""}${pdf ? `<a class="text-button" href="/api/jobs/${encodeURIComponent(job.id)}/papers/${encodeURIComponent(paper.id)}/pdf" target="_blank" rel="noopener noreferrer">${icon("paper")}查看 PDF</a>` : ""}<span class="paper-id">${escapeHtml(paper.id)}</span></div>${paper.summary ? `<details class="paper-summary" data-paper-id="${escapeHtml(paper.id)}" ${opened.has(String(paper.id)) ? "open" : ""}><summary>${icon("book")}阅读全文总结${icon("chevron")}</summary><div class="markdown">${markdown(paper.summary)}</div></details>` : ""}</div></article>`;
+    return `<article class="paper-card"><div class="paper-rank">${String(index + 1).padStart(2, "0")}</div><div class="paper-content"><div class="paper-meta">${sources.map((source) => `<span class="source-tag">${escapeHtml(source)}</span>`).join("")}${year ? `<span>${escapeHtml(year)}</span>` : ""}<span class="paper-status ${paper.status === "ok" ? "ok" : paper.status === "failed" ? "failed" : "pending"}">${paper.status === "ok" ? icon("check") : icon("clock")}${paperStatus}</span></div><h3 class="paper-title">${title}</h3>${authors.length ? `<p class="paper-authors">${escapeHtml(authors.slice(0, 3).join(" · "))}${authors.length > 3 ? " 等" : ""}</p>` : ""}${paper.selection_reason ? `<div class="paper-reason">${icon("spark")}<p>${escapeHtml(paper.selection_reason)}</p></div>` : ""}${paper.error ? `<div class="notice error">${escapeHtml(paper.error)}</div>` : ""}<div class="paper-actions">${url ? `<a class="text-button" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">论文来源${icon("external")}</a>` : ""}${pdf ? `<a class="text-button" href="/api/jobs/${encodeURIComponent(job.id)}/papers/${encodeURIComponent(paper.id)}/pdf" target="_blank" rel="noopener noreferrer">${icon("paper")}查看 PDF</a>` : ""}<span class="paper-id">${escapeHtml(paper.id)}</span></div>${paper.summary ? `<details class="paper-summary" data-paper-id="${escapeHtml(paper.id)}" ${opened.has(String(paper.id)) ? "open" : ""}><summary>${icon("book")}阅读全文总结${icon("chevron")}</summary><div class="markdown">${markdown(paper.summary)}</div></details>` : ""}</div></article>`;
   }).join("");
 }
 function eventDescription(item) {
@@ -307,23 +302,22 @@ function renderActivity(job) {
   $("#activity-live").hidden = !activeStatuses.has(job.status);
   $("#activity-list").innerHTML = events.length ? events.map(({ item, description }) => `<div class="activity-item"><span class="activity-dot ${item.status === "failed" ? "failed" : ""}"></span><div class="activity-content"><strong>${escapeHtml(description[0])}</strong><p>${escapeHtml(description[1])}</p><time class="activity-time">${escapeHtml(dateLabel(item.time))}</time></div></div>`).join("") : '<p class="activity-empty">任务启动后，实际执行进展会显示在这里。</p>';
   const sources = job.metrics?.sources || {};
-  $("#source-health").innerHTML = Object.keys(sources).length ? `<div class="sidebar-label">来源状态</div>${Object.entries(sources).map(([name, source]) => `<div class="source-health-row"><span>${escapeHtml(name)}</span><span class="source-result ${source.status === "failed" ? "failed" : ""}">${source.status === "failed" ? "请求失败" : `${Number(source.count || 0)} 篇${source.status === "mock" ? " · 演示" : ""}`}</span></div>`).join("")}` : "";
+  $("#source-health").innerHTML = Object.keys(sources).length ? `<div class="sidebar-label">来源状态</div>${Object.entries(sources).map(([name, source]) => `<div class="source-health-row"><span>${escapeHtml(name)}</span><span class="source-result ${source.status === "failed" ? "failed" : ""}">${source.status === "failed" ? "请求失败" : `${Number(source.count || 0)} 篇`}</span></div>`).join("")}` : "";
 }
 function renderJob(job) {
   state.job = job;
   $("#run-title").textContent = job.idea || "文献研究";
   $("#run-eyebrow").textContent = activeStatuses.has(job.status) ? "FOLLOW THE EVIDENCE" : "YOUR RESEARCH, COLLECTED";
-  $("#run-meta").innerHTML = `${badge(job.status)}<span>${job.mock ? "离线演示 · 合成材料" : "真实文献研究"}</span>${job.model_id ? `<span>${escapeHtml(job.model_id.toUpperCase())}</span>` : ""}<span>Top ${Number(job.top_k || 3)}</span><span>${escapeHtml(dateLabel(job.created_at))}</span>`;
+  $("#run-meta").innerHTML = `${badge(job.status)}<span>文献研究</span>${job.model_id ? `<span>${escapeHtml(job.model_id.toUpperCase())}</span>` : ""}<span>Top ${Number(job.top_k || 3)}</span><span>${escapeHtml(dateLabel(job.created_at))}</span>`;
   $("#cancel-job").hidden = !activeStatuses.has(job.status);
   $("#cancel-job").disabled = false;
   $("#download-report").disabled = !job.report;
   const messages = [];
-  if (job.mock) messages.push("本次为离线演示：论文和分析为合成测试材料，不代表真实检索或模型推理。");
   if (job.status === "partial") messages.push("本次部分完成。请核对已完成论文数量、来源状态和报告内容。");
   if (job.status === "failed") messages.push(job.error || "研究未完成，请查看运行日志与模型连接状态。");
   if (job.status === "cancelled") messages.push("研究已停止，已生成的论文与分析结果仍可查看。");
   $("#run-notice").hidden = !messages.length;
-  $("#run-notice").className = `notice ${job.status === "failed" ? "error" : job.status === "partial" ? "warning" : job.mock ? "mock" : ""}`;
+  $("#run-notice").className = `notice ${job.status === "failed" ? "error" : job.status === "partial" ? "warning" : ""}`;
   $("#run-notice").textContent = messages.join(" ");
   renderProgress(job);
   renderPapers(job);
@@ -367,7 +361,7 @@ async function startResearch(event) {
   if (!idea || state.submitting) { $("#idea").focus(); return; }
   state.submitting = true; updateComposer();
   try {
-    const job = await api("/api/jobs", { method: "POST", body: JSON.stringify({ idea, top_k: Number($("#top-k").value), mock: state.mock, concurrent: true }) });
+    const job = await api("/api/jobs", { method: "POST", body: JSON.stringify({ idea, top_k: Number($("#top-k").value), concurrent: true }) });
     state.activeJobId = job.id;
     renderModelControls();
     await refreshHistory();
@@ -380,8 +374,6 @@ $("#research-form").addEventListener("submit", startResearch);
 $("#model-select").addEventListener("change", renderModelControls);
 $("#switch-model").addEventListener("click", switchModel);
 $("#idea").addEventListener("input", updateComposer);
-$("#live-mode").addEventListener("click", () => setMode(false));
-$("#mock-mode").addEventListener("click", () => setMode(true));
 $("#new-research").addEventListener("click", newResearch);
 $("#brand-home").addEventListener("click", (event) => { event.preventDefault(); showView("home"); });
 $("#nav-home").addEventListener("click", () => showView("home"));
@@ -389,7 +381,7 @@ $("#back-home").addEventListener("click", () => showView("home"));
 for (const element of [$("#nav-history"), $("#view-all")]) element.addEventListener("click", () => { showView("history"); refreshHistory(); });
 $("#history-search").addEventListener("input", renderHistory);
 $("#history-refresh").addEventListener("click", () => refreshHistory(true));
-$("#refresh-status").addEventListener("click", async () => { await refreshStatus(); toast(state.model?.connected ? "本地模型连接正常" : "尚未连接模型；可先使用离线演示。"); });
+$("#refresh-status").addEventListener("click", async () => { await refreshStatus(); toast(state.model?.connected ? "本地模型连接正常" : "尚未连接模型，请启动模型服务后重试。"); });
 $$("[data-idea]").forEach((button) => button.addEventListener("click", () => { $("#idea").value = button.dataset.idea; updateComposer(); $("#idea").focus(); }));
 document.addEventListener("click", (event) => { const button = event.target.closest("[data-job-id]"); if (button) loadJob(button.dataset.jobId); });
 $$("[data-tab]").forEach((button) => button.addEventListener("click", () => switchTab(button.dataset.tab)));
@@ -406,7 +398,6 @@ $("#reuse-idea").addEventListener("click", () => {
   newResearch();
   $("#idea").value = job.idea || "";
   $("#top-k").value = String(job.top_k || 3);
-  setMode(Boolean(job.mock));
 });
 $("#cancel-job").addEventListener("click", async () => {
   if (!state.currentId) return;

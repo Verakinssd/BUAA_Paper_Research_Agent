@@ -13,8 +13,8 @@ from research.task_agent import TaskAgent
 async def run(args):
     load_dotenv()
     papers = json.loads(Path(args.selection).read_text(encoding="utf-8"))
-    if not papers or any(not p.get("fixture_text") for p in papers) and args.mock:
-        raise ValueError("--mock 只接受来自离线模式的 selection.json")
+    if not papers:
+        raise ValueError("selection.json 必须包含已筛选的论文")
     root = Path("outputs") / ("benchmark-" + str(time.time_ns()))
     rows = []
     for repeat in range(args.repeats):
@@ -26,7 +26,7 @@ async def run(args):
             previous_cache = os.environ.get("PAPER_CACHE_DIR")
             os.environ["PAPER_CACHE_DIR"] = str(out / "_isolated_cache")
             try:
-                results, metrics = await process_papers(papers, out, TaskAgent(args.mock), concurrent)
+                results, metrics = await process_papers(papers, out, TaskAgent(), concurrent)
             finally:
                 if previous_cache is None:
                     os.environ.pop("PAPER_CACHE_DIR", None)
@@ -45,5 +45,4 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--selection", required=True)
     parser.add_argument("--repeats", type=int, choices=range(1, 6), default=3)
-    parser.add_argument("--mock", action="store_true")
     asyncio.run(run(parser.parse_args()))

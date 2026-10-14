@@ -9,6 +9,7 @@ from research.sources import cvf_pdf_url, merge_dedup, paper_keys, restore_abstr
 from research.sources import request as source_request
 from research.task_agent import TaskAgent, validate_selection
 from research.pipeline import convert_pdf, process_papers, restore_cached_fulltext, store_cached_fulltext
+from support import write_test_pdf
 
 
 def paper(title, doi="", aid="", source="arxiv"):
@@ -37,15 +38,16 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(restore_abstract({"world": [1, 3], "hello": [0, 2]}), "hello world hello world")
 
     def test_cvf_open_access_pdf_is_derived_from_proceedings_doi(self):
+        # Synthetic metadata checks URL construction without requesting a paper.
         work = {
-            "doi": "https://doi.org/10.1109/iccv48922.2021.00370",
-            "display_name": "Free-form Description Guided 3D Visual Graph Network",
-            "authorships": [{"author": {"display_name": "Mingtao Feng"}}],
+            "doi": "https://doi.org/10.1109/ICCV.2021.99999",
+            "display_name": "Synthetic Paper for URL Construction",
+            "authorships": [{"author": {"display_name": "Test Author"}}],
         }
         self.assertEqual(
             cvf_pdf_url(work),
             "https://openaccess.thecvf.com/content/ICCV2021/papers/"
-            "Feng_Free-form_Description_Guided_3D_Visual_Graph_Network_ICCV_2021_paper.pdf",
+            "Author_Synthetic_Paper_for_URL_Construction_ICCV_2021_paper.pdf",
         )
 
     def test_non_cvf_work_has_no_derived_pdf(self):
@@ -61,8 +63,7 @@ class CoreTests(unittest.TestCase):
             validate_selection({"selected": [{"id": "P1", "reason": "x"}, {"id": "P1", "reason": "y"}]}, [p1, p2], 2)
 
     def test_no_pdf_does_not_become_fulltext_summary(self):
-        agent = TaskAgent(mock=True)
-        agent.mock = False  # No model required: missing-PDF branch must exit before inference.
+        agent = TaskAgent(llm=object())  # Missing-PDF branch exits before inference.
         with tempfile.TemporaryDirectory() as folder:
             results, metrics = asyncio.run(process_papers([paper("A")], Path(folder), agent))
         self.assertEqual(results[0]["status"], "failed")
@@ -84,8 +85,6 @@ class CoreTests(unittest.TestCase):
 
     def test_all_equivalent_urls_are_checked_before_any_download(self):
         class Agent:
-            mock = False
-
             async def summarize(self, paper, markdown, progress=None):
                 return "cached summary"
 
@@ -107,7 +106,8 @@ class CoreTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder, \
                 patch.dict(os.environ, {"PDF_LAYOUT_MODE": "legacy"}):
             path = Path(folder) / "fixture.pdf"
-            text = convert_pdf(path, "direct extraction " * 20)
+            write_test_pdf(path, "direct extraction " * 20)
+            text = convert_pdf(path)
         self.assertIn("[Page 1]", text)
         self.assertIn("direct extraction", text)
 

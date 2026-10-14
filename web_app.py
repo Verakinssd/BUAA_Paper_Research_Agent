@@ -110,6 +110,8 @@ class JobManager:
             job = read_json(path)
             if not isinstance(job, dict) or job.get("id") != path.stem:
                 continue
+            if job.get("mock"):
+                continue  # Archived test runs are not research history.
             if job.get("status") in ACTIVE:
                 job.update(status="failed", updated_at=now_iso(), finished_at=now_iso(),
                            error="网页服务已重启，之前的任务已中断；请重新运行。")
@@ -155,7 +157,7 @@ class JobManager:
             metrics = read_json(self.artifact(path, "metrics.json"), {})
             meta = read_json(self.artifact(path, "run_meta.json"), {})
             selections = read_json(self.artifact(path, "selection.json"), [])
-            if not metrics or not isinstance(metrics, dict):
+            if not metrics or not isinstance(metrics, dict) or metrics.get("mode") == "mock":
                 continue
             trace = read_json(self.artifact(path, "main_trace.json"), [])
             build_args = next((item.get("arguments", {}) for item in trace
@@ -171,7 +173,7 @@ class JobManager:
             if not completed:
                 status = "failed"
             self.jobs[path.name] = dict(id=path.name, idea=idea, top_k=requested,
-                mock=metrics.get("mode") == "mock", concurrent=bool(metrics.get("concurrent")),
+                concurrent=bool(metrics.get("concurrent")),
                 status=status, created_at=timestamp, updated_at=timestamp, finished_at=timestamp,
                 logs=[], legacy=True, model_id=meta.get("model_id"), model_label=meta.get("model_label"))
 
@@ -185,7 +187,7 @@ class JobManager:
 
     def snapshot(self, job):
         result = {key: job.get(key) for key in
-                  ("id", "idea", "top_k", "mock", "concurrent", "status", "created_at", "updated_at", "model_id", "model_label")}
+                  ("id", "idea", "top_k", "concurrent", "status", "created_at", "updated_at", "model_id", "model_label")}
         result.update(stage="search", run_id=None, candidates=[], papers=[], metrics={},
                       report="", events=[], completed_count=0, selected_count=0,
                       logs=list(job.get("logs", []))[-100:])
@@ -268,21 +270,24 @@ class JobManager:
             raise HTTPException(400, "研究想法需为 1–2000 个字符")
         if type(top_k) is not int or not 1 <= top_k <= 5:
             raise HTTPException(400, "Top-K 需为 1–5 的整数")
-        if any(type(payload.get(key, False)) is not bool for key in ("mock", "concurrent")):
-            raise HTTPException(400, "mock 和 concurrent 需为布尔值")
+        if set(payload) - {"idea", "top_k", "concurrent"}:
+            raise HTTPException(400, "请求包含不支持的参数")
+        if type(payload.get("concurrent", False)) is not bool:
+            raise HTTPException(400, "concurrent 需为布尔值")
         async with self.lock:
             if self.active_id:
                 raise HTTPException(409, "已有任务正在运行，请等待完成或停止后再试")
             selected_model = {}
-            if not payload.get("mock", False):
-                catalog = await self.model_control.catalog()
-                if catalog["managed"]:
-                    if catalog["status"] != "ready":
-                        raise HTTPException(409, "模型尚未就绪，请等待加载完成后再开始研究")
-                    selected_model = next((m for m in catalog["models"] if m["id"] == catalog["current_id"]), {})
+            catalog = await self.model_control.catalog()
+            if catalog["managed"]:
+                if catalog["status"] != "ready":
+                    raise HTTPException(409, "模型尚未就绪，请等待加载完成后再开始研究")
+                selected_model = next((m for m in catalog["models"] if m["id"] == catalog["current_id"]), {})
+            if not (await self.health())["model"]["connected"]:
+                raise HTTPException(409, "模型未连接，请先启动模型服务后再开始研究")
             stamp = now_iso()
             job = dict(id=uuid.uuid4().hex, idea=idea.strip(), top_k=top_k,
-                       mock=payload.get("mock", False), concurrent=payload.get("concurrent", False),
+                       concurrent=payload.get("concurrent", False),
                        status="queued", created_at=stamp, updated_at=stamp, logs=[],
                        model_id=selected_model.get("id"), model_label=selected_model.get("label"))
             self.jobs[job["id"]] = job
@@ -304,8 +309,6 @@ class JobManager:
                 env.update(PAPER_MODEL_ID=job["model_id"], PAPER_MODEL_LABEL=job["model_label"])
             command = [sys.executable, "-u", str(self.project / "main_agent.py"),
                        "--idea", job["idea"], "--top-k", str(job["top_k"])]
-            if job["mock"]:
-                command.append("--mock")
             if job["concurrent"]:
                 command.append("--concurrent")
             process = await asyncio.create_subprocess_exec(*command, cwd=self.project, env=env,
@@ -382,7 +385,7 @@ class JobManager:
                 return {"model": self.health_cache[1], "active_job_id": self.active_id}
             name = os.getenv("LLM_MODEL", "未配置模型")
             base = os.getenv("LLM_BASE_URL", "").rstrip("/")
-            model = dict(name=name, connected=False, detail="请配置并启动模型服务；演示模式可直接运行")
+            model = dict(name=name, connected=False, detail="请配置并启动模型服务")
             if base:
                 try:
                     local = urlsplit(base).hostname in {"127.0.0.1", "localhost", "::1"}
@@ -395,7 +398,7 @@ class JobManager:
                     else:
                         model["detail"] = f"模型服务返回 HTTP {response.status_code}"
                 except (httpx.HTTPError, ValueError, TimeoutError):
-                    model["detail"] = "模型服务未连接；请确认服务已启动，或选择演示模式"
+                    model["detail"] = "模型服务未连接；请确认服务已启动"
             self.health_cache = (time.monotonic(), self.clean(model))
             return {"model": self.health_cache[1], "active_job_id": self.active_id}
 
@@ -460,7 +463,7 @@ def create_app(project=PROJECT, output_root=None):
         for job in sorted(manager.jobs.values(), key=lambda j: j["created_at"], reverse=True):
             snap = manager.snapshot(job)
             summaries.append({key: snap[key] for key in
-                ("id", "idea", "top_k", "mock", "status", "created_at", "updated_at", "completed_count", "selected_count")})
+                ("id", "idea", "top_k", "status", "created_at", "updated_at", "completed_count", "selected_count")})
         return JSONResponse({"jobs": summaries})
 
     async def job_detail(request):
