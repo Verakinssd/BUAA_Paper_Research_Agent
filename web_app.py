@@ -1,6 +1,7 @@
 """Local web workspace for the existing CLI/MCP research pipeline."""
 import argparse
 import asyncio
+from collections import deque
 from contextlib import asynccontextmanager, suppress
 from datetime import datetime, timezone
 import json
@@ -14,8 +15,9 @@ from urllib.parse import urlsplit
 import uuid
 
 import httpx
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 from starlette.applications import Starlette
+from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -23,6 +25,7 @@ from starlette.responses import FileResponse, JSONResponse
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 from research.model_manager import ModelControlClient
+from research.accounts import SESSION_TTL_SECONDS, UserStore
 
 
 PROJECT = Path(__file__).resolve().parent
@@ -262,7 +265,7 @@ class JobManager:
             result["stage"] = "done"
         return self.clean(result)
 
-    async def create(self, payload):
+    async def create(self, payload, owner_id=None):
         if not isinstance(payload, dict):
             raise HTTPException(400, "请求内容必须是 JSON 对象")
         idea, top_k = payload.get("idea"), payload.get("top_k", 3)
@@ -287,6 +290,7 @@ class JobManager:
                 raise HTTPException(409, "模型未连接，请先启动模型服务后再开始研究")
             stamp = now_iso()
             job = dict(id=uuid.uuid4().hex, idea=idea.strip(), top_k=top_k,
+                       owner_id=owner_id,
                        concurrent=payload.get("concurrent", False),
                        status="queued", created_at=stamp, updated_at=stamp, logs=[],
                        model_id=selected_model.get("id"), model_label=selected_model.get("label"))
@@ -403,12 +407,24 @@ class JobManager:
             return {"model": self.health_cache[1], "active_job_id": self.active_id}
 
 
-def create_app(project=PROJECT, output_root=None):
+def create_app(project=PROJECT, output_root=None, data_dir=None):
     manager = JobManager(project, output_root)
+    configured_data = os.getenv("PAPER_DATA_DIR") or dotenv_values(manager.project / ".env").get("PAPER_DATA_DIR")
+    if data_dir is None:
+        # Explicit test/output workspaces never read or write the real account database.
+        data_dir = (manager.output_root / "_accounts" if output_root is not None else
+                    Path(configured_data) if configured_data else manager.project / "data")
+    account_path = Path(data_dir).expanduser()
+    if not account_path.is_absolute():
+        account_path = manager.project / account_path
+    accounts = UserStore(account_path)
+    cookie_name = "paper_session"
+    auth_attempts = {}
 
     @asynccontextmanager
     async def lifespan(app):
         load_dotenv(manager.project / ".env")
+        await run_in_threadpool(accounts.initialize)
         await manager.startup()
         try:
             yield
@@ -425,18 +441,149 @@ def create_app(project=PROJECT, output_root=None):
         return FileResponse(path)
 
     async def status(request):
-        return JSONResponse(await manager.health())
+        result = dict(await manager.health())
+        active_id = manager.active_id
+        result["resource_busy"] = bool(active_id)
+        result["active_job_id"] = (active_id if active_id and
+                                   visible(manager.jobs[active_id], request.state.user) else None)
+        return JSONResponse(result)
+
+    def visible(job, user):
+        owner = job.get("owner_id")
+        return owner == user["id"] or (not owner and user["role"] == "admin")
+
+    def owned_job(request):
+        job = manager.get(request.path_params["job_id"])
+        if not visible(job, request.state.user):
+            raise HTTPException(404, "任务不存在")
+        return job
+
+    def admin_only(request):
+        if request.state.user["role"] != "admin":
+            raise HTTPException(403, "仅管理员可执行此操作")
+
+    async def bounded_body(request, limit):
+        body = bytearray()
+        async for chunk in request.stream():
+            body.extend(chunk)
+            if len(body) > limit:
+                raise HTTPException(413, "请求内容过大")
+        return bytes(body)
 
     async def payload(request, limit=20000):
         if "application/json" not in request.headers.get("content-type", ""):
             raise HTTPException(415, "请使用 application/json")
-        body = await request.body()
-        if len(body) > limit:
-            raise HTTPException(413, "请求内容过大")
+        body = await bounded_body(request, limit)
         try:
             return json.loads(body)
         except (ValueError, UnicodeError):
             raise HTTPException(400, "JSON 格式不正确") from None
+
+    async def object_payload(request, allowed, required=()):
+        data = await payload(request)
+        if not isinstance(data, dict) or set(data) - set(allowed) or set(required) - set(data):
+            raise HTTPException(400, "请求参数不正确")
+        return data
+
+    def throttle(request, category):
+        # Bounded, process-local limits. Never trust a caller-supplied forwarding header.
+        current = time.monotonic()
+        expired = [key for key, values in auth_attempts.items() if not values or values[-1] < current - 300]
+        for key in expired:
+            auth_attempts.pop(key, None)
+        key = (category, request.client.host if request.client else "unknown")
+        if key not in auth_attempts and len(auth_attempts) >= 4096:
+            raise HTTPException(429, "请求过于频繁，请稍后重试")
+        attempts = auth_attempts.setdefault(key, deque())
+        while attempts and attempts[0] < current - 300:
+            attempts.popleft()
+        if len(attempts) >= (10 if category == "register" else 30):
+            raise HTTPException(429, "尝试次数过多，请五分钟后重试")
+        attempts.append(current)
+
+    def with_session(user, token, status_code=200):
+        response = JSONResponse({"user": user}, status_code=status_code)
+        response.set_cookie(cookie_name, token, max_age=SESSION_TTL_SECONDS,
+                            httponly=True, samesite="lax", path="/",
+                            secure=os.getenv("PAPER_COOKIE_SECURE", "0") == "1")
+        return response
+
+    async def me(request):
+        return JSONResponse({"user": request.state.user})
+
+    async def register(request):
+        throttle(request, "register")
+        data = await object_payload(request, {"username", "password", "display_name"}, {"username", "password"})
+        user = await run_in_threadpool(accounts.create_user, data["username"], data["password"],
+                                       display_name=data.get("display_name"), role="user")
+        token = await run_in_threadpool(accounts.create_session, user["id"])
+        return with_session(user, token, 201)
+
+    async def login(request):
+        throttle(request, "login")
+        data = await object_payload(request, {"username", "password"}, {"username", "password"})
+        user = await run_in_threadpool(accounts.authenticate, data["username"], data["password"])
+        token = await run_in_threadpool(accounts.create_session, user["id"])
+        return with_session(user, token)
+
+    async def logout(request):
+        token = request.cookies.get(cookie_name)
+        if token:
+            await run_in_threadpool(accounts.revoke_session, token)
+        response = JSONResponse({"ok": True})
+        response.delete_cookie(cookie_name, path="/")
+        return response
+
+    async def profile(request):
+        data = await object_payload(request, {"username", "display_name", "bio"})
+        user = await run_in_threadpool(accounts.update_profile, request.state.user["id"], data)
+        return JSONResponse({"user": user})
+
+    async def password(request):
+        throttle(request, "password")
+        data = await object_payload(request, {"current_password", "new_password"}, {"current_password", "new_password"})
+        user_id = request.state.user["id"]
+        await run_in_threadpool(accounts.change_password, user_id, data["current_password"], data["new_password"])
+        token = await run_in_threadpool(accounts.create_session, user_id)
+        return with_session(await run_in_threadpool(accounts.profile, user_id), token)
+
+    async def avatar(request):
+        if request.method == "DELETE":
+            user = await run_in_threadpool(accounts.delete_avatar, request.state.user["id"])
+        else:
+            raw = await bounded_body(request, 3 * 1024 * 1024)
+            user = await run_in_threadpool(accounts.set_avatar, request.state.user["id"], raw,
+                                           request.headers.get("content-type", ""))
+        return JSONResponse({"user": user})
+
+    async def avatar_file(request):
+        path = await run_in_threadpool(accounts.avatar_path, request.path_params["user_id"])
+        return FileResponse(path, media_type="image/png")
+
+    async def admin_users(request):
+        admin_only(request)
+        try:
+            page = int(request.query_params.get("page", "1"))
+            page_size = int(request.query_params.get("page_size", "20"))
+        except ValueError:
+            raise HTTPException(400, "分页参数需为整数") from None
+        result = await run_in_threadpool(accounts.admin_list, search=request.query_params.get("search", ""),
+                                         page=page, page_size=page_size)
+        return JSONResponse(result)
+
+    async def admin_update(request):
+        admin_only(request)
+        data = await object_payload(request, {"username", "display_name", "bio", "role", "is_active"})
+        user = await run_in_threadpool(accounts.admin_update, request.state.user["id"],
+                                       request.path_params["user_id"], data)
+        return JSONResponse({"user": user})
+
+    async def admin_password(request):
+        admin_only(request)
+        data = await object_payload(request, {"new_password"}, {"new_password"})
+        await run_in_threadpool(accounts.reset_password, request.state.user["id"],
+                                 request.path_params["user_id"], data["new_password"])
+        return JSONResponse({"ok": True})
 
     async def models(request):
         result = await manager.model_control.catalog()
@@ -444,6 +591,7 @@ def create_app(project=PROJECT, output_root=None):
         return JSONResponse(manager.clean(result))
 
     async def switch_model(request):
+        admin_only(request)
         data = await payload(request, 2048)
         if (not isinstance(data, dict) or not isinstance(data.get("model_id"), str)
                 or data["model_id"] not in {"q4_k_m", "q5_k_m"}):
@@ -457,23 +605,25 @@ def create_app(project=PROJECT, output_root=None):
 
     async def jobs(request):
         if request.method == "POST":
-            return JSONResponse(await manager.create(await payload(request)), status_code=202)
+            return JSONResponse(await manager.create(await payload(request), request.state.user["id"]), status_code=202)
         manager.discover_history()
         summaries = []
         for job in sorted(manager.jobs.values(), key=lambda j: j["created_at"], reverse=True):
+            if not visible(job, request.state.user):
+                continue
             snap = manager.snapshot(job)
             summaries.append({key: snap[key] for key in
                 ("id", "idea", "top_k", "status", "created_at", "updated_at", "completed_count", "selected_count")})
         return JSONResponse({"jobs": summaries})
 
     async def job_detail(request):
-        return JSONResponse(manager.snapshot(manager.get(request.path_params["job_id"])))
+        return JSONResponse(manager.snapshot(owned_job(request)))
 
     async def cancel_job(request):
-        return JSONResponse(await manager.cancel(request.path_params["job_id"]))
+        return JSONResponse(await manager.cancel(owned_job(request)["id"]))
 
     async def artifact_response(request):
-        job = manager.get(request.path_params["job_id"])
+        job = owned_job(request)
         run = manager.run_directory(job)
         if not run:
             raise HTTPException(404, "文件尚未生成")
@@ -494,6 +644,17 @@ def create_app(project=PROJECT, output_root=None):
         return FileResponse(path, media_type=media, filename=filename)
 
     app = Starlette(lifespan=lifespan, exception_handlers={HTTPException: error_response}, routes=[
+        Route("/api/auth/me", me),
+        Route("/api/auth/register", register, methods=["POST"]),
+        Route("/api/auth/login", login, methods=["POST"]),
+        Route("/api/auth/logout", logout, methods=["POST"]),
+        Route("/api/auth/profile", profile, methods=["PATCH"]),
+        Route("/api/auth/password", password, methods=["POST"]),
+        Route("/api/auth/avatar", avatar, methods=["POST", "DELETE"]),
+        Route("/api/users/{user_id}/avatar", avatar_file),
+        Route("/api/admin/users", admin_users),
+        Route("/api/admin/users/{user_id}", admin_update, methods=["PATCH"]),
+        Route("/api/admin/users/{user_id}/password", admin_password, methods=["POST"]),
         Route("/", home), Route("/api/status", status), Route("/api/jobs", jobs, methods=["GET", "POST"]),
         Route("/api/models", models), Route("/api/models/switch", switch_model, methods=["POST"]),
         Route("/api/jobs/{job_id}", job_detail),
@@ -503,15 +664,25 @@ def create_app(project=PROJECT, output_root=None):
         Mount("/static", StaticFiles(directory=manager.project / "web", check_dir=False), name="static"),
     ])
     app.state.manager = manager
+    app.state.accounts = accounts
 
     async def local_security(request: Request, call_next):
-        if request.method == "POST":
+        rejection = None
+        if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
             origin = request.headers.get("origin")
             if origin and origin.rstrip("/") != str(request.base_url).rstrip("/"):
-                return JSONResponse({"error": "仅允许同源请求"}, status_code=403)
+                rejection = JSONResponse({"error": "仅允许同源请求"}, status_code=403)
             if request.headers.get("sec-fetch-site") == "cross-site":
-                return JSONResponse({"error": "仅允许同源请求"}, status_code=403)
-        response = await call_next(request)
+                rejection = JSONResponse({"error": "仅允许同源请求"}, status_code=403)
+        request.state.user = None
+        if not rejection and request.url.path.startswith("/api/"):
+            token = request.cookies.get(cookie_name)
+            if token:
+                request.state.user = await run_in_threadpool(accounts.session_user, token)
+            public = request.url.path in {"/api/auth/me", "/api/auth/login", "/api/auth/register", "/api/auth/logout"}
+            if not public and request.state.user is None:
+                rejection = JSONResponse({"error": "请先登录后继续"}, status_code=401)
+        response = rejection if rejection is not None else await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Content-Security-Policy"] = (
@@ -520,6 +691,9 @@ def create_app(project=PROJECT, output_root=None):
         )
         if request.url.path.startswith("/api/"):
             response.headers["Cache-Control"] = "no-store"
+        elif request.url.path == "/" or request.url.path.startswith("/static/"):
+            # Revalidate the shell and assets together after local deployments.
+            response.headers["Cache-Control"] = "no-cache"
         return response
 
     app.add_middleware(BaseHTTPMiddleware, dispatch=local_security)

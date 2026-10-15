@@ -181,6 +181,11 @@ class ModelWebTests(unittest.IsolatedAsyncioTestCase):
         self.manager = self.app.state.manager
         await self.manager.startup()
         self.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app), base_url="http://testserver")
+        from starlette.concurrency import run_in_threadpool
+        user = await run_in_threadpool(self.app.state.accounts.create_user,
+                                      "model_test_admin", "test-password", role="admin")
+        token = await run_in_threadpool(self.app.state.accounts.create_session, user["id"])
+        self.client.cookies.set("paper_session", token)
         self.catalog = dict(managed=True, status="ready", current_id="q4_k_m", target_id=None,
             models=[dict(id="q4_k_m", label="Qwen Q4", available=True),
                     dict(id="q5_k_m", label="Qwen Q5", available=True)])

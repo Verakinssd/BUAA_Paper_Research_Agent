@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import AsyncMock, patch
 
 import httpx
+from starlette.concurrency import run_in_threadpool
 
 from web_app import create_app, JobManager, now_iso, PROJECT
 from support import FakeTaskAgent, sample_papers, fake_download
@@ -30,6 +31,10 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
         self.spawn_patch = patch("web_app.asyncio.create_subprocess_exec", new=spawn_fixture)
         self.spawn_patch.start()
         self.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=self.app), base_url="http://testserver")
+        self.user = await run_in_threadpool(self.app.state.accounts.create_user,
+                                           "web_test_admin", "test-password", role="admin")
+        token = await run_in_threadpool(self.app.state.accounts.create_session, self.user["id"])
+        self.client.cookies.set("paper_session", token)
 
     async def asyncTearDown(self):
         await self.manager.shutdown()

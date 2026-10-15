@@ -9,6 +9,7 @@ __pycache__/
 .vscode/
 *.log
 outputs/
+/data/
 models/
 *.gguf
 third_party/

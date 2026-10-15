@@ -11,7 +11,8 @@ const phases = [
   { id: "read", title: "全文阅读", description: "提取方法、发现与局限" },
   { id: "report", title: "形成报告", description: "梳理线索与研究建议" },
 ];
-const state = { jobs: [], job: null, currentId: null, activeJobId: null, submitting: false, model: null, models: null, switching: false, modelPoll: null, statusRefreshing: false, view: "home", tab: "papers", poll: null, requestVersion: 0 };
+const account = { user: null, mode: "login", pending: false, epoch: 0, users: [], total: 0, page: 1, pageSize: 20, search: "", searchTimer: null, adminVersion: 0, editing: null };
+const state = { jobs: [], job: null, currentId: null, activeJobId: null, resourceBusy: false, submitting: false, model: null, models: null, switching: false, modelPoll: null, statusRefreshing: false, view: "home", tab: "papers", poll: null, requestVersion: 0 };
 const modelBusy = (catalog = state.models) => Boolean(catalog?.managed && ["unloading", "loading", "recovering"].includes(catalog.status));
 
 function escapeHtml(value) {
@@ -40,11 +41,14 @@ function toast(message, type = "info") {
   setTimeout(() => item.remove(), 5500);
 }
 async function api(path, options = {}) {
+  const epoch = account.epoch;
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
   try {
-    const response = await fetch(path, { ...options, signal: controller.signal, headers: { ...(options.body ? { "Content-Type": "application/json" } : {}), ...options.headers } });
+    const response = await fetch(path, { credentials: "same-origin", ...options, signal: controller.signal, headers: { ...(options.body && !(options.body instanceof Blob) ? { "Content-Type": "application/json" } : {}), ...options.headers } });
     const body = await response.json().catch(() => ({}));
+    if (epoch !== account.epoch) throw new Error("账号已切换，请重新操作。");
+    if (response.status === 401 && !["/api/auth/login", "/api/auth/register"].includes(path)) requireLogin("登录状态已失效，请重新登录。");
     if (!response.ok) throw new Error(typeof body.error === "string" ? body.error : `请求未完成（HTTP ${response.status}）`);
     return body;
   } catch (error) {
@@ -123,26 +127,33 @@ function closeSidebar() {
   $("#mobile-menu").setAttribute("aria-expanded", "false");
 }
 function showView(view) {
+  if (!account.user) return;
+  if (view === "admin" && account.user.role !== "admin") view = "home";
   state.view = view;
-  for (const name of ["home", "history", "run"]) $(`#${name}-view`).hidden = name !== view;
-  $("#breadcrumb-current").textContent = { home: "工作台", history: "研究记录", run: "研究详情" }[view];
-  for (const name of ["home", "history"]) {
+  for (const name of ["home", "history", "run", "profile", "admin"]) $(`#${name}-view`).hidden = name !== view;
+  $("#breadcrumb-current").textContent = { home: "工作台", history: "研究记录", run: "研究详情", profile: "个人空间", admin: "用户管理" }[view];
+  for (const name of ["home", "history", "profile", "admin"]) {
     const button = $(`#nav-${name}`);
     button.classList.toggle("active", name === view);
     if (name === view) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
   }
   if (view !== "run") { clearTimeout(state.poll); state.requestVersion++; }
+  $("#account-dropdown").hidden = true;
+  $("#account-trigger").setAttribute("aria-expanded", "false");
+  if (view === "profile") populateProfile();
+  if (view === "admin") loadAdminUsers();
+  if (view !== "run") document.title = `${$("#breadcrumb-current").textContent} · Paper`;
   closeSidebar();
   window.scrollTo({ top: 0, behavior: "instant" });
 }
 function updateComposer() {
   const characters = $("#idea").value.length;
   $("#idea-count").textContent = `${characters} / 2000`;
-  const busy = Boolean(state.activeJobId);
+  const busy = Boolean(state.activeJobId || state.resourceBusy);
   const unavailable = !state.model?.connected || state.switching || (state.models?.managed && state.models.status !== "ready");
   $("#start-button").disabled = state.submitting || busy || unavailable;
   $("#start-button span").textContent = state.submitting ? "正在开始…" : busy ? "已有研究运行中" : "开始研究";
-  $("#research-hint").textContent = busy ? "有一项研究正在运行，可从研究记录查看进度。" : modelBusy() || state.switching ? "正在加载模型，完成后即可开始研究。" : unavailable ? "本地模型尚未连接，请先启动模型服务。" : "检索真实论文 · 由本地模型完成分析";
+  $("#research-hint").textContent = busy ? state.activeJobId ? "有一项研究正在运行，可从研究记录查看进度。" : "共享研究资源正在使用中，请稍后开始。" : modelBusy() || state.switching ? "正在加载模型，完成后即可开始研究。" : unavailable ? "本地模型尚未连接，请联系管理员检查服务。" : "检索真实论文 · 由本地模型完成分析";
 }
 function newResearch() {
   showView("home");
@@ -153,22 +164,26 @@ function newResearch() {
   $("#idea").focus({ preventScroll: true });
 }
 async function refreshStatus() {
-  if (state.statusRefreshing) return;
+  if (!account.user || state.statusRefreshing) return;
+  const epoch = account.epoch;
   state.statusRefreshing = true;
   clearTimeout(state.modelPoll);
   try {
     const [health, catalog] = await Promise.allSettled([api("/api/status"), api("/api/models")]);
+    if (epoch !== account.epoch || !account.user) return;
     state.models = catalog.status === "fulfilled" ? catalog.value : null;
     if (health.status !== "fulfilled") throw health.reason;
     const data = health.value;
     state.model = data.model || { connected: false };
     state.activeJobId = data.active_job_id || null;
+    state.resourceBusy = Boolean(data.resource_busy);
     const current = state.models?.models?.find((m) => m.id === state.models.current_id);
     $("#model-name").textContent = current ? `${current.id.toUpperCase()} · Qwen3.8-27B` : state.model.name || "本地模型";
     const connected = state.model.connected && !modelBusy();
     $("#model-state").innerHTML = `<span class="status-dot ${connected ? "connected" : "offline"}"></span>${modelBusy() ? "模型切换中…" : connected ? "已连接 · 就绪" : "尚未连接"}`;
     $("#refresh-status").title = state.model.detail || "重新检查模型连接";
   } catch {
+    if (!account.user || epoch !== account.epoch) return;
     state.model = { connected: false };
     $("#model-state").innerHTML = '<span class="status-dot offline"></span>网页服务未连接';
   } finally {
@@ -179,6 +194,7 @@ async function refreshStatus() {
   if (modelBusy() || (state.models?.managed && state.models.status === "ready" && !state.model?.connected)) state.modelPoll = setTimeout(refreshStatus, 1200);
 }
 function renderModelControls() {
+  const isAdmin = account.user?.role === "admin";
   const catalog = state.models, select = $("#model-select");
   const entries = Array.isArray(catalog?.models) ? catalog.models : [];
   const chosen = select.value || catalog?.target_id || catalog?.current_id || "q4_k_m";
@@ -188,14 +204,15 @@ function renderModelControls() {
     return `<option value="${escapeHtml(m.id)}" ${!m.available ? "disabled" : ""}>${escapeHtml(m.label + suffix)}</option>`;
   }).join("") : '<option value="">模型切换尚未连接</option>';
   if (entries.some((m) => m.id === chosen)) select.value = chosen;
-  const pending = state.switching || modelBusy(catalog), occupied = Boolean(state.activeJobId || catalog?.blocked_by_job);
-  select.disabled = !catalog?.managed || pending || occupied;
+  const pending = state.switching || modelBusy(catalog), occupied = Boolean(state.activeJobId || state.resourceBusy || catalog?.blocked_by_job);
+  select.disabled = !isAdmin || !catalog?.managed || pending || occupied;
   const selected = entries.find((m) => m.id === select.value);
-  $("#switch-model").disabled = !catalog?.managed || pending || occupied || !selected?.available || (catalog.status === "ready" && selected.id === catalog.current_id);
+  $("#switch-model").hidden = !isAdmin;
+  $("#switch-model").disabled = !isAdmin || !catalog?.managed || pending || occupied || !selected?.available || (catalog.status === "ready" && selected.id === catalog.current_id);
   $("#switch-model").textContent = pending ? "正在加载…" : "加载模型";
   const target = entries.find((m) => m.id === catalog?.target_id);
   $("#model-loading-label").textContent = pending ? `${catalog?.status === "recovering" ? "正在恢复原模型" : "正在切换模型"}${target ? ` · ${target.id.toUpperCase()}` : ""}` : catalog?.current_id ? `当前 ${catalog.current_id.toUpperCase()}` : "";
-  $("#model-switch-hint").textContent = catalog?.error || (!catalog?.managed ? "网页切换需启用模型服务：python deploy/serve_gguf.py --managed" : occupied ? "研究运行期间锁定模型；完成或停止任务后可切换。" : pending ? "正在卸载和加载模型，请稍候。此过程不会同时加载两份权重。" : "Q5 使用单槽位优先预留显存。未下载完成的模型无法选择；点击左下角刷新可更新文件状态。");
+  $("#model-switch-hint").textContent = !isAdmin ? "使用当前共享模型进行研究；模型切换由管理员负责。" : catalog?.error || (!catalog?.managed ? "网页切换需启用模型服务：python deploy/serve_gguf.py --managed" : occupied ? "研究运行期间锁定模型；完成或停止任务后可切换。" : pending ? "正在卸载和加载模型，请稍候。此过程不会同时加载两份权重。" : "Q5 使用单槽位优先预留显存。未下载完成的模型无法选择；点击左下角刷新可更新文件状态。");
   $("#model-switch-hint").classList.toggle("model-hint-error", Boolean(catalog?.error));
 }
 async function switchModel() {
@@ -222,8 +239,10 @@ function renderHistory() {
   const query = $("#history-search").value.trim().toLocaleLowerCase();
   const filtered = state.jobs.filter((job) => String(job.idea || "").toLocaleLowerCase().includes(query));
   $("#all-jobs").innerHTML = filtered.length ? filtered.map(jobCard).join("") : emptyState(query ? "没有找到匹配的研究" : "还没有研究记录", query ? "换一个关键词试试。" : "完成的研究将自动保存在这里。");
+  updateProfileStats();
 }
 async function refreshHistory(announce = false) {
+  if (!account.user) return;
   try {
     const data = await api("/api/jobs");
     state.jobs = Array.isArray(data.jobs) ? data.jobs.filter((job) => !job.mock) : [];
@@ -420,13 +439,292 @@ $("#help-dialog").addEventListener("click", (event) => { if (event.target === $(
 $("#mobile-menu").addEventListener("click", () => { const open = $("#sidebar").classList.toggle("is-open"); $("#mobile-overlay").hidden = !open; $("#mobile-menu").setAttribute("aria-expanded", String(open)); });
 $("#mobile-overlay").addEventListener("click", closeSidebar);
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape") closeSidebar();
+    if (event.key === "Escape") { closeSidebar(); $("#account-dropdown").hidden = true; $("#account-trigger").setAttribute("aria-expanded", "false"); }
+  if (!account.user) return;
   if ($(":modal")) return;
   if ((event.ctrlKey || event.metaKey) && event.key === "Enter" && state.view === "home") { event.preventDefault(); if (!$("#start-button").disabled) $("#research-form").requestSubmit(); }
   const editing = event.target.matches("input, textarea, select, [contenteditable]");
   if (!editing && !event.ctrlKey && !event.metaKey && !event.altKey && event.key.toLowerCase() === "n") { event.preventDefault(); newResearch(); }
 });
 window.addEventListener("beforeunload", () => { clearTimeout(state.poll); clearTimeout(state.modelPoll); });
+
+// Cookie-backed accounts. Clearing a session also clears every private view.
+function formError(id, message = "") { const target = $(id); target.textContent = message; target.hidden = !message; }
+function roleBadge(user) { return `<span class="role-badge ${user.role === "admin" ? "admin" : ""}">${user.role === "admin" ? icon("shield") : ""}${user.role === "admin" ? "管理员" : "普通用户"}</span>`; }
+function avatarMarkup(user) {
+  if (user?.avatar_url) {
+    try {
+      const url = new URL(user.avatar_url, location.origin);
+      if (url.origin === location.origin && /^\/api\/users\/[a-zA-Z0-9_-]+\/avatar$/.test(url.pathname)) return `<img src="${escapeHtml(url.pathname + url.search)}" alt="" loading="lazy">`;
+    } catch { /* A malformed avatar URL falls back to a name initial. */ }
+  }
+  return escapeHtml(Array.from(user?.display_name || user?.username || "研")[0].toLocaleUpperCase());
+}
+function setAuthMode(mode) {
+  account.mode = mode;
+  const register = mode === "register";
+  for (const name of ["login", "register"]) { const tab = $(`#auth-${name}-tab`); tab.classList.toggle("active", mode === name); tab.setAttribute("aria-selected", String(mode === name)); }
+  $("#auth-heading").textContent = register ? "为你的好奇心，留个位置" : "欢迎回到你的研究空间";
+  $("#auth-description").textContent = register ? "创建账号，开启属于你的研究旅程。" : "登录，让上一次的灵感继续生长。";
+  $("#auth-eyebrow").textContent = register ? "A NEW CHAPTER BEGINS" : "WELCOME BACK";
+  $("#auth-display-field").hidden = !register;
+  $("#auth-confirm-field").hidden = !register;
+  $("#auth-confirm-password").required = register;
+  $("#auth-password").minLength = register ? 8 : 1;
+  $("#auth-password").autocomplete = register ? "new-password" : "current-password";
+  $("#auth-password").placeholder = register ? "设置密码，至少 8 位" : "输入密码";
+  $("#auth-submit span").textContent = register ? "创建我的研究空间" : "进入研究空间";
+  $("#auth-form-hint").textContent = register ? "注册后即为普通用户，拥有独立的研究记录。" : "专注于问题，让每次探索都留下痕迹。";
+  formError("#auth-error");
+}
+function requireLogin(message = "") {
+  account.epoch++;
+  account.user = null;
+  account.editing = null;
+  account.users = [];
+  account.total = 0;
+  account.adminVersion++;
+  clearTimeout(state.poll); clearTimeout(state.modelPoll); clearTimeout(account.searchTimer);
+  state.requestVersion++;
+  state.jobs = []; state.job = null; state.currentId = null; state.activeJobId = null; state.resourceBusy = false; state.model = null; state.models = null; state.submitting = false; state.statusRefreshing = false;
+  closeSidebar();
+  $$("dialog[open]").forEach((dialog) => dialog.close());
+  $("#account-dropdown").hidden = true;
+  $("#auth-screen").hidden = false;
+  $("#toasts").replaceChildren();
+  $("#session-loading").hidden = true;
+  document.body.classList.remove("auth-pending");
+  document.body.classList.add("is-signed-out");
+  $("#idea").value = ""; $("#history-search").value = ""; $("#admin-search").value = "";
+  $("#profile-form").reset(); $("#password-form").reset(); $("#admin-edit-form").reset(); $("#admin-reset-form").reset();
+  $$("[data-password]").forEach((toggle) => { document.getElementById(toggle.dataset.password).type = "password"; toggle.setAttribute("aria-label", "显示密码"); toggle.setAttribute("aria-pressed", "false"); });
+  for (const id of ["paper-list", "report-content", "activity-list", "log-output", "run-title", "run-meta", "run-notice", "source-health", "progress-count", "admin-users", "admin-edit-name", "admin-edit-joined", "profile-display-name", "profile-handle", "profile-bio-preview", "sidebar-user-name", "topbar-user-name", "dropdown-name", "dropdown-username"]) $(`#${id}`).textContent = "";
+  for (const id of ["sidebar-avatar", "topbar-avatar", "profile-avatar", "profile-edit-avatar", "admin-edit-avatar"]) $(`#${id}`).textContent = "";
+  renderHistory(); updateComposer();
+  setAuthMode("login");
+  $("#auth-form").reset();
+  formError("#auth-error", message);
+  document.title = "登录 · Paper 研究空间";
+}
+function renderIdentity() {
+  const user = account.user;
+  if (!user) return;
+  const name = user.display_name || user.username, admin = user.role === "admin";
+  $("#sidebar-user-name").textContent = name;
+  $("#topbar-user-name").textContent = name;
+  $("#dropdown-name").textContent = name;
+  $("#dropdown-username").textContent = `@${user.username}`;
+  $("#sidebar-user-role").textContent = admin ? "管理员 · 个人研究空间" : "普通用户 · 个人研究空间";
+  $("#topbar-user-role").textContent = admin ? "管理员" : "个人工作区";
+  $("#nav-admin").hidden = !admin;
+  for (const id of ["sidebar-avatar", "topbar-avatar", "profile-avatar", "profile-edit-avatar"]) $(`#${id}`).innerHTML = avatarMarkup(user);
+  $("#profile-display-name").textContent = name;
+  $("#profile-handle").textContent = `@${user.username}`;
+  $("#profile-bio-preview").textContent = user.bio || "让好奇心，成为你的个性签名。";
+  $("#profile-role-badge").className = `role-badge ${admin ? "admin" : ""}`;
+  $("#profile-role-badge").textContent = admin ? "管理员" : "普通用户";
+  $("#remove-avatar").hidden = !user.avatar_url;
+  updateProfileStats();
+  renderModelControls();
+  if (!admin && state.view === "admin") { $("#admin-user-dialog").close(); showView("home"); }
+}
+function updateProfileStats() {
+  $("#profile-research-count").textContent = state.jobs.filter((job) => job.status === "completed").length;
+  $("#profile-paper-count").textContent = state.jobs.reduce((sum, job) => sum + Number(job.completed_count || 0), 0);
+  const date = account.user ? parseDate(account.user.created_at) : null;
+  $("#profile-joined").textContent = date && !Number.isNaN(date.getTime()) ? new Intl.DateTimeFormat("zh-CN", { year: "numeric", month: "2-digit" }).format(date) : "—";
+}
+function populateProfile() {
+  if (!account.user) return;
+  renderIdentity();
+  $("#profile-username").value = account.user.username;
+  $("#profile-display").value = account.user.display_name || "";
+  $("#profile-bio").value = account.user.bio || "";
+  $("#bio-count").textContent = `${$("#profile-bio").value.length} / 200`;
+  $("#profile-save-note").textContent = "资料仅用于你的 Paper 账号。";
+  $("#password-form").reset(); formError("#profile-error"); formError("#password-error");
+}
+async function enterWorkspace(user) {
+  const epoch = ++account.epoch;
+  account.user = user;
+  account.page = 1; account.search = "";
+  $("#auth-screen").hidden = true;
+  $("#session-loading").hidden = true;
+  document.body.classList.remove("auth-pending", "is-signed-out");
+  $("#auth-password").value = ""; $("#auth-confirm-password").value = "";
+  renderIdentity(); showView("home");
+  await Promise.allSettled([refreshStatus(), refreshHistory()]);
+  return epoch;
+}
+async function bootstrapAccounts() {
+  try {
+    const data = await api("/api/auth/me");
+    if (data.user) await enterWorkspace(data.user); else requireLogin();
+  } catch (error) { requireLogin(error.message); }
+}
+async function refreshSession() {
+  try {
+    const data = await api("/api/auth/me");
+    if (!data.user) { requireLogin("登录状态已失效，请重新登录。"); return; }
+    if (!account.user || String(data.user.id) !== String(account.user.id)) { requireLogin("账号已变更，请重新登录。"); return; }
+    account.user = data.user;
+    renderIdentity();
+  } catch { /* Other API requests provide a connection error without discarding a valid session. */ }
+}
+$("#auth-login-tab").addEventListener("click", () => { if (!account.pending) setAuthMode("login"); });
+$("#auth-register-tab").addEventListener("click", () => { if (!account.pending) setAuthMode("register"); });
+$(".auth-tabs").addEventListener("keydown", (event) => { if (["ArrowLeft", "ArrowRight"].includes(event.key) && !account.pending) { event.preventDefault(); setAuthMode(account.mode === "login" ? "register" : "login"); $(`#auth-${account.mode}-tab`).focus(); } });
+document.addEventListener("click", (event) => {
+  const toggle = event.target.closest("[data-password]");
+  if (toggle) { const input = document.getElementById(toggle.dataset.password); const visible = input.type === "password"; input.type = visible ? "text" : "password"; toggle.setAttribute("aria-label", visible ? "隐藏密码" : "显示密码"); toggle.setAttribute("aria-pressed", String(visible)); }
+  if (!event.target.closest(".account-menu")) { $("#account-dropdown").hidden = true; $("#account-trigger").setAttribute("aria-expanded", "false"); }
+  const manage = event.target.closest("[data-manage-user]");
+  if (manage && account.user?.role === "admin") openUserEditor(manage.dataset.manageUser);
+});
+$("#auth-form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (account.pending) return;
+  const register = account.mode === "register", password = $("#auth-password").value;
+  if (register && password !== $("#auth-confirm-password").value) { formError("#auth-error", "两次输入的密码不一致。"); $("#auth-confirm-password").focus(); return; }
+  account.pending = true;
+  $("#auth-submit").disabled = true; $("#auth-login-tab").disabled = true; $("#auth-register-tab").disabled = true;
+  $("#auth-submit span").textContent = register ? "正在创建空间…" : "正在登录…";
+  formError("#auth-error");
+  try {
+    const payload = { username: $("#auth-username").value.trim(), password };
+    if (register && $("#auth-display-name").value.trim()) payload.display_name = $("#auth-display-name").value.trim();
+    const data = await api(`/api/auth/${register ? "register" : "login"}`, { method: "POST", body: JSON.stringify(payload) });
+    const epoch = await enterWorkspace(data.user);
+    if (epoch === account.epoch && account.user) toast(register ? "你的研究空间已就绪。欢迎加入 Paper！" : `欢迎回来，${data.user.display_name || data.user.username}。`);
+  } catch (error) { formError("#auth-error", error.message); }
+  finally { account.pending = false; $("#auth-submit").disabled = false; $("#auth-login-tab").disabled = false; $("#auth-register-tab").disabled = false; $("#auth-submit span").textContent = account.mode === "register" ? "创建我的研究空间" : "进入研究空间"; }
+});
+$("#account-trigger").addEventListener("click", () => { const dropdown = $("#account-dropdown"); dropdown.hidden = !dropdown.hidden; $("#account-trigger").setAttribute("aria-expanded", String(!dropdown.hidden)); });
+for (const selector of ["#nav-profile", "#sidebar-account", "#dropdown-profile"]) $(selector).addEventListener("click", () => showView("profile"));
+$("#nav-admin").addEventListener("click", () => showView("admin"));
+$("#logout-button").addEventListener("click", async () => {
+  $("#logout-button").disabled = true;
+  try { await api("/api/auth/logout", { method: "POST", body: "{}" }); requireLogin(); }
+  catch (error) { toast(error.message, "error"); }
+  finally { $("#logout-button").disabled = false; }
+});
+$("#profile-bio").addEventListener("input", () => { $("#bio-count").textContent = `${$("#profile-bio").value.length} / 200`; });
+$("#profile-form").addEventListener("submit", async (event) => {
+  event.preventDefault(); $("#save-profile").disabled = true; formError("#profile-error");
+  try {
+    const username = $("#profile-username").value.trim();
+    const data = await api("/api/auth/profile", { method: "PATCH", body: JSON.stringify({ username, display_name: $("#profile-display").value.trim() || username, bio: $("#profile-bio").value }) });
+    account.user = data.user; renderIdentity();
+    $("#profile-username").value = data.user.username;
+    $("#profile-display").value = data.user.display_name;
+    $("#profile-bio").value = data.user.bio || "";
+    $("#bio-count").textContent = `${$("#profile-bio").value.length} / 200`;
+    $("#profile-save-note").textContent = "已保存，新的资料已同步。";
+    toast("个人资料已更新。");
+  } catch (error) { formError("#profile-error", error.message); }
+  finally { $("#save-profile").disabled = false; }
+});
+$("#password-form").addEventListener("submit", async (event) => {
+  event.preventDefault(); formError("#password-error");
+  if ($("#new-password").value !== $("#confirm-new-password").value) { formError("#password-error", "两次输入的新密码不一致。"); return; }
+  $("#save-password").disabled = true;
+  try {
+    const data = await api("/api/auth/password", { method: "POST", body: JSON.stringify({ current_password: $("#current-password").value, new_password: $("#new-password").value }) });
+    account.user = data.user; renderIdentity(); $("#password-form").reset(); toast("密码已更新，其他登录会话已退出。");
+  } catch (error) { formError("#password-error", error.message); }
+  finally { $("#save-password").disabled = false; }
+});
+$("#upload-avatar").addEventListener("click", () => $("#avatar-file").click());
+$("#avatar-file").addEventListener("change", async () => {
+  const file = $("#avatar-file").files[0];
+  if (!file) return;
+  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type) || file.size > 3 * 1024 * 1024) { toast("请选择不超过 3 MB 的 JPG、PNG 或 WebP 图片。", "error"); $("#avatar-file").value = ""; return; }
+  $("#upload-avatar").disabled = true; $("#remove-avatar").disabled = true;
+  try { const data = await api("/api/auth/avatar", { method: "POST", headers: { "Content-Type": file.type }, body: file }); account.user = data.user; renderIdentity(); toast("新头像已保存。"); }
+  catch (error) { toast(error.message, "error"); }
+  finally { $("#upload-avatar").disabled = false; $("#remove-avatar").disabled = false; $("#avatar-file").value = ""; }
+});
+$("#remove-avatar").addEventListener("click", async () => {
+  $("#remove-avatar").disabled = true;
+  try { const data = await api("/api/auth/avatar", { method: "DELETE" }); account.user = data.user; renderIdentity(); toast("已恢复默认头像。"); }
+  catch (error) { toast(error.message, "error"); }
+  finally { $("#remove-avatar").disabled = false; }
+});
+async function loadAdminUsers() {
+  if (account.user?.role !== "admin") return;
+  const version = ++account.adminVersion;
+  $("#admin-users").classList.add("is-loading");
+  if (!account.users.length) $("#admin-users").innerHTML = emptyState("正在打开成员列表", "读取空间成员与账号信息。");
+  try {
+    const query = new URLSearchParams({ search: account.search, page: String(account.page), page_size: String(account.pageSize) });
+    const data = await api(`/api/admin/users?${query}`);
+    if (version !== account.adminVersion || account.user?.role !== "admin") return;
+    account.users = data.users || []; account.total = Number(data.total || 0); account.page = Number(data.page || 1);
+    if (!account.search) $("#admin-user-total").textContent = account.total;
+    $("#admin-result-count").textContent = account.search ? `找到 ${account.total} 位成员` : `共 ${account.total} 位成员`;
+    const pages = Math.max(1, Math.ceil(account.total / account.pageSize));
+    $("#admin-page").textContent = `${account.page} / ${pages}`;
+    $("#admin-pagination-label").textContent = account.total ? `显示 ${(account.page - 1) * account.pageSize + 1}–${Math.min(account.page * account.pageSize, account.total)} 位成员` : "暂无匹配成员";
+    $("#admin-prev").disabled = account.page <= 1;
+    $("#admin-next").disabled = account.page >= pages;
+    renderAdminUsers();
+  } catch (error) { if (version === account.adminVersion && account.user?.role === "admin") { $("#admin-users").innerHTML = emptyState("暂时无法读取成员", error.message); toast(error.message, "error"); } }
+  finally { if (version === account.adminVersion) $("#admin-users").classList.remove("is-loading"); }
+}
+function renderAdminUsers() {
+  if (!account.users.length) { $("#admin-users").innerHTML = emptyState("没有找到匹配的成员", "尝试其他用户名或显示名称。"); return; }
+  $("#admin-users").innerHTML = `<table class="users-table"><thead><tr><th>成员</th><th>身份</th><th>账号状态</th><th>加入时间</th><th>操作</th></tr></thead><tbody>${account.users.map((user) => `<tr><td><div class="table-user"><span class="user-avatar">${avatarMarkup(user)}</span><div><strong>${escapeHtml(user.display_name || user.username)}${String(user.id) === String(account.user.id) ? '<span class="you-tag">你</span>' : ""}</strong><span>@${escapeHtml(user.username)}</span></div></div></td><td>${roleBadge(user)}</td><td><span class="user-status ${user.is_active ? "" : "inactive"}"><span></span>${user.is_active ? "正常使用" : "已停用"}</span></td><td>${escapeHtml(dateLabel(user.created_at))}</td><td><button type="button" class="secondary-button manage-user" data-manage-user="${escapeHtml(user.id)}">${icon("edit")}管理</button></td></tr>`).join("")}</tbody></table>`;
+}
+function openUserEditor(id) {
+  const user = account.users.find((item) => String(item.id) === String(id));
+  if (!user) return;
+  account.editing = user;
+  const self = String(user.id) === String(account.user.id);
+  $("#admin-edit-name").textContent = user.display_name || user.username;
+  $("#admin-edit-joined").textContent = `@${user.username} · ${dateLabel(user.created_at)} 加入`;
+  $("#admin-edit-avatar").innerHTML = avatarMarkup(user);
+  $("#admin-edit-username").value = user.username;
+  $("#admin-edit-display").value = user.display_name || "";
+  $("#admin-edit-bio").value = user.bio || "";
+  $("#admin-edit-role").value = user.role;
+  $("#admin-edit-active").value = String(user.is_active);
+  $("#admin-edit-active").disabled = self;
+  $("#admin-self-hint").textContent = self ? "当前登录账号不可停用。" : "权限变更立即生效。";
+  $("#admin-reset-form").hidden = self;
+  $(".admin-reset-section > p").textContent = self ? "请在个人空间修改自己的密码。" : "将使此账号的已有登录会话失效。请将新密码私下告知用户。";
+  $("#admin-reset-form").reset();
+  formError("#admin-edit-error"); formError("#admin-reset-error");
+  $("#admin-user-dialog").showModal();
+}
+$("#admin-search").addEventListener("input", () => { clearTimeout(account.searchTimer); account.searchTimer = setTimeout(() => { account.search = $("#admin-search").value.trim(); account.page = 1; loadAdminUsers(); }, 300); });
+$("#admin-refresh").addEventListener("click", loadAdminUsers);
+$("#admin-prev").addEventListener("click", () => { if (account.page > 1) { account.page--; loadAdminUsers(); } });
+$("#admin-next").addEventListener("click", () => { if (account.page * account.pageSize < account.total) { account.page++; loadAdminUsers(); } });
+$("#close-admin-user").addEventListener("click", () => $("#admin-user-dialog").close());
+$("#admin-user-dialog").addEventListener("click", (event) => { if (event.target === $("#admin-user-dialog")) { const rect = event.target.getBoundingClientRect(); if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) event.target.close(); } });
+$("#admin-edit-form").addEventListener("submit", async (event) => {
+  event.preventDefault(); if (!account.editing) return;
+  $("#admin-save-user").disabled = true; formError("#admin-edit-error");
+  try {
+    const username = $("#admin-edit-username").value.trim();
+    const data = await api(`/api/admin/users/${encodeURIComponent(account.editing.id)}`, { method: "PATCH", body: JSON.stringify({ username, display_name: $("#admin-edit-display").value.trim() || username, bio: $("#admin-edit-bio").value, role: $("#admin-edit-role").value, is_active: $("#admin-edit-active").value === "true" }) });
+    if (String(data.user.id) === String(account.user.id)) { account.user = data.user; renderIdentity(); }
+    $("#admin-user-dialog").close(); toast("成员资料与权限已更新。");
+    if (account.user.role === "admin") await loadAdminUsers();
+  } catch (error) { formError("#admin-edit-error", error.message); }
+  finally { $("#admin-save-user").disabled = false; }
+});
+$("#admin-reset-form").addEventListener("submit", async (event) => {
+  event.preventDefault(); if (!account.editing || !$("#admin-reset-confirm").checked) return;
+  $("#admin-reset-submit").disabled = true; formError("#admin-reset-error");
+  const self = String(account.editing.id) === String(account.user.id);
+  try {
+    await api(`/api/admin/users/${encodeURIComponent(account.editing.id)}/password`, { method: "POST", body: JSON.stringify({ new_password: $("#admin-reset-password").value }) });
+    $("#admin-reset-form").reset();
+    if (self) requireLogin("密码已重置，请使用新密码登录。"); else toast("密码已重置，该用户原有登录会话已失效。");
+  } catch (error) { formError("#admin-reset-error", error.message); }
+  finally { $("#admin-reset-submit").disabled = false; }
+});
 updateComposer();
-Promise.allSettled([refreshStatus(), refreshHistory()]);
-setInterval(() => { if (!document.hidden) { refreshStatus(); refreshHistory(); } }, 15000);
+bootstrapAccounts();
+setInterval(async () => { if (!document.hidden && account.user) { await refreshSession(); if (account.user) { refreshStatus(); refreshHistory(); } } }, 15000);

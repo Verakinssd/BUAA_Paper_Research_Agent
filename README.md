@@ -85,6 +85,12 @@ python deploy/serve_gguf.py --managed
 
 ![Paper Research Agent 网页运行示例](demo.png)
 
+首次部署先在项目目录创建管理员（交互式设置用户名和密码，无默认账号）：
+
+```bash
+python manage_users.py create-admin
+```
+
 在同一台服务器的第二个终端中运行：
 
 ```bash
@@ -93,7 +99,7 @@ cd Paper-Research-Agent
 python web_app.py --port 7860
 ```
 
-浏览器打开 `http://127.0.0.1:7860`，输入研究想法即可开始。
+浏览器打开 `http://127.0.0.1:7860`，注册普通用户或登录管理员账号后即可开始。个人空间支持修改用户名、头像、签名和密码；管理员还可管理用户身份、启用/禁用账号、重置用户密码，以及切换全局模型。
 
 如果运行在远程服务器，可用编辑器的端口转发功能，或在自己的电脑上运行：
 
