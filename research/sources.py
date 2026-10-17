@@ -176,19 +176,8 @@ def merge_dedup(papers):
     return [p for _, p in groups]
 
 
-def basic_rank(query, papers):
-    tokens = set(re.findall(r"[a-z0-9]+", query.lower()))
-    for p in papers:
-        title = set(re.findall(r"[a-z0-9]+", p["title"].lower()))
-        abstract = set(re.findall(r"[a-z0-9]+", p.get("abstract", "").lower()))
-        p["basic_score"] = round((2 * len(tokens & title) + len(tokens & abstract)) / max(1, 3 * len(tokens)), 4)
-    ranked = sorted(papers, key=lambda p: p["basic_score"], reverse=True)
-    for i, p in enumerate(ranked, 1):
-        p["id"] = f"P{i}"
-    return ranked
-
-
-async def retrieve(query, limit=8, concurrent=False):
+async def retrieve(query, limit=8, concurrent=False, ranking_method=None):
+    from .ranking import rank, VALID_METHODS, DEFAULT_METHOD
     stats = {}
     async def one(name, func):
         started = time.perf_counter()
@@ -206,4 +195,11 @@ async def retrieve(query, limit=8, concurrent=False):
     else:
         parts = [await one(name, fn) for name, fn in jobs]
     papers = [p for part in parts for p in part]
-    return basic_rank(query, merge_dedup(papers)), stats
+    ranked = rank(query, merge_dedup(papers), method=ranking_method)
+    used = (ranking_method
+            or os.getenv("PAPER_RANKING_METHOD", DEFAULT_METHOD)
+            or DEFAULT_METHOD)
+    if used not in VALID_METHODS:
+        used = DEFAULT_METHOD
+    stats["ranking_method"] = used
+    return ranked, stats

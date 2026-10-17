@@ -95,5 +95,10 @@ if __name__ == "__main__":
     parser.add_argument("--idea", default="我想研究大语言模型的参数高效微调方法。")
     parser.add_argument("--top-k", type=int, choices=range(1, 6), default=3)
     parser.add_argument("--concurrent", action="store_true")
+    parser.add_argument("--ranking-method",
+                        choices=("basic", "bm25", "dense_linear", "hybrid_rrf"),
+                        help="同时传给 MCP server 的检索排序策略（也可通过 PAPER_RANKING_METHOD 环境变量设置）")
     args = parser.parse_args()
+    if args.ranking_method:
+        os.environ["PAPER_RANKING_METHOD"] = args.ranking_method
     asyncio.run(run(args))

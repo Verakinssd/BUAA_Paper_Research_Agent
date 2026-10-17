@@ -32,7 +32,7 @@ class TaskAgent:
         self.llm = LLM() if llm is None else llm
 
     async def select(self, idea, papers, k):
-        candidates = [{key: p.get(key) for key in ("id", "title", "abstract", "year", "basic_score")}
+        candidates = [{key: p.get(key) for key in ("id", "title", "abstract", "year", "rank_score")}
                       for p in papers]
         for candidate in candidates:
             abstract = candidate.get("abstract") or ""

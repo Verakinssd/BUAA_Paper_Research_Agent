@@ -14,7 +14,7 @@ def sample_papers(count=3):
     return [dict(id=f"P{i}", title=f"TEST paper {i}", abstract="Test metadata only.",
                  url=f"https://example.test/paper-{i}",
                  pdf_urls=[f"https://example.test/paper-{i}.pdf"],
-                 sources=["arxiv" if i % 2 else "openalex"], basic_score=1)
+                 sources=["arxiv" if i % 2 else "openalex"], rank_score=1)
             for i in range(1, count + 1)]
 
 

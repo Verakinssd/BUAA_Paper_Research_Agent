@@ -1,6 +1,7 @@
 """Our own MCP service. Run through main_agent.py, not as a separate first step."""
 import argparse
 import json
+import logging
 import os
 import sys
 import time
@@ -13,6 +14,15 @@ from research.pipeline import process_papers, save_json
 from research.task_agent import TaskAgent
 
 load_dotenv()
+
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO").upper(),
+    format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
+    datefmt="%H:%M:%S",
+    stream=sys.stderr,
+)
+log = logging.getLogger("server")
+
 mcp = FastMCP("Paper Research MCP")
 state = {}
 config = {"concurrent": False}
@@ -22,7 +32,7 @@ def trace(output, event, data):
     row = {"event": event, "time": time.time(), **data}
     with (output / "trace.jsonl").open("a", encoding="utf-8") as stream:
         stream.write(json.dumps(row, ensure_ascii=False) + "\n")
-    print(f'[MCP] {event}', file=sys.stderr, flush=True)
+    log.info(event)
 
 
 @mcp.tool()
@@ -43,7 +53,7 @@ async def search_papers(query: str, max_per_source: int = 8) -> dict:
     save_json(output / "candidates.json", papers)
     trace(output, "sources_searched", {"sources": sources, "deduplicated_count": len(papers)})
     # Main Agent receives bounded candidate metadata; full records remain server-side.
-    candidates = [{k: p.get(k) for k in ("id", "title", "abstract", "year", "sources", "basic_score")}
+    candidates = [{k: p.get(k) for k in ("id", "title", "abstract", "year", "sources", "rank_score")}
                   for p in papers]
     for candidate in candidates:
         abstract = candidate.get("abstract") or ""
@@ -106,6 +116,10 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--concurrent", action="store_true")
+    parser.add_argument("--ranking-method",
+                        choices=("basic", "bm25", "dense_linear", "hybrid_rrf"))
     args = parser.parse_args()
-    config.update(concurrent=args.concurrent)
+    config.update(concurrent=args.concurrent, ranking_method=args.ranking_method)
+    if args.ranking_method:
+        os.environ["PAPER_RANKING_METHOD"] = args.ranking_method
     mcp.run(transport="stdio")

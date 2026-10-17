@@ -203,7 +203,7 @@ class JobManager:
             result["run_id"] = run.name
             candidates = read_json(self.artifact(run, "candidates.json"), [])
             result["candidates"] = [{key: p.get(key) for key in
-                ("id", "title", "abstract", "year", "authors", "url", "sources", "basic_score")}
+                ("id", "title", "abstract", "year", "authors", "url", "sources", "rank_score")}
                 for p in candidates if isinstance(p, dict)]
             selected = read_json(self.artifact(run, "selection.json"), [])
             topk = read_json(self.artifact(run, "topk.json"), [])

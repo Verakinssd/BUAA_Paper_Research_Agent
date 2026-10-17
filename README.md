@@ -23,9 +23,7 @@ python -m pip install -r requirements.txt
 
 ```bash
 git clone --branch b11586 --depth 1 https://github.com/ggml-org/llama.cpp.git
-cmake -S llama.cpp -B llama.cpp/build \
-  -DGGML_CUDA=ON \
-  -DCMAKE_BUILD_TYPE=Release
+cmake -S llama.cpp -B llama.cpp/build   -DGGML_CUDA=ON   -DCMAKE_BUILD_TYPE=Release   -DCMAKE_CUDA_COMPILER=/usr/local/cuda-12.2/bin/nvcc   -DCMAKE_CUDA_ARCHITECTURES=89   -DTHREADS_PREFER_PTHREAD_FLAG=ON
 cmake --build llama.cpp/build --config Release --target llama-server -j 4
 ```
 
@@ -37,7 +35,7 @@ cmake --build llama.cpp/build --config Release --target llama-server -j 4
 
 ```bash
 mkdir -p models
-curl --location --fail --retry 5 --continue-at - \
+curl -k --location --fail --retry 5 --continue-at - \
   --output models/Qwen3.8-27B-Q4_K_M.gguf \
   https://huggingface.co/bartowski/Qwen3.8-27B-GGUF/resolve/main/Qwen3.8-27B-Q4_K_M.gguf
 ```
@@ -142,3 +140,46 @@ python main_agent.py \
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+## 相关性排序方法扩展
+
+在原来basic方法的基础上，新增了bm25、dense_linear、hybrid_rrf方法。dense_linear、hybrid_rrf方法需要部署embedding模型。这里用的BGE-M3模型。
+
+### 部署BGE-M3
+
+安装pytorch、FlagEmbedding、FastAPI
+
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+pip install -U FlagEmbedding
+pip install -U huggingface_hub
+pip install fastapi "uvicorn[standard]"
+```
+
+### 启动BGE-M3服务
+
+```bash
+uvicorn deploy.serve_bge:app --host 127.0.0.1 --port 8002
+```
+### 测试BGE-M3服务
+
+```bash
+curl -X POST http://127.0.0.1:8000/embed \
+  -H "Content-Type: application/json" \
+  -d '{
+    "texts": [
+      "LoRA训练",
+      "多智能体学习"
+    ]
+  }'
+```
+
+### 配置相关性排序方法
+
+在`.env`中配置相关性排序方法
+
+```dotenv
+PAPER_RANKING_METHOD=bm25
+```
+
+如果没有`PAPER_RANKING_METHOD`，默认使用`basic`方法。
