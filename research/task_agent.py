@@ -42,6 +42,8 @@ class TaskAgent:
         schema = '仅返回 JSON：{"selected":[{"id":"P1","reason":"具体关联理由"}]}。只选候选 ID，恰好 k 篇，不重复。'
         selection_tokens = min(self.llm.max_tokens,
                                max(256, int(os.getenv("SELECTION_MAX_TOKENS", "512"))))
+        if getattr(self.llm, "backend", None) == "openai":
+            selection_tokens = min(self.llm.max_tokens, max(2048, selection_tokens))
         for attempt in range(2):
             text = await self.llm.text(EVIDENCE_RULE + schema, prompt, max_tokens=selection_tokens)
             try:
@@ -56,10 +58,15 @@ class TaskAgent:
         notes = []
         position, index = 0, 1
         chunk_chars = max(256, int(os.getenv("SUMMARY_CHUNK_CHARS", "24000")))
+        if getattr(self.llm, "backend", None) == "openai":
+            chunk_chars = min(chunk_chars, 12000)
         note_tokens = max(256, int(os.getenv("SUMMARY_NOTE_MAX_TOKENS", "384")))
         final_tokens = max(512, int(os.getenv("SUMMARY_FINAL_MAX_TOKENS", "1024")))
         note_tokens = min(note_tokens, self.llm.max_tokens)
         final_tokens = min(final_tokens, self.llm.max_tokens)
+        if getattr(self.llm, "backend", None) == "openai":
+            note_tokens = min(self.llm.max_tokens, max(2048, note_tokens))
+            final_tokens = min(self.llm.max_tokens, max(4096, final_tokens))
         system = EVIDENCE_RULE + (
             "只输出本段的事实笔记，覆盖研究问题、方法、实验和局限，不超过 250 个中文字符。"
             "保留证据页码，不要复述原文，不要输出思考过程，必须在字数限制内自然结束。"
@@ -128,6 +135,7 @@ class TaskAgent:
         return result
 
     async def report(self, idea, results):
+        remote = getattr(self.llm, "backend", None) == "openai"
         evidence = [{k: r.get(k) for k in ("id", "title", "status", "summary", "error", "evidence")}
                     for r in results]
         return await self.llm.merge_notes(
@@ -136,6 +144,6 @@ class TaskAgent:
             "不要输出思考过程，必须自然结束。",
             "研究想法：" + idea,
             [json.dumps(p, ensure_ascii=False) for p in evidence],
-            max_tokens=min(self.llm.max_tokens, max(768, int(os.getenv("REPORT_MAX_TOKENS", "1536")))),
-            reduce_max_tokens=min(self.llm.max_tokens, max(256, int(os.getenv("SUMMARY_NOTE_MAX_TOKENS", "384")))),
+            max_tokens=min(self.llm.max_tokens, max(4096 if remote else 768, int(os.getenv("REPORT_MAX_TOKENS", "1536")))),
+            reduce_max_tokens=min(self.llm.max_tokens, max(2048 if remote else 256, int(os.getenv("SUMMARY_NOTE_MAX_TOKENS", "384")))),
         )

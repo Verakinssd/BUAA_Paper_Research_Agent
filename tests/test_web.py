@@ -69,6 +69,13 @@ class WebTests(unittest.IsolatedAsyncioTestCase):
             pdf = await self.client.get(paper["pdf_url"])
             self.assertEqual(pdf.status_code, 200)
             self.assertTrue(pdf.content.startswith(b"%PDF-"))
+            self.assertTrue(paper["markdown_available"])
+            fulltext = await self.client.get(f'/api/jobs/{job_id}/papers/{paper["id"]}/markdown')
+            self.assertEqual(fulltext.status_code, 200)
+            self.assertIn("attachment", fulltext.headers["content-disposition"])
+            self.assertIn("text/markdown", fulltext.headers["content-type"])
+            self.assertTrue(fulltext.text.strip())
+            self.assertNotIn("TEST summary", fulltext.text)
         report = await self.client.get(f"/api/jobs/{job_id}/report")
         self.assertEqual(report.status_code, 200)
         self.assertIn("attachment", report.headers["content-disposition"])
@@ -207,7 +214,7 @@ class TopKRegressionTests(unittest.IsolatedAsyncioTestCase):
     async def test_two_candidates_cannot_fulfill_requested_top_three(self):
         import server
         fixture = sample_papers(2)
-        sources = {"arxiv": {"status": "ok"}, "openalex": {"status": "ok"}}
+        sources = {"arxiv": {"status": "ok"}, "openalex": {"status": "ok"}, "ranking_method": "bm25"}
         with tempfile.TemporaryDirectory() as folder, \
                 patch.dict(os.environ, {"PAPER_OUTPUT_ROOT": folder, "PAPER_CACHE_DIR": folder + "/cache"}), \
                 patch.dict(server.config, {"concurrent": False}), \
@@ -219,6 +226,8 @@ class TopKRegressionTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(result["metrics"]["completed_count"], 2)
             self.assertEqual(result["metrics"]["requested_top_k"], 3)
             self.assertFalse(result["metrics"]["task_success"])
+            result = await server.build_report(found["run_id"], "test", 2)
+            self.assertTrue(result["metrics"]["task_success"])
         server.state.pop(found["run_id"], None)
 
 

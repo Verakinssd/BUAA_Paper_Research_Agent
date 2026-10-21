@@ -3,6 +3,41 @@ import asyncio
 import json
 import os
 import httpx
+from urllib.parse import urlsplit
+
+
+class OutputTruncatedError(ValueError):
+    """A response exhausted its output budget; partial text is unusable."""
+
+
+def provider_options(base):
+    # GLM thinking can consume a short probe's entire output budget.
+    if urlsplit(base).hostname == "open.bigmodel.cn":
+        return {"thinking": {"type": "disabled"}}
+    if urlsplit(base).hostname == "openrouter.ai":
+        return {"reasoning": {"enabled": False}}
+    return {}
+
+
+def api_error(response, base):
+    """Use vetted descriptions, never echo an upstream body containing secrets."""
+    if urlsplit(base).hostname == "open.bigmodel.cn":
+        try:
+            code = str(response.json().get("error", {}).get("code", ""))
+        except (ValueError, AttributeError, TypeError):
+            code = ""
+        hints = {
+            "1113": "智谱账号处于欠费状态，请在智谱控制台检查账户状态。",
+            "1302": "智谱账号达到请求速率或并发限制，请停止其他调用，等待一分钟后再试，避免连续点击测试。",
+            "1305": "智谱模型当前访问量过大，请稍后重试；这不代表 Key 填写错误。",
+            "1308": "智谱账号已达到当前周期的使用上限，请在控制台查看重置时间。",
+            "1310": "智谱账号已达到每周或每月使用上限，请在控制台查看重置时间。",
+        }
+        if code in hints:
+            return f"API HTTP {response.status_code}（智谱 {code}）：{hints[code]}"
+    if response.status_code == 429:
+        return "API HTTP 429：服务商限制了请求频率、并发或额度，请稍后重试并在服务商控制台检查限额。"
+    return f"API HTTP {response.status_code}，请检查地址、Key、模型权限和额度。"
 
 
 def parse_json(text):
@@ -13,38 +48,52 @@ def parse_json(text):
 
 
 class LLM:
-    def __init__(self):
-        self.base = os.getenv("LLM_BASE_URL", "").rstrip("/")
-        self.key = os.getenv("LLM_API_KEY", "")
-        self.model = os.getenv("LLM_MODEL", "")
-        self.trust_env = os.getenv("LLM_TRUST_ENV", "1") == "1"
-        self.max_tokens = int(os.getenv("LLM_MAX_TOKENS", "2048"))
-        self.tokenize = os.getenv("LLM_TOKENIZE", "0") == "1"
-        self.context_tokens = int(os.getenv("LLM_CONTEXT_TOKENS", "8192"))
-        self.backend = os.getenv("LLM_BACKEND", "vllm").lower()
-        if self.backend not in ("llamacpp", "vllm"):
-            raise ValueError("LLM_BACKEND 必须为 llamacpp 或 vllm")
+    def __init__(self, config=None):
+        env = os.environ if config is None else {**os.environ, **config}
+        self.base = env.get("LLM_BASE_URL", "").rstrip("/")
+        self.key = env.get("LLM_API_KEY", "")
+        self.model = env.get("LLM_MODEL", "")
+        self.trust_env = env.get("LLM_TRUST_ENV", "1") == "1"
+        self.max_tokens = int(env.get("LLM_MAX_TOKENS", "2048"))
+        self.tokenize = env.get("LLM_TOKENIZE", "0") == "1"
+        self.context_tokens = int(env.get("LLM_CONTEXT_TOKENS", "8192"))
+        self.backend = env.get("LLM_BACKEND", "vllm").lower()
+        if self.backend not in ("llamacpp", "vllm", "openai"):
+            raise ValueError("LLM_BACKEND 必须为 llamacpp、vllm 或 openai")
         self.server_root = self.base.removesuffix("/v1")
-        self.tokenize_url = os.getenv("LLM_TOKENIZE_URL", self.base.removesuffix("/v1") + "/tokenize")
+        self.tokenize_url = env.get("LLM_TOKENIZE_URL", self.base.removesuffix("/v1") + "/tokenize")
         self.options = {}
-        for env, field, cast in (("LLM_TEMPERATURE", "temperature", float),
+        for name, field, cast in (("LLM_TEMPERATURE", "temperature", float),
                                  ("LLM_TOP_P", "top_p", float), ("LLM_TOP_K", "top_k", int)):
-            if os.getenv(env):
-                self.options[field] = cast(os.environ[env])
-        if os.getenv("LLM_ENABLE_THINKING") in ("0", "1"):
+            if env.get(name):
+                self.options[field] = cast(env[name])
+        if env.get("LLM_ENABLE_THINKING") in ("0", "1"):
             self.options["chat_template_kwargs"] = {
-                "enable_thinking": os.environ["LLM_ENABLE_THINKING"] == "1"}
+                "enable_thinking": env["LLM_ENABLE_THINKING"] == "1"}
+        if self.backend == "openai":
+            self.tokenize = False
+            self.options = {k: v for k, v in self.options.items() if k in {"temperature", "top_p"}}
+            self.options.update(provider_options(self.base))
         if self.max_tokens <= 0 or self.context_tokens <= 0:
             raise ValueError("生成长度和上下文长度必须大于 0")
         if not self.base or not self.model:
             raise ValueError("请在 .env 设置 LLM_BASE_URL 和 LLM_MODEL，并启动模型服务。")
-        if not self.key and os.getenv("LLM_ALLOW_NO_KEY") != "1":
+        if not self.key and env.get("LLM_ALLOW_NO_KEY") != "1":
             raise ValueError("请设置 LLM_API_KEY；无鉴权本地服务可设置 LLM_ALLOW_NO_KEY=1。")
 
     def headers(self):
         return {"Authorization": f"Bearer {self.key}"} if self.key else {}
 
     async def fits(self, messages, tools=None, max_tokens=None):
+        if self.backend == "openai":
+            # Conservative byte estimate; providers rarely expose their tokenizer.
+            # This also enables the existing chunking/reduction path for remote APIs.
+            count = len(json.dumps(messages, ensure_ascii=False).encode("utf-8")) + 32 * len(messages)
+            if tools:
+                count += len(json.dumps(tools, ensure_ascii=False).encode("utf-8"))
+            # Reserve the retry budget during chunk planning too. Otherwise a
+            # chunk can fit at 2048 but leave no room for the 8192-token retry.
+            return count + max(max_tokens or self.max_tokens, self.max_tokens) + 128 <= self.context_tokens
         if not self.tokenize:
             return True
         payload = {"model": self.model, "messages": messages, "add_generation_prompt": True}
@@ -100,8 +149,20 @@ class LLM:
         )
 
     async def chat(self, messages, tools=None, max_tokens=None):
+        try:
+            return await self._chat_once(messages, tools, max_tokens)
+        except OutputTruncatedError:
+            requested = max_tokens or self.max_tokens
+            if (self.backend != "openai" or requested >= self.max_tokens
+                    or not await self.fits(messages, tools, self.max_tokens)):
+                raise
+            # Retry once with room for reasoning and the actual answer. Never
+            # accept a truncated summary, and never retry without a hard cap.
+            return await self._chat_once(messages, tools, self.max_tokens)
+
+    async def _chat_once(self, messages, tools=None, max_tokens=None):
         if not await self.fits(messages, tools, max_tokens):
-            raise ValueError("输入与预留输出超过本地模型上下文；请减少候选数或提高模型服务的上下文长度")
+            raise ValueError("输入与预留输出超过模型上下文；请减少候选数或提高模型服务的上下文长度")
         payload = {"model": self.model, "messages": messages,
                    "max_tokens": max_tokens or self.max_tokens, **self.options}
         if tools:
@@ -117,15 +178,26 @@ class LLM:
                         raise RuntimeError("LLM 网络请求失败") from None
                     await asyncio.sleep(2 ** attempt)
                     continue
+                if (response.status_code == 400 and urlsplit(self.base).hostname == "openrouter.ai"
+                        and payload.get("reasoning") == {"enabled": False} and attempt < 2):
+                    # The free router can pick a different model for each call.
+                    # Some endpoints require reasoning; request low effort there.
+                    try:
+                        error = str(response.json().get("error", {}).get("message", "")).lower()
+                    except (ValueError, AttributeError, TypeError):
+                        error = ""
+                    if "reasoning" in error and "mandatory" in error:
+                        payload["reasoning"] = {"effort": "low"}
+                        continue
                 if response.status_code in (429, 500, 502, 503, 504) and attempt < 2:
                     await asyncio.sleep(2 ** attempt)
                     continue
                 if response.is_error:
                     # Avoid leaking keys, provider URLs, or response bodies into logs.
-                    raise RuntimeError(f"LLM HTTP {response.status_code}，请检查配置/模型/额度。")
+                    raise RuntimeError(api_error(response, self.base))
                 choice = response.json()["choices"][0]
                 if choice.get("finish_reason") == "length":
-                    raise ValueError("模型输出达到长度上限，未作为完整结果使用；请增加 LLM_MAX_TOKENS 并预留上下文")
+                    raise OutputTruncatedError("模型回复被输出长度上限截断，未作为完整结果使用；请提高输出上限或换用推理开销较小的模型。")
                 message = choice["message"]
                 return {k: v for k, v in message.items()
                         if k in ("role", "content", "tool_calls")}

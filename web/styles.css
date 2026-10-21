@@ -889,3 +889,20 @@ kbd { color: #6e815a; font-size: 10px; }
   .report-panel { padding: 0; }
   body { background: white; }
 }
+
+/* Personal API settings reuse the account form styles. */
+.api-settings-card { margin-bottom: 22px; }
+.api-settings-card .account-form { max-width: 850px; }
+.api-settings-card fieldset { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; gap: 18px; }
+.api-settings-card fieldset[hidden] { display: none; }
+.api-settings-card select { width: 100%; min-height: 42px; padding: 10px 12px; border: 1px solid #dce3d9; border-radius: 8px; background: white; color: inherit; font: inherit; }
+.api-settings-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.api-settings-actions .primary-button { margin-left: auto; }
+.api-usage-note, #api-settings-note { font-size: 12px; line-height: 1.7; color: #647264; }
+#api-key-status { font-size: 11px; color: #647264; }
+@media (max-width: 600px) { .api-settings-actions .primary-button { margin-left: 0; width: 100%; } }
+
+.concurrent-option { display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap; font-size: 12px; color: #526453; cursor: pointer; }
+.concurrent-option input { accent-color: #3e7468; width: 15px; height: 15px; }
+.concurrent-option small { font-size: 10px; color: #798579; }
+.composer-options { flex-wrap: wrap; gap: 16px; }

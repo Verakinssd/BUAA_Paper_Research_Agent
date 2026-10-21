@@ -32,7 +32,7 @@ async def run_main(args):
             else:
                 name = "build_report"
                 arguments = dict(run_id=json.loads(messages[-1]["content"])["run_id"],
-                                 idea=args.idea, top_k=args.top_k)
+                                 top_k=args.top_k)
             return {"role": "assistant", "content": None, "tool_calls": [
                 {"id": f"test-call-{self.calls}", "type": "function", "function": {
                     "name": name, "arguments": json.dumps(arguments)}}]}

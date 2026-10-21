@@ -13,7 +13,7 @@ const phases = [
 ];
 const account = { user: null, mode: "login", pending: false, epoch: 0, users: [], total: 0, page: 1, pageSize: 20, search: "", searchTimer: null, adminVersion: 0, editing: null };
 const state = { jobs: [], job: null, currentId: null, activeJobId: null, resourceBusy: false, submitting: false, model: null, models: null, switching: false, modelPoll: null, statusRefreshing: false, view: "home", tab: "papers", poll: null, requestVersion: 0 };
-const modelBusy = (catalog = state.models) => Boolean(catalog?.managed && ["unloading", "loading", "recovering"].includes(catalog.status));
+const modelBusy = (catalog = state.models) => Boolean(state.model?.mode !== "remote" && catalog?.managed && ["unloading", "loading", "recovering"].includes(catalog.status));
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
@@ -140,7 +140,7 @@ function showView(view) {
   if (view !== "run") { clearTimeout(state.poll); state.requestVersion++; }
   $("#account-dropdown").hidden = true;
   $("#account-trigger").setAttribute("aria-expanded", "false");
-  if (view === "profile") populateProfile();
+  if (view === "profile") { populateProfile(); loadAPISettings(); }
   if (view === "admin") loadAdminUsers();
   if (view !== "run") document.title = `${$("#breadcrumb-current").textContent} · Paper`;
   closeSidebar();
@@ -150,13 +150,14 @@ function updateComposer() {
   const characters = $("#idea").value.length;
   $("#idea-count").textContent = `${characters} / 2000`;
   const busy = Boolean(state.activeJobId || state.resourceBusy);
-  const unavailable = !state.model?.connected || state.switching || (state.models?.managed && state.models.status !== "ready");
+  const unavailable = !state.model?.connected || state.switching || (state.model?.mode !== "remote" && state.models?.managed && state.models.status !== "ready");
   $("#start-button").disabled = state.submitting || busy || unavailable;
   $("#start-button span").textContent = state.submitting ? "正在开始…" : busy ? "已有研究运行中" : "开始研究";
-  $("#research-hint").textContent = busy ? state.activeJobId ? "有一项研究正在运行，可从研究记录查看进度。" : "共享研究资源正在使用中，请稍后开始。" : modelBusy() || state.switching ? "正在加载模型，完成后即可开始研究。" : unavailable ? "本地模型尚未连接，请联系管理员检查服务。" : "检索真实论文 · 由本地模型完成分析";
+  $("#research-hint").textContent = busy ? state.activeJobId ? "有一项研究正在运行，可从研究记录查看进度。" : "共享研究资源正在使用中，请稍后开始。" : modelBusy() || state.switching ? "正在加载模型，完成后即可开始研究。" : unavailable ? "模型尚未连接，可在个人空间配置网络 API，或启动本地服务。" : state.model?.mode === "remote" ? "检索真实论文 · 使用你的网络 API 分析（可能产生费用）" : "检索真实论文 · 由本地模型完成分析";
 }
 function newResearch() {
   showView("home");
+  $("#concurrent").checked = false;
   $("#idea").value = "";
   state.currentId = null;
   updateComposer();
@@ -177,10 +178,10 @@ async function refreshStatus() {
     state.model = data.model || { connected: false };
     state.activeJobId = data.active_job_id || null;
     state.resourceBusy = Boolean(data.resource_busy);
-    const current = state.models?.models?.find((m) => m.id === state.models.current_id);
+    const current = state.model.mode === "remote" ? null : state.models?.models?.find((m) => m.id === state.models.current_id);
     $("#model-name").textContent = current ? `${current.id.toUpperCase()} · Qwen3.8-27B` : state.model.name || "本地模型";
     const connected = state.model.connected && !modelBusy();
-    $("#model-state").innerHTML = `<span class="status-dot ${connected ? "connected" : "offline"}"></span>${modelBusy() ? "模型切换中…" : connected ? "已连接 · 就绪" : "尚未连接"}`;
+    $("#model-state").innerHTML = `<span class="status-dot ${connected ? "connected" : "offline"}"></span>${modelBusy() ? "模型切换中…" : connected ? state.model.mode === "remote" ? "网络 API · 已配置" : "已连接 · 就绪" : "尚未连接"}`;
     $("#refresh-status").title = state.model.detail || "重新检查模型连接";
   } catch {
     if (!account.user || epoch !== account.epoch) return;
@@ -191,11 +192,21 @@ async function refreshStatus() {
   }
   renderModelControls();
   updateComposer();
-  if (modelBusy() || (state.models?.managed && state.models.status === "ready" && !state.model?.connected)) state.modelPoll = setTimeout(refreshStatus, 1200);
+  if (state.model?.mode !== "remote" && (modelBusy() || (state.models?.managed && state.models.status === "ready" && !state.model?.connected))) state.modelPoll = setTimeout(refreshStatus, 1200);
 }
 function renderModelControls() {
   const isAdmin = account.user?.role === "admin";
   const catalog = state.models, select = $("#model-select");
+  if (state.model?.mode === "remote") {
+    select.innerHTML = `<option>${escapeHtml(state.model.name)} · 我的网络 API</option>`;
+    select.disabled = true;
+    $("#switch-model").hidden = true;
+    $("#switch-model").disabled = true;
+    $("#model-loading-label").textContent = "个人配置";
+    $("#model-switch-hint").textContent = "使用你保存的 API Key；可在个人空间测试连接或切回本地模型。";
+    $("#model-switch-hint").classList.remove("model-hint-error");
+    return;
+  }
   const entries = Array.isArray(catalog?.models) ? catalog.models : [];
   const chosen = select.value || catalog?.target_id || catalog?.current_id || "q4_k_m";
   select.innerHTML = entries.length ? entries.map((m) => {
@@ -289,7 +300,7 @@ function renderPapers(job) {
     const title = escapeHtml(paper.title || "未命名论文");
     const pdf = paper.pdf_available === true || (paper.pdf_available === undefined && paper.status === "ok");
     const paperStatus = paper.status === "ok" ? "已完成阅读" : paper.status === "failed" ? "处理未完成" : paper.status === "cancelled" ? "已停止处理" : "等待 / 正在分析";
-    return `<article class="paper-card"><div class="paper-rank">${String(index + 1).padStart(2, "0")}</div><div class="paper-content"><div class="paper-meta">${sources.map((source) => `<span class="source-tag">${escapeHtml(source)}</span>`).join("")}${year ? `<span>${escapeHtml(year)}</span>` : ""}<span class="paper-status ${paper.status === "ok" ? "ok" : paper.status === "failed" ? "failed" : "pending"}">${paper.status === "ok" ? icon("check") : icon("clock")}${paperStatus}</span></div><h3 class="paper-title">${title}</h3>${authors.length ? `<p class="paper-authors">${escapeHtml(authors.slice(0, 3).join(" · "))}${authors.length > 3 ? " 等" : ""}</p>` : ""}${paper.selection_reason ? `<div class="paper-reason">${icon("spark")}<p>${escapeHtml(paper.selection_reason)}</p></div>` : ""}${paper.error ? `<div class="notice error">${escapeHtml(paper.error)}</div>` : ""}<div class="paper-actions">${url ? `<a class="text-button" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">论文来源${icon("external")}</a>` : ""}${pdf ? `<a class="text-button" href="/api/jobs/${encodeURIComponent(job.id)}/papers/${encodeURIComponent(paper.id)}/pdf" target="_blank" rel="noopener noreferrer">${icon("paper")}查看 PDF</a>` : ""}<span class="paper-id">${escapeHtml(paper.id)}</span></div>${paper.summary ? `<details class="paper-summary" data-paper-id="${escapeHtml(paper.id)}" ${opened.has(String(paper.id)) ? "open" : ""}><summary>${icon("book")}阅读全文总结${icon("chevron")}</summary><div class="markdown">${markdown(paper.summary)}</div></details>` : ""}</div></article>`;
+    return `<article class="paper-card"><div class="paper-rank">${String(index + 1).padStart(2, "0")}</div><div class="paper-content"><div class="paper-meta">${sources.map((source) => `<span class="source-tag">${escapeHtml(source)}</span>`).join("")}${year ? `<span>${escapeHtml(year)}</span>` : ""}<span class="paper-status ${paper.status === "ok" ? "ok" : paper.status === "failed" ? "failed" : "pending"}">${paper.status === "ok" ? icon("check") : icon("clock")}${paperStatus}</span></div><h3 class="paper-title">${title}</h3>${authors.length ? `<p class="paper-authors">${escapeHtml(authors.slice(0, 3).join(" · "))}${authors.length > 3 ? " 等" : ""}</p>` : ""}${paper.selection_reason ? `<div class="paper-reason">${icon("spark")}<p>${escapeHtml(paper.selection_reason)}</p></div>` : ""}${paper.error ? `<div class="notice error">${escapeHtml(paper.error)}</div>` : ""}<div class="paper-actions">${url ? `<a class="text-button" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">论文来源${icon("external")}</a>` : ""}${pdf ? `<a class="text-button" href="/api/jobs/${encodeURIComponent(job.id)}/papers/${encodeURIComponent(paper.id)}/pdf" target="_blank" rel="noopener noreferrer">${icon("paper")}查看 PDF</a>` : ""}${paper.markdown_available ? `<a class="text-button" href="/api/jobs/${encodeURIComponent(job.id)}/papers/${encodeURIComponent(paper.id)}/markdown" download>${icon("paper")}下载全文 Markdown</a>` : ""}<span class="paper-id">${escapeHtml(paper.id)}</span></div>${paper.summary ? `<details class="paper-summary" data-paper-id="${escapeHtml(paper.id)}" ${opened.has(String(paper.id)) ? "open" : ""}><summary>${icon("book")}阅读全文总结${icon("chevron")}</summary><div class="markdown">${markdown(paper.summary)}</div></details>` : ""}</div></article>`;
   }).join("");
 }
 function eventDescription(item) {
@@ -380,7 +391,7 @@ async function startResearch(event) {
   if (!idea || state.submitting) { $("#idea").focus(); return; }
   state.submitting = true; updateComposer();
   try {
-    const job = await api("/api/jobs", { method: "POST", body: JSON.stringify({ idea, top_k: Number($("#top-k").value), concurrent: true }) });
+    const job = await api("/api/jobs", { method: "POST", body: JSON.stringify({ idea, top_k: Number($("#top-k").value), concurrent: $("#concurrent").checked }) });
     state.activeJobId = job.id;
     renderModelControls();
     await refreshHistory();
@@ -400,7 +411,7 @@ $("#back-home").addEventListener("click", () => showView("home"));
 for (const element of [$("#nav-history"), $("#view-all")]) element.addEventListener("click", () => { showView("history"); refreshHistory(); });
 $("#history-search").addEventListener("input", renderHistory);
 $("#history-refresh").addEventListener("click", () => refreshHistory(true));
-$("#refresh-status").addEventListener("click", async () => { await refreshStatus(); toast(state.model?.connected ? "本地模型连接正常" : "尚未连接模型，请启动模型服务后重试。"); });
+$("#refresh-status").addEventListener("click", async () => { await refreshStatus(); toast(state.model?.detail || "尚未连接模型，请检查个人配置或本地服务。"); });
 $$("[data-idea]").forEach((button) => button.addEventListener("click", () => { $("#idea").value = button.dataset.idea; updateComposer(); $("#idea").focus(); }));
 document.addEventListener("click", (event) => { const button = event.target.closest("[data-job-id]"); if (button) loadJob(button.dataset.jobId); });
 $$("[data-tab]").forEach((button) => button.addEventListener("click", () => switchTab(button.dataset.tab)));
@@ -417,6 +428,7 @@ $("#reuse-idea").addEventListener("click", () => {
   newResearch();
   $("#idea").value = job.idea || "";
   $("#top-k").value = String(job.top_k || 3);
+  $("#concurrent").checked = false;
 });
 $("#cancel-job").addEventListener("click", async () => {
   if (!state.currentId) return;
@@ -496,7 +508,7 @@ function requireLogin(message = "") {
   document.body.classList.remove("auth-pending");
   document.body.classList.add("is-signed-out");
   $("#idea").value = ""; $("#history-search").value = ""; $("#admin-search").value = "";
-  $("#profile-form").reset(); $("#password-form").reset(); $("#admin-edit-form").reset(); $("#admin-reset-form").reset();
+  $("#api-settings-form").reset(); personalAPI.config = null; personalAPI.version++; $("#api-key-status").textContent = ""; $("#api-settings-note").textContent = ""; $("#profile-form").reset(); $("#password-form").reset(); $("#admin-edit-form").reset(); $("#admin-reset-form").reset();
   $$("[data-password]").forEach((toggle) => { document.getElementById(toggle.dataset.password).type = "password"; toggle.setAttribute("aria-label", "显示密码"); toggle.setAttribute("aria-pressed", "false"); });
   for (const id of ["paper-list", "report-content", "activity-list", "log-output", "run-title", "run-meta", "run-notice", "source-health", "progress-count", "admin-users", "admin-edit-name", "admin-edit-joined", "profile-display-name", "profile-handle", "profile-bio-preview", "sidebar-user-name", "topbar-user-name", "dropdown-name", "dropdown-username"]) $(`#${id}`).textContent = "";
   for (const id of ["sidebar-avatar", "topbar-avatar", "profile-avatar", "profile-edit-avatar", "admin-edit-avatar"]) $(`#${id}`).textContent = "";
@@ -724,6 +736,85 @@ $("#admin-reset-form").addEventListener("submit", async (event) => {
     if (self) requireLogin("密码已重置，请使用新密码登录。"); else toast("密码已重置，该用户原有登录会话已失效。");
   } catch (error) { formError("#admin-reset-error", error.message); }
   finally { $("#admin-reset-submit").disabled = false; }
+});
+const personalAPI = { config: null, version: 0, pending: false };
+function toggleAPIFields() {
+  const remote = $("#api-mode").value === "remote";
+  $("#api-remote-fields").hidden = !remote;
+  $("#api-remote-fields").disabled = !remote || personalAPI.pending;
+  $("#api-test").hidden = !remote;
+}
+function setAPIBusy(busy) {
+  personalAPI.pending = busy;
+  for (const id of ["api-mode", "api-save", "api-test", "api-delete"]) $(`#${id}`).disabled = busy;
+  toggleAPIFields();
+}
+function fillAPISettings(config) {
+  personalAPI.config = config;
+  $("#api-mode").value = config.mode;
+  $("#api-base").value = config.base_url;
+  $("#api-model").value = config.model;
+  $("#api-context").value = config.context_tokens;
+  $("#api-key").value = "";
+  $("#api-key").type = "password";
+  const toggle = $('[data-password="api-key"]');
+  toggle.setAttribute("aria-pressed", "false"); toggle.setAttribute("aria-label", "显示密码");
+  $("#api-key-status").textContent = config.has_api_key ? "已保存 · 留空保留" : "尚未配置";
+  $("#api-key").placeholder = config.has_api_key ? "已保存，留空保留原 Key" : "输入你的 API Key";
+  toggleAPIFields();
+}
+async function loadAPISettings() {
+  const version = ++personalAPI.version;
+  setAPIBusy(true); formError("#api-settings-error");
+  $("#api-settings-note").textContent = "正在读取个人配置…";
+  try {
+    const config = await api("/api/settings/model");
+    if (version !== personalAPI.version || !account.user) return;
+    fillAPISettings(config);
+    $("#api-settings-note").textContent = config.mode === "remote" ? "当前使用个人网络 API。" : "当前使用本地模型服务。";
+  } catch (error) { if (version === personalAPI.version && account.user) { formError("#api-settings-error", error.message); $("#api-settings-note").textContent = "配置读取失败，请重新打开个人空间。"; } }
+  finally { if (version === personalAPI.version) setAPIBusy(false); }
+}
+function apiSettingsPayload() {
+  const payload = { mode: $("#api-mode").value, base_url: $("#api-base").value.trim(), model: $("#api-model").value.trim(), context_tokens: Number($("#api-context").value) };
+  if ($("#api-key").value.trim()) payload.api_key = $("#api-key").value.trim();
+  return payload;
+}
+$("#open-api-settings").addEventListener("click", () => { showView("profile"); $("#api-settings-form").scrollIntoView({ behavior: "smooth", block: "center" }); });
+$("#api-mode").addEventListener("change", toggleAPIFields);
+$("#api-settings-form").addEventListener("input", () => { $("#api-settings-note").textContent = "配置已修改，保存后对新任务生效。"; formError("#api-settings-error"); });
+$("#api-settings-form").addEventListener("submit", async (event) => {
+  event.preventDefault(); if (personalAPI.pending) return;
+  const version = personalAPI.version;
+  setAPIBusy(true); formError("#api-settings-error");
+  try {
+    const config = await api("/api/settings/model", { method: "PUT", body: JSON.stringify(apiSettingsPayload()) });
+    if (version !== personalAPI.version || !account.user) return;
+    fillAPISettings(config); $("#api-settings-note").textContent = "已保存，对下一次研究生效。";
+    toast("模型配置已保存。"); await refreshStatus();
+  } catch (error) { if (version === personalAPI.version && account.user) formError("#api-settings-error", error.message); }
+  finally { if (version === personalAPI.version) setAPIBusy(false); }
+});
+$("#api-test").addEventListener("click", async () => {
+  if (personalAPI.pending || !$("#api-settings-form").reportValidity()) return;
+  const version = personalAPI.version;
+  setAPIBusy(true); formError("#api-settings-error"); $("#api-settings-note").textContent = "正在测试 API 连接和工具调用…";
+  try {
+    const result = await api("/api/settings/model/test", { method: "POST", body: JSON.stringify(apiSettingsPayload()) });
+    if (version === personalAPI.version && account.user) $("#api-settings-note").textContent = result.message;
+  } catch (error) { if (version === personalAPI.version && account.user) { $("#api-settings-note").textContent = "测试未通过，配置尚未保存。"; formError("#api-settings-error", error.message); } }
+  finally { if (version === personalAPI.version) setAPIBusy(false); }
+});
+$("#api-delete").addEventListener("click", async () => {
+  if (personalAPI.pending) return;
+  const version = personalAPI.version;
+  setAPIBusy(true); formError("#api-settings-error");
+  try {
+    const config = await api("/api/settings/model", { method: "DELETE" });
+    if (version !== personalAPI.version || !account.user) return;
+    fillAPISettings(config); $("#api-settings-note").textContent = "网络配置已清除，已切回本地模式。"; await refreshStatus();
+  } catch (error) { if (version === personalAPI.version && account.user) formError("#api-settings-error", error.message); }
+  finally { if (version === personalAPI.version) setAPIBusy(false); }
 });
 updateComposer();
 bootstrapAccounts();

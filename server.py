@@ -104,7 +104,8 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
                    requested_top_k=top_k,
                    model_id=os.getenv("PAPER_MODEL_ID"), model_label=os.getenv("PAPER_MODEL_LABEL"),
                    task_success=(report_success and metrics["completed_count"] == len(selected) == top_k
-                                 and all(s["status"] == "ok" for s in run["sources"].values())),
+                                 and all(s["status"] == "ok" for s in run["sources"].values()
+                                         if isinstance(s, dict))),
                    sources=run["sources"])
     save_json(output / "metrics.json", metrics)
     trace(output, "report_completed", {"metrics": metrics})

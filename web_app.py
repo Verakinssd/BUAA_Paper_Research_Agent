@@ -26,6 +26,7 @@ from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 from research.model_manager import ModelControlClient
 from research.accounts import SESSION_TTL_SECONDS, UserStore
+from research.api_settings import APISettings, remote_environment, test_connection
 
 
 PROJECT = Path(__file__).resolve().parent
@@ -74,10 +75,12 @@ class JobManager:
         self.health_lock = asyncio.Lock()
         self.health_cache = (0, {})
         self.model_control = ModelControlClient(self.project)
+        self.job_configs = {}  # In-memory snapshots only; never persisted with jobs.
 
     def clean(self, value):
         secrets = [secret for name, secret in os.environ.items()
                    if len(secret) >= 8 and re.search(r"(?:KEY|TOKEN|PASSWORD|SECRET)$", name, re.I)]
+        secrets += [config["api_key"] for config in self.job_configs.values() if config.get("api_key")]
 
         def redact(item):
             if isinstance(item, dict):
@@ -243,6 +246,7 @@ class JobManager:
                 item["summary"] = paper.get("summary") or read_text(self.artifact(run, f"summaries/{pid}.md"))
                 pdf = self.artifact(run, f"fulltext/{pid}.pdf")
                 item["pdf_available"] = pdf.is_file()
+                item["markdown_available"] = self.artifact(run, f"fulltext/{pid}.md").is_file()
                 item["pdf_url"] = (f'/api/jobs/{job["id"]}/papers/{pid}/pdf'
                                    if pdf.is_file() else None)
                 result["papers"].append(item)
@@ -265,7 +269,7 @@ class JobManager:
             result["stage"] = "done"
         return self.clean(result)
 
-    async def create(self, payload, owner_id=None):
+    async def create(self, payload, owner_id=None, model_config=None):
         if not isinstance(payload, dict):
             raise HTTPException(400, "请求内容必须是 JSON 对象")
         idea, top_k = payload.get("idea"), payload.get("top_k", 3)
@@ -281,13 +285,17 @@ class JobManager:
             if self.active_id:
                 raise HTTPException(409, "已有任务正在运行，请等待完成或停止后再试")
             selected_model = {}
-            catalog = await self.model_control.catalog()
-            if catalog["managed"]:
-                if catalog["status"] != "ready":
-                    raise HTTPException(409, "模型尚未就绪，请等待加载完成后再开始研究")
-                selected_model = next((m for m in catalog["models"] if m["id"] == catalog["current_id"]), {})
-            if not (await self.health())["model"]["connected"]:
-                raise HTTPException(409, "模型未连接，请先启动模型服务后再开始研究")
+            remote = model_config and model_config["mode"] == "remote"
+            if remote:
+                selected_model = dict(id="remote", label=model_config["model"])
+            else:
+                catalog = await self.model_control.catalog()
+                if catalog["managed"]:
+                    if catalog["status"] != "ready":
+                        raise HTTPException(409, "模型尚未就绪，请等待加载完成后再开始研究")
+                    selected_model = next((m for m in catalog["models"] if m["id"] == catalog["current_id"]), {})
+                if not (await self.health())["model"]["connected"]:
+                    raise HTTPException(409, "模型未连接，请先启动模型服务或在个人空间配置网络 API")
             stamp = now_iso()
             job = dict(id=uuid.uuid4().hex, idea=idea.strip(), top_k=top_k,
                        owner_id=owner_id,
@@ -296,6 +304,8 @@ class JobManager:
                        model_id=selected_model.get("id"), model_label=selected_model.get("label"))
             self.jobs[job["id"]] = job
             self.persist(job)
+            if remote:
+                self.job_configs[job["id"]] = dict(model_config)
             self.tasks[job["id"]] = asyncio.create_task(self.execute(job))
             return self.snapshot(job)
 
@@ -307,6 +317,8 @@ class JobManager:
             job.update(status="running", updated_at=now_iso())
             self.persist(job)
             env = dict(os.environ)  # Keep the scheduler's GPU allocation unchanged.
+            if job["id"] in self.job_configs:
+                env.update(remote_environment(self.job_configs[job["id"]]))
             env.update(PAPER_OUTPUT_ROOT=str(self.runs / job["id"]), PAPER_WEB_JOB_ID=job["id"],
                        PYTHONUNBUFFERED="1", PYTHONIOENCODING="utf-8")
             if job.get("model_id"):
@@ -351,6 +363,7 @@ class JobManager:
             self.processes.pop(job["id"], None)
             job.update(updated_at=now_iso(), finished_at=now_iso())
             self.persist(job)
+            self.job_configs.pop(job["id"], None)
             self.tasks.pop(job["id"], None)
 
     async def stop_process(self, process):
@@ -418,6 +431,7 @@ def create_app(project=PROJECT, output_root=None, data_dir=None):
     if not account_path.is_absolute():
         account_path = manager.project / account_path
     accounts = UserStore(account_path)
+    api_settings = APISettings(accounts)
     cookie_name = "paper_session"
     auth_attempts = {}
 
@@ -441,7 +455,12 @@ def create_app(project=PROJECT, output_root=None, data_dir=None):
         return FileResponse(path)
 
     async def status(request):
-        result = dict(await manager.health())
+        config = await run_in_threadpool(api_settings.read, request.state.user["id"])
+        if config["mode"] == "remote":
+            result = {"model": dict(name=config["model"], mode="remote", connected=True,
+                                    detail="网络 API 已配置；可在个人空间测试连接")}
+        else:
+            result = dict(await manager.health())
         active_id = manager.active_id
         result["resource_busy"] = bool(active_id)
         result["active_job_id"] = (active_id if active_id and
@@ -590,6 +609,25 @@ def create_app(project=PROJECT, output_root=None, data_dir=None):
         result["blocked_by_job"] = bool(manager.active_id)
         return JSONResponse(manager.clean(result))
 
+    async def personal_model(request):
+        user_id = request.state.user["id"]
+        if request.method == "GET":
+            config = await run_in_threadpool(api_settings.read, user_id)
+            return JSONResponse(api_settings.public(config))
+        if request.method == "DELETE":
+            result = await run_in_threadpool(api_settings.save, user_id,
+                                            dict(mode="local", base_url="", model="", api_key=""))
+        else:
+            result = await run_in_threadpool(api_settings.save, user_id, await payload(request))
+        return JSONResponse(result)
+
+    async def personal_model_test(request):
+        throttle(request, "api_test")
+        config = await run_in_threadpool(api_settings.prepare, request.state.user["id"], await payload(request))
+        if config["mode"] != "remote":
+            raise HTTPException(400, "请选择网络 API 后测试连接。")
+        return JSONResponse(await test_connection(config))
+
     async def switch_model(request):
         admin_only(request)
         data = await payload(request, 2048)
@@ -605,7 +643,8 @@ def create_app(project=PROJECT, output_root=None, data_dir=None):
 
     async def jobs(request):
         if request.method == "POST":
-            return JSONResponse(await manager.create(await payload(request), request.state.user["id"]), status_code=202)
+            config = await run_in_threadpool(api_settings.read, request.state.user["id"])
+            return JSONResponse(await manager.create(await payload(request), request.state.user["id"], config), status_code=202)
         manager.discover_history()
         summaries = []
         for job in sorted(manager.jobs.values(), key=lambda j: j["created_at"], reverse=True):
@@ -634,8 +673,12 @@ def create_app(project=PROJECT, output_root=None, data_dir=None):
             snapshot = manager.snapshot(job)
             if paper_id not in {p["id"] for p in snapshot["papers"]}:
                 raise HTTPException(404, "论文不存在")
-            path = manager.artifact(run, f"fulltext/{paper_id}.pdf")
-            media, filename = "application/pdf", f"{paper_id}.pdf"
+            if request.url.path.endswith("/markdown"):
+                path = manager.artifact(run, f"fulltext/{paper_id}.md")
+                media, filename = "text/markdown; charset=utf-8", f"{paper_id}-fulltext.md"
+            else:
+                path = manager.artifact(run, f"fulltext/{paper_id}.pdf")
+                media, filename = "application/pdf", f"{paper_id}.pdf"
         else:
             path = manager.artifact(run, "report.md")
             media, filename = "text/markdown; charset=utf-8", f"research-{job['id'][:8]}.md"
@@ -649,6 +692,8 @@ def create_app(project=PROJECT, output_root=None, data_dir=None):
         Route("/api/auth/login", login, methods=["POST"]),
         Route("/api/auth/logout", logout, methods=["POST"]),
         Route("/api/auth/profile", profile, methods=["PATCH"]),
+        Route("/api/settings/model", personal_model, methods=["GET", "PUT", "DELETE"]),
+        Route("/api/settings/model/test", personal_model_test, methods=["POST"]),
         Route("/api/auth/password", password, methods=["POST"]),
         Route("/api/auth/avatar", avatar, methods=["POST", "DELETE"]),
         Route("/api/users/{user_id}/avatar", avatar_file),
@@ -661,6 +706,7 @@ def create_app(project=PROJECT, output_root=None, data_dir=None):
         Route("/api/jobs/{job_id}/cancel", cancel_job, methods=["POST"]),
         Route("/api/jobs/{job_id}/report", artifact_response),
         Route("/api/jobs/{job_id}/papers/{paper_id}/pdf", artifact_response),
+        Route("/api/jobs/{job_id}/papers/{paper_id}/markdown", artifact_response),
         Mount("/static", StaticFiles(directory=manager.project / "web", check_dir=False), name="static"),
     ])
     app.state.manager = manager

@@ -177,6 +177,10 @@ class UserStore:
                     );
                     CREATE INDEX IF NOT EXISTS sessions_user_id ON sessions(user_id);
                     CREATE INDEX IF NOT EXISTS sessions_expires_at ON sessions(expires_at);
+                    CREATE TABLE IF NOT EXISTS model_settings (
+                        user_id TEXT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+                        value TEXT NOT NULL
+                    );
                     COMMIT;
                 """)
             finally:
