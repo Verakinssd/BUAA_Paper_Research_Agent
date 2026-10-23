@@ -13,6 +13,69 @@ _convert_lock = asyncio.Lock()
 _arxiv_pdf_lock = asyncio.Lock()
 _last_pdf_request = 0.0
 
+PIPELINE_MODES = {"legacy", "staged"}
+
+
+def _positive_int(name, default):
+    raw = os.getenv(name, str(default))
+    try:
+        value = int(raw)
+    except ValueError:
+        raise ValueError(f"{name} 必须为正整数") from None
+    if value <= 0:
+        raise ValueError(f"{name} 必须为正整数")
+    return value
+
+
+def pipeline_settings(concurrent=False, mode=None):
+    """Resolve scheduling without changing the legacy default entry points.
+
+    With no explicit PIPELINE_MODE, the existing `concurrent` flag keeps its
+    original meaning: false is serial and true uses the whole-paper limit of 2.
+    An explicit mode is used by reproducible benchmarks and deployments that
+    want to opt in to staged scheduling.
+    """
+    explicit = mode if mode is not None else os.getenv("PIPELINE_MODE")
+    explicit = explicit.strip().lower() if explicit else ""
+    if explicit and explicit not in PIPELINE_MODES:
+        raise ValueError("PIPELINE_MODE 必须为 legacy 或 staged")
+    selected = explicit or "legacy"
+    enabled = bool(concurrent) or bool(explicit)
+    return {
+        "mode": selected,
+        "enabled": enabled,
+        "legacy_concurrency": 2 if enabled else 1,
+        "download_concurrency": _positive_int("DOWNLOAD_CONCURRENCY", 4),
+        "convert_concurrency": _positive_int("CONVERT_CONCURRENCY", 1),
+        "summary_concurrency": _positive_int("SUMMARY_CONCURRENCY", 2),
+        "max_in_flight": _positive_int("PIPELINE_MAX_IN_FLIGHT", 8),
+    }
+
+
+def _stage_timings():
+    return {
+        name: {"seconds": 0.0, "wait_seconds": 0.0, "attempts": 0, "failures": 0}
+        for name in ("cache", "download", "convert", "summary")
+    }
+
+
+async def _run_stage(semaphore, timing, operation):
+    wait_started = time.perf_counter()
+    if semaphore is not None:
+        await semaphore.acquire()
+    timing["wait_seconds"] += time.perf_counter() - wait_started if semaphore is not None else 0
+    timing["attempts"] += 1
+    active_started = time.perf_counter()
+    try:
+        return await operation()
+    except Exception:
+        timing["failures"] += 1
+        raise
+    finally:
+        timing["seconds"] += time.perf_counter() - active_started
+        if semaphore is not None:
+            semaphore.release()
+
 
 def save_json(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -133,42 +196,69 @@ async def download_pdf(url, path, progress=None):
         await fetch()
 
 
-async def process_papers(papers, output, agent, concurrent=False, trace=None):
+async def process_papers(papers, output, agent, concurrent=False, trace=None, mode=None):
+    """Download, convert and summarize papers with legacy or staged scheduling."""
+    papers = list(papers)
+    settings = pipeline_settings(concurrent, mode)
     output = Path(output)
     (output / "fulltext").mkdir(parents=True, exist_ok=True)
     (output / "summaries").mkdir(exist_ok=True)
-    semaphore = asyncio.Semaphore(2 if concurrent else 1)
+
+    # Legacy deliberately keeps one semaphore around the complete per-paper
+    # workflow. Staged mode owns a different semaphore for each expensive stage.
+    whole_paper_gate = (asyncio.Semaphore(settings["legacy_concurrency"])
+                        if settings["mode"] == "legacy" else None)
+    download_gate = (asyncio.Semaphore(settings["download_concurrency"])
+                     if settings["mode"] == "staged" else None)
+    convert_gate = (asyncio.Semaphore(settings["convert_concurrency"])
+                    if settings["mode"] == "staged" else _convert_lock)
+    summary_gate = (asyncio.Semaphore(settings["summary_concurrency"])
+                    if settings["mode"] == "staged" else None)
+
     def emit(event, data):
         if trace:
             trace(event, data)
 
-    async def one(p):
-        async with semaphore:
-            started = time.perf_counter()
-            result = {key: p.get(key) for key in ("id", "title", "url", "sources", "selection_reason")}
-            result["status"] = "failed"
-            pdf = output / "fulltext" / (p["id"] + ".pdf")
-            errors = []
-            emit("paper_started", {"id": p["id"], "title": p["title"]})
-            try:
-                text = None
-                pdf_urls = p.get("pdf_urls", [])[:3]
-                # Check every equivalent source before downloading any of them.
-                # This lets a cached arXiv copy satisfy a paper even when a new
-                # publisher/CVF URL has since become the preferred first choice.
-                for url in pdf_urls:
-                    cache_started = time.perf_counter()
+    async def process_one(p):
+        scheduler_wait_started = time.perf_counter()
+        if whole_paper_gate is not None:
+            await whole_paper_gate.acquire()
+        scheduler_wait = (time.perf_counter() - scheduler_wait_started
+                          if whole_paper_gate is not None else 0.0)
+        started = time.perf_counter()
+        timings = _stage_timings()
+        result = {key: p.get(key) for key in ("id", "title", "url", "sources", "selection_reason")}
+        result["status"] = "failed"
+        pdf = output / "fulltext" / (p["id"] + ".pdf")
+        errors = []
+        emit("paper_started", {"id": p["id"], "title": p["title"]})
+        try:
+            text = None
+            pdf_urls = p.get("pdf_urls", [])[:3]
+            # Check every equivalent source before downloading any of them.
+            # This lets a cached arXiv copy satisfy a paper even when a new
+            # publisher/CVF URL has since become the preferred first choice.
+            for url in pdf_urls:
+                cache_started = time.perf_counter()
+                timings["cache"]["attempts"] += 1
+                try:
                     text = await asyncio.to_thread(restore_cached_fulltext, url, pdf)
-                    if text is not None:
-                        emit("paper_cache_hit", {"id": p["id"], "pdf_url": url,
-                                                 "pdf_bytes": pdf.stat().st_size,
-                                                 "markdown_chars": len(text),
-                                                 "seconds": round(time.perf_counter() - cache_started, 3)})
-                        break
-                for url in ([] if text is not None else pdf_urls):
-                    try:
-                        download_started = time.perf_counter()
-                        emit("pdf_download_started", {"id": p["id"], "pdf_url": url})
+                except Exception:
+                    timings["cache"]["failures"] += 1
+                    raise
+                finally:
+                    timings["cache"]["seconds"] += time.perf_counter() - cache_started
+                if text is not None:
+                    emit("paper_cache_hit", {"id": p["id"], "pdf_url": url,
+                                             "pdf_bytes": pdf.stat().st_size,
+                                             "markdown_chars": len(text),
+                                             "seconds": round(time.perf_counter() - cache_started, 3)})
+                    break
+            for url in ([] if text is not None else pdf_urls):
+                try:
+                    emit("pdf_download_started", {"id": p["id"], "pdf_url": url})
+
+                    async def download_operation():
                         await download_pdf(
                             url, pdf,
                             lambda downloaded, expected: emit(
@@ -178,45 +268,118 @@ async def process_papers(papers, output, agent, concurrent=False, trace=None):
                                  "total_bytes": expected},
                             ),
                         )
-                        emit("pdf_download_completed", {"id": p["id"], "pdf_url": url,
-                                                         "pdf_bytes": pdf.stat().st_size,
-                                                         "seconds": round(time.perf_counter() - download_started, 3)})
-                        convert_started = time.perf_counter()
-                        emit("pdf_conversion_started", {"id": p["id"],
-                                                         "mode": os.getenv("PDF_LAYOUT_MODE", "legacy")})
-                        async with _convert_lock:
-                            text = await asyncio.to_thread(convert_pdf, pdf)
-                        emit("pdf_conversion_completed", {"id": p["id"],
-                                                           "markdown_chars": len(text),
-                                                           "seconds": round(time.perf_counter() - convert_started, 3)})
+
+                    before = dict(timings["download"])
+                    await _run_stage(download_gate, timings["download"], download_operation)
+                    emit("pdf_download_completed", {
+                        "id": p["id"], "pdf_url": url, "pdf_bytes": pdf.stat().st_size,
+                        "seconds": round(timings["download"]["seconds"] - before["seconds"], 3),
+                        "wait_seconds": round(timings["download"]["wait_seconds"] - before["wait_seconds"], 3),
+                    })
+                    emit("pdf_conversion_started", {"id": p["id"],
+                                                     "mode": os.getenv("PDF_LAYOUT_MODE", "legacy")})
+
+                    async def convert_operation():
+                        return await asyncio.to_thread(convert_pdf, pdf)
+
+                    before = dict(timings["convert"])
+                    text = await _run_stage(convert_gate, timings["convert"], convert_operation)
+                    emit("pdf_conversion_completed", {
+                        "id": p["id"], "markdown_chars": len(text),
+                        "seconds": round(timings["convert"]["seconds"] - before["seconds"], 3),
+                        "wait_seconds": round(timings["convert"]["wait_seconds"] - before["wait_seconds"], 3),
+                    })
+                    async def store_cache_operation():
                         await asyncio.to_thread(store_cached_fulltext, url, pdf, text)
-                        break
-                    except Exception as exc:
-                        errors.append(str(exc))
-                        pdf.unlink(missing_ok=True)
-                if text is None:
-                    raise ValueError("没有可用的公开 PDF；" + "; ".join(errors))
-                md = output / "fulltext" / (p["id"] + ".md")
-                md.write_text(text, encoding="utf-8")
-                result["markdown_path"] = str(md)
-                result["summary"] = await agent.summarize(p, text, progress=emit)
-                summary = output / "summaries" / (p["id"] + ".md")
-                summary.write_text(result["summary"], encoding="utf-8")
-                result.update(status="ok", summary_path=str(summary),
-                              evidence="extracted_fulltext")
-            except Exception as exc:
-                result["error"] = str(exc)
-                result["evidence"] = "no_completed_summary"
-            result["seconds"] = round(time.perf_counter() - started, 3)
-            emit("paper_processed", {key: v for key, v in result.items() if key != "summary"})
-            return result
+
+                    await _run_stage(None, timings["cache"], store_cache_operation)
+                    break
+                except Exception as exc:
+                    errors.append(str(exc))
+                    pdf.unlink(missing_ok=True)
+            if text is None:
+                raise ValueError("没有可用的公开 PDF；" + "; ".join(errors))
+            md = output / "fulltext" / (p["id"] + ".md")
+            md.write_text(text, encoding="utf-8")
+            result["markdown_path"] = str(md)
+
+            async def summary_operation():
+                return await agent.summarize(p, text, progress=emit)
+
+            result["summary"] = await _run_stage(
+                summary_gate, timings["summary"], summary_operation
+            )
+            summary = output / "summaries" / (p["id"] + ".md")
+            summary.write_text(result["summary"], encoding="utf-8")
+            result.update(status="ok", summary_path=str(summary),
+                          evidence="extracted_fulltext")
+        except Exception as exc:
+            result["error"] = str(exc)
+            result["evidence"] = "no_completed_summary"
+        result["seconds"] = round(time.perf_counter() - started, 3)
+        result["timings"] = {
+            "scheduler_wait_seconds": round(scheduler_wait, 6),
+            "stages": {
+                name: {key: round(value, 6) if isinstance(value, float) else value
+                       for key, value in timing.items()}
+                for name, timing in timings.items()
+            },
+        }
+        try:
+            emit("paper_processed", {key: value for key, value in result.items() if key != "summary"})
+        finally:
+            if whole_paper_gate is not None:
+                whole_paper_gate.release()
+        return result
+
+    # A fixed worker pool avoids creating one asyncio Task per input paper. The
+    # queue is implicit in the protected index and bounded by max_in_flight.
+    results = [None] * len(papers)
+    next_index = 0
+    index_lock = asyncio.Lock()
+
+    async def worker():
+        nonlocal next_index
+        while True:
+            async with index_lock:
+                if next_index >= len(papers):
+                    return
+                index = next_index
+                next_index += 1
+            results[index] = await process_one(papers[index])
+
     started = time.perf_counter()
-    results = await asyncio.gather(*(one(p) for p in papers))
+    worker_count = min(len(papers), settings["max_in_flight"])
+    if worker_count:
+        await asyncio.gather(*(worker() for _ in range(worker_count)))
+    elapsed = time.perf_counter() - started
+    completed = sum(result["status"] == "ok" for result in results)
+    stage_metrics = {}
+    for name in ("cache", "download", "convert", "summary"):
+        rows = [result["timings"]["stages"][name] for result in results]
+        stage_metrics[name] = {
+            "seconds": round(sum(row["seconds"] for row in rows), 6),
+            "wait_seconds": round(sum(row["wait_seconds"] for row in rows), 6),
+            "attempts": sum(row["attempts"] for row in rows),
+            "failures": sum(row["failures"] for row in rows),
+        }
     metrics = {
-        "processing_seconds": round(time.perf_counter() - started, 3),
-        "selected_count": len(papers), "completed_count": sum(r["status"] == "ok" for r in results),
-        "paper_success_rate": sum(r["status"] == "ok" for r in results) / max(1, len(papers)),
-        "concurrent": concurrent,
+        "processing_seconds": round(elapsed, 3),
+        "selected_count": len(papers), "attempted_count": len(papers),
+        "completed_count": completed, "failed_count": len(papers) - completed,
+        "failure_rate": (len(papers) - completed) / max(1, len(papers)),
+        "paper_success_rate": completed / max(1, len(papers)),
+        "throughput_papers_per_second": round(len(papers) / elapsed, 6) if elapsed else 0.0,
+        "successful_papers_per_second": round(completed / elapsed, 6) if elapsed else 0.0,
+        "concurrent": settings["enabled"], "pipeline_mode": settings["mode"],
+        "concurrency": {key: settings[key] for key in (
+            "legacy_concurrency", "download_concurrency", "convert_concurrency",
+            "summary_concurrency", "max_in_flight",
+        )},
+        "scheduler_wait_seconds": round(sum(
+            result["timings"]["scheduler_wait_seconds"] for result in results
+        ), 6),
+        "stage_metrics": stage_metrics,
         "measured_scope": "PDF download + Markdown conversion + per-paper summaries",
     }
     return results, metrics
