@@ -15,6 +15,10 @@ from research.task_agent import TaskAgent
 
 load_dotenv()
 
+# On Windows, a lazy numpy import inside a running MCP stdio session hangs forever;
+# import it here before the transport starts reading stdin.
+import rank_bm25  # noqa: E402,F401
+
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO").upper(),
     format="%(asctime)s %(levelname)-7s %(name)s: %(message)s",
