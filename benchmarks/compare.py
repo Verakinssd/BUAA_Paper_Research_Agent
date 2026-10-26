@@ -6,7 +6,8 @@ import argparse
 import json
 from pathlib import Path
 
-MUST_MATCH = ("dataset_hash", "mode", "workload")
+MUST_MATCH = ("dataset_hash", "mode", "workload", "workers")
+DEFAULTS = {"workers": 1}  # summaries written before --workers existed
 
 
 def check_comparable(a, b):
@@ -15,8 +16,9 @@ def check_comparable(a, b):
         if not summary["meta"].get("full_dataset"):
             raise ValueError(f"{name} 不是完整 100 条数据集的结果，不能用于正式对比")
     for key in MUST_MATCH:
-        if a["meta"].get(key) != b["meta"].get(key):
-            raise ValueError(f"{key} 不一致：{a['meta'].get(key)} vs {b['meta'].get(key)}")
+        left, right = a["meta"].get(key, DEFAULTS.get(key)), b["meta"].get(key, DEFAULTS.get(key))
+        if left != right:
+            raise ValueError(f"{key} 不一致：{left} vs {right}")
     return [f"{key} 不一致：{a['meta'].get(key)} vs {b['meta'].get(key)}"
             for key in ("concurrent", "repeats") if a["meta"].get(key) != b["meta"].get(key)]
 
@@ -51,6 +53,8 @@ def compare(a, b):
     ta, tb = a["llm"]["total"], b["llm"]["total"]
     for key in ("prefill_tps_server", "decode_tps_server", "completion_tps_overall"):
         lines += [_line(key + " (tok/s)", ta.get(key), tb.get(key))]
+    tha, thb = a.get("throughput") or {}, b.get("throughput") or {}
+    lines += [_line("吞吐 (条/小时)", tha.get("queries_per_hour"), thb.get("queries_per_hour"))]
     lines += [_line("select 与参考重合率", a["select_overlap_mean"], b["select_overlap_mean"])]
     return "\n".join(lines) + "\n"
 

@@ -27,6 +27,7 @@ from benchmarks.summary import render_markdown, summarize
 
 REPO = Path(__file__).resolve().parent.parent
 stage_var = contextvars.ContextVar("bench_stage", default="other")
+collector_var = contextvars.ContextVar("bench_collector", default=None)
 ENV_KEYS = ("PAPER_MODEL_ID", "PAPER_MODEL_LABEL", "PDF_LAYOUT_MODE", "SELECTION_MAX_TOKENS",
             "SUMMARY_CHUNK_CHARS", "SUMMARY_NOTE_MAX_TOKENS", "SUMMARY_FINAL_MAX_TOKENS",
             "REPORT_MAX_TOKENS", "PAPER_RANKING_METHOD")
@@ -70,6 +71,15 @@ class Collector:
                 for name, s in stages.items()}
 
 
+class Router:
+    """The one observer installed on the LLM client. With --workers > 1 several queries
+    share it, so each call goes to the Collector of the query (asyncio task) that made it."""
+    def __call__(self, *call):
+        target = collector_var.get()
+        if target is not None:
+            target(*call)
+
+
 def shuffled(rows, seed):
     rows = list(rows)
     random.Random(seed).shuffle(rows)
@@ -100,6 +110,7 @@ async def run_query(query, agent, corpus, collector, concurrent, work_dir):
     reference_ids = [p["id"] for p in reference]
     row = {"qid": query["qid"], "topic": query["topic"], "lang": query["lang"],
            "top_k": query["top_k"]}
+    collector_var.set(collector)
     collector.drain()
 
     stage_var.set("select")
@@ -230,6 +241,9 @@ def parse_args(argv=None):
     p.add_argument("--queries", default=str(QUERIES_PATH))
     p.add_argument("--corpus-dir", default=str(CORPUS_DIR))
     p.add_argument("--concurrent", action="store_true", help="单查询内 2 篇论文并发")
+    p.add_argument("--workers", type=int, default=1,
+                   help="同时跑几条查询（服务端 --parallel 需 >= workers，--concurrent 时需 >= 2*workers）。"
+                        "用来缩短总时长；单条查询耗时会因争用变长，只能和相同 workers 的结果对比")
     p.add_argument("--repeats", type=int, choices=range(1, 6), default=1)
     p.add_argument("--warmup", type=int, default=None, help="额外预热查询数，不计入统计（stage 默认 3，e2e 默认 0）")
     p.add_argument("--seed", type=int, default=0, help="查询执行顺序的随机种子")
@@ -249,6 +263,8 @@ async def run(args, agent_factory=TaskAgent):
         selected = selected[:args.limit]
     if not selected:
         raise SystemExit("过滤后没有查询")
+    if args.workers < 1:
+        raise SystemExit("--workers 必须 >= 1")
     full = len(selected) == len(all_rows)
     stage_mode = args.mode == "stage"
     warmup = args.warmup if args.warmup is not None else (3 if stage_mode else 0)
@@ -264,27 +280,32 @@ async def run(args, agent_factory=TaskAgent):
 
     meta_path = out / "run_meta.json"
     meta = {"label": args.label, "mode": args.mode, "workload": "frozen" if stage_mode else "live",
-            "concurrent": args.concurrent, "repeats": args.repeats, "warmup": warmup,
-            "seed": args.seed, "dataset_hash": dataset_hash, "full_dataset": full,
+            "concurrent": args.concurrent, "workers": args.workers, "repeats": args.repeats,
+            "warmup": warmup, "seed": args.seed, "dataset_hash": dataset_hash, "full_dataset": full,
             "filters": {"limit": args.limit, "top_k": args.top_k, "lang": args.lang}}
     if meta_path.is_file():
         old = json.loads(meta_path.read_text(encoding="utf-8"))
-        for key in ("mode", "dataset_hash", "seed", "repeats", "concurrent", "filters"):
+        old.setdefault("workers", 1)  # written before --workers existed
+        for key in ("mode", "dataset_hash", "seed", "repeats", "concurrent", "workers", "filters"):
             if old.get(key) != meta[key]:
                 raise SystemExit(f"断点续跑参数与已有 run_meta.json 不一致：{key}")
         meta = old
     else:
         meta.update(started_at=time.strftime("%Y-%m-%d %H:%M:%S"), environment=collect_environment())
         save_json(meta_path, meta)
+    slots = ((meta.get("environment") or {}).get("server") or {}).get("total_slots")
+    need = args.workers * (2 if args.concurrent else 1)
+    if stage_mode and slots and slots < need:
+        print(f"警告：服务端只有 {slots} 个并行槽位，少于需要的 {need}；多出的请求会在服务端排队，"
+              f"单条查询耗时会被拉长。请用 LLAMA_PARALLEL={need} 重启模型服务。", file=sys.stderr, flush=True)
 
     agent = collector = None
     previous_cache = os.environ.get("PAPER_CACHE_DIR")
     if stage_mode:
         os.environ["PAPER_CACHE_DIR"] = str(corpus.cache_dir)
         agent = agent_factory()
-        collector = Collector()
         if hasattr(getattr(agent, "llm", None), "observer"):
-            agent.llm.observer = collector
+            agent.llm.observer = Router()
     plan = []
     if stage_mode and warmup:
         plan += [(True, 0, q) for q in shuffled(selected, args.seed)[:warmup]]
@@ -292,37 +313,51 @@ async def run(args, agent_factory=TaskAgent):
         order = shuffled(selected, args.seed + repeat) if stage_mode else stratified(selected, args.seed + repeat)
         plan += [(False, repeat, q) for q in order]
 
+    async def execute(index, is_warmup, repeat, query):
+        started, started_at = time.perf_counter(), time.time()
+        try:
+            if stage_mode:
+                work = out / "work" / f"{'w' if is_warmup else repeat}-{query['qid']}"
+                work.mkdir(parents=True, exist_ok=True)
+                row = await run_query(query, agent, corpus, Collector(), args.concurrent, work)
+            else:
+                row = await run_query_e2e(query, out, args.concurrent, args.e2e_timeout)
+        except Exception as exc:
+            row = {"qid": query["qid"], "topic": query["topic"], "lang": query["lang"],
+                   "top_k": query["top_k"], "error": str(exc), "task_success": False,
+                   "query_seconds": round(time.perf_counter() - started, 3), "stages": {}}
+        row.update(repeat=repeat, warmup=is_warmup, started_at=round(started_at, 3),
+                   ended_at=round(time.time(), 3))
+        with results_path.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(row, ensure_ascii=False) + "\n")
+        print(f"[{index}/{len(plan)}] {query['qid']} k={query['top_k']} "
+              f"{'warmup ' if is_warmup else ''}{row['query_seconds']}s "
+              f"{'ok' if row.get('task_success') else 'FAILED'}", flush=True)
+
+    pending = [(index, is_warmup, repeat, query)
+               for index, (is_warmup, repeat, query) in enumerate(plan, 1)
+               if (repeat, query["qid"], is_warmup) not in done]
+    gate = asyncio.Semaphore(args.workers)
+
+    async def guarded(item):
+        async with gate:
+            await execute(*item)
+
     try:
-        for index, (is_warmup, repeat, query) in enumerate(plan, 1):
-            if (repeat, query["qid"], is_warmup) in done:
-                continue
-            started = time.perf_counter()
-            try:
-                if stage_mode:
-                    work = out / "work" / f"{'w' if is_warmup else repeat}-{query['qid']}"
-                    work.mkdir(parents=True, exist_ok=True)
-                    row = await run_query(query, agent, corpus, collector, args.concurrent, work)
-                else:
-                    row = await run_query_e2e(query, out, args.concurrent, args.e2e_timeout)
-            except Exception as exc:
-                row = {"qid": query["qid"], "topic": query["topic"], "lang": query["lang"],
-                       "top_k": query["top_k"], "error": str(exc), "task_success": False,
-                       "query_seconds": round(time.perf_counter() - started, 3), "stages": {}}
-            row.update(repeat=repeat, warmup=is_warmup)
-            with results_path.open("a", encoding="utf-8") as stream:
-                stream.write(json.dumps(row, ensure_ascii=False) + "\n")
-            print(f"[{index}/{len(plan)}] {query['qid']} k={query['top_k']} "
-                  f"{'warmup ' if is_warmup else ''}{row['query_seconds']}s "
-                  f"{'ok' if row.get('task_success') else 'FAILED'}", flush=True)
+        for item in pending:  # warmup always runs alone, before the measured phase
+            if item[1]:
+                await execute(*item)
+        await asyncio.gather(*(guarded(item) for item in pending if not item[1]))
     finally:
         if previous_cache is None:
             os.environ.pop("PAPER_CACHE_DIR", None)
         else:
             os.environ["PAPER_CACHE_DIR"] = previous_cache
 
-    summary = summarize(read_rows(results_path), {k: meta[k] for k in (
-        "label", "mode", "workload", "concurrent", "dataset_hash", "full_dataset", "repeats",
-        "warmup", "seed", "filters")})
+    summary = summarize(read_rows(results_path), dict(
+        {k: meta[k] for k in ("label", "mode", "workload", "concurrent", "dataset_hash",
+                              "full_dataset", "repeats", "warmup", "seed", "filters")},
+        workers=meta.get("workers", 1)))
     save_json(out / "summary.json", summary)
     (out / "summary.md").write_text(render_markdown(summary), encoding="utf-8")
     print(render_markdown(summary))

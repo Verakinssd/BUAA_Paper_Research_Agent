@@ -72,6 +72,30 @@ def llm_totals(rows):
             "by_stage": {s: speeds(c) for s, c in sorted(stages.items())}}
 
 
+def busy_seconds(rows):
+    """Wall time during which at least one measured query was running. Overlapping queries
+    (--workers > 1) count once, and idle gaps between a stop and a resume do not count."""
+    spans = sorted((r["started_at"], r["ended_at"]) for r in rows
+                   if r.get("started_at") is not None and r.get("ended_at") is not None)
+    total, current = 0.0, None
+    for start, end in spans:
+        if current and start <= current[1]:
+            current[1] = max(current[1], end)
+        else:
+            if current:
+                total += current[1] - current[0]
+            current = [start, end]
+    return total + (current[1] - current[0] if current else 0.0)
+
+
+def throughput(rows, completion_tokens):
+    busy = busy_seconds(rows)
+    if busy <= 0:
+        return None
+    return {"busy_seconds": round(busy, 1), "queries_per_hour": round(len(rows) / busy * 3600, 2),
+            "completion_tps_aggregate": round(completion_tokens / busy, 2) if completion_tokens else None}
+
+
 def summarize(rows, meta):
     rows = [r for r in rows if not r.get("warmup")]
     times = [r["query_seconds"] for r in rows]
@@ -86,6 +110,7 @@ def summarize(rows, meta):
     repeat_means = [round(statistics.fmean(v), 3) for _, v in sorted(repeats.items())]
     overlaps = [r["select_overlap"] for r in rows if r.get("select_overlap") is not None]
     ok = [r for r in rows if r.get("task_success")]
+    llm = llm_totals(rows)
     return {
         "meta": meta,
         "n_queries": len(rows),
@@ -102,7 +127,8 @@ def summarize(rows, meta):
                    for name, s in sorted(stage_sums.items())} if rows else {},
         "fit_time_vs_top_k": fit_line([r["top_k"] for r in rows], times),
         "select_overlap_mean": round(statistics.fmean(overlaps), 4) if overlaps else None,
-        "llm": llm_totals(rows),
+        "llm": llm,
+        "throughput": throughput(rows, llm["total"].get("completion_tokens", 0)),
     }
 
 
@@ -115,9 +141,15 @@ def _row(label, s):
 def render_markdown(summary):
     meta = summary["meta"]
     lines = [f"# Benchmark `{meta.get('label')}`", "",
-             f"- 模式：{meta.get('mode')}（负载：{meta.get('workload')}，并发：{meta.get('concurrent')}）",
+             f"- 模式：{meta.get('mode')}（负载：{meta.get('workload')}，论文并发：{meta.get('concurrent')}，同时查询数：{meta.get('workers', 1)}）",
              f"- 数据集哈希：`{meta.get('dataset_hash')}`；完整数据集：{meta.get('full_dataset')}",
              f"- 有效查询数：{summary['n_queries']}；任务成功率：{summary['success_rate']}", ""]
+    if meta.get("workers", 1) > 1:
+        lines += ["> 多条查询同时运行，单条耗时包含争用，只能和相同同时查询数的结果比较；总时长看吞吐。", ""]
+    if summary.get("throughput"):
+        t = summary["throughput"]
+        lines += [f"- 吞吐：{t['queries_per_hour']} 条/小时（有效运行 {t['busy_seconds']} s）；"
+                  f"聚合 completion：{t['completion_tps_aggregate']} tok/s", ""]
     lines += ["## 查询时间", "| 分组 | n | 平均(s) | 中位数(s) | P95(s) | 最小(s) | 最大(s) |",
               "|---|---|---|---|---|---|---|", _row("全部", summary["overall"])]
     lines += [_row(f"top_k={k}", s) for k, s in summary["by_top_k"].items()]
