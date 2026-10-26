@@ -21,6 +21,15 @@ class DatasetTests(unittest.TestCase):
         self.assertEqual(sum(r["lang"] == "en" for r in rows), 25)
         self.assertEqual(len(digest), 16)
 
+    def test_hash_is_independent_of_line_endings(self):
+        import tempfile
+        rows, digest = build_dataset.load_queries()
+        text = build_dataset.QUERIES_PATH.read_bytes().replace(b"\r\n", b"\n")
+        with tempfile.TemporaryDirectory() as tmp:
+            crlf = Path(tmp) / "queries.jsonl"
+            crlf.write_bytes(text.replace(b"\n", b"\r\n"))
+            self.assertEqual(build_dataset.load_queries(crlf)[1], digest)
+
     def test_committed_file_matches_generator(self):
         generated = build_dataset.dumps(build_dataset.build_queries())
         self.assertEqual(build_dataset.QUERIES_PATH.read_text(encoding="utf-8"), generated)
