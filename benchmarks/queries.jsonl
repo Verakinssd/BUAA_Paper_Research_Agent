@@ -1,0 +1,100 @@
+{"qid": "q001", "topic": "peft", "lang": "zh", "idea": "我想研究大语言模型的参数高效微调方法。", "search_query": "parameter-efficient fine-tuning", "top_k": 1}
+{"qid": "q002", "topic": "peft", "lang": "zh", "idea": "我想研究大语言模型的参数高效微调方法。", "search_query": "parameter-efficient fine-tuning", "top_k": 2}
+{"qid": "q003", "topic": "peft", "lang": "zh", "idea": "我想研究大语言模型的参数高效微调方法。", "search_query": "parameter-efficient fine-tuning", "top_k": 3}
+{"qid": "q004", "topic": "peft", "lang": "zh", "idea": "我想研究大语言模型的参数高效微调方法。", "search_query": "parameter-efficient fine-tuning", "top_k": 4}
+{"qid": "q005", "topic": "peft", "lang": "zh", "idea": "我想研究大语言模型的参数高效微调方法。", "search_query": "parameter-efficient fine-tuning", "top_k": 5}
+{"qid": "q006", "topic": "rag", "lang": "zh", "idea": "我想研究检索增强生成（RAG）如何减少大模型幻觉。", "search_query": "retrieval-augmented generation", "top_k": 1}
+{"qid": "q007", "topic": "rag", "lang": "zh", "idea": "我想研究检索增强生成（RAG）如何减少大模型幻觉。", "search_query": "retrieval-augmented generation", "top_k": 2}
+{"qid": "q008", "topic": "rag", "lang": "zh", "idea": "我想研究检索增强生成（RAG）如何减少大模型幻觉。", "search_query": "retrieval-augmented generation", "top_k": 3}
+{"qid": "q009", "topic": "rag", "lang": "zh", "idea": "我想研究检索增强生成（RAG）如何减少大模型幻觉。", "search_query": "retrieval-augmented generation", "top_k": 4}
+{"qid": "q010", "topic": "rag", "lang": "zh", "idea": "我想研究检索增强生成（RAG）如何减少大模型幻觉。", "search_query": "retrieval-augmented generation", "top_k": 5}
+{"qid": "q011", "topic": "quant", "lang": "zh", "idea": "我想了解大语言模型的低比特量化与推理加速技术。", "search_query": "language model quantization", "top_k": 1}
+{"qid": "q012", "topic": "quant", "lang": "zh", "idea": "我想了解大语言模型的低比特量化与推理加速技术。", "search_query": "language model quantization", "top_k": 2}
+{"qid": "q013", "topic": "quant", "lang": "zh", "idea": "我想了解大语言模型的低比特量化与推理加速技术。", "search_query": "language model quantization", "top_k": 3}
+{"qid": "q014", "topic": "quant", "lang": "zh", "idea": "我想了解大语言模型的低比特量化与推理加速技术。", "search_query": "language model quantization", "top_k": 4}
+{"qid": "q015", "topic": "quant", "lang": "zh", "idea": "我想了解大语言模型的低比特量化与推理加速技术。", "search_query": "language model quantization", "top_k": 5}
+{"qid": "q016", "topic": "kvcache", "lang": "zh", "idea": "我想研究长上下文推理中的 KV Cache 压缩方法。", "search_query": "KV cache compression", "top_k": 1}
+{"qid": "q017", "topic": "kvcache", "lang": "zh", "idea": "我想研究长上下文推理中的 KV Cache 压缩方法。", "search_query": "KV cache compression", "top_k": 2}
+{"qid": "q018", "topic": "kvcache", "lang": "zh", "idea": "我想研究长上下文推理中的 KV Cache 压缩方法。", "search_query": "KV cache compression", "top_k": 3}
+{"qid": "q019", "topic": "kvcache", "lang": "zh", "idea": "我想研究长上下文推理中的 KV Cache 压缩方法。", "search_query": "KV cache compression", "top_k": 4}
+{"qid": "q020", "topic": "kvcache", "lang": "zh", "idea": "我想研究长上下文推理中的 KV Cache 压缩方法。", "search_query": "KV cache compression", "top_k": 5}
+{"qid": "q021", "topic": "speculative", "lang": "zh", "idea": "我想研究大模型推测解码以加快生成速度。", "search_query": "speculative decoding", "top_k": 1}
+{"qid": "q022", "topic": "speculative", "lang": "zh", "idea": "我想研究大模型推测解码以加快生成速度。", "search_query": "speculative decoding", "top_k": 2}
+{"qid": "q023", "topic": "speculative", "lang": "zh", "idea": "我想研究大模型推测解码以加快生成速度。", "search_query": "speculative decoding", "top_k": 3}
+{"qid": "q024", "topic": "speculative", "lang": "zh", "idea": "我想研究大模型推测解码以加快生成速度。", "search_query": "speculative decoding", "top_k": 4}
+{"qid": "q025", "topic": "speculative", "lang": "zh", "idea": "我想研究大模型推测解码以加快生成速度。", "search_query": "speculative decoding", "top_k": 5}
+{"qid": "q026", "topic": "multimodal", "lang": "zh", "idea": "我想研究视觉语言多模态大模型的对齐与评测。", "search_query": "vision-language models", "top_k": 1}
+{"qid": "q027", "topic": "multimodal", "lang": "zh", "idea": "我想研究视觉语言多模态大模型的对齐与评测。", "search_query": "vision-language models", "top_k": 2}
+{"qid": "q028", "topic": "multimodal", "lang": "zh", "idea": "我想研究视觉语言多模态大模型的对齐与评测。", "search_query": "vision-language models", "top_k": 3}
+{"qid": "q029", "topic": "multimodal", "lang": "zh", "idea": "我想研究视觉语言多模态大模型的对齐与评测。", "search_query": "vision-language models", "top_k": 4}
+{"qid": "q030", "topic": "multimodal", "lang": "zh", "idea": "我想研究视觉语言多模态大模型的对齐与评测。", "search_query": "vision-language models", "top_k": 5}
+{"qid": "q031", "topic": "rlhf", "lang": "zh", "idea": "我想研究基于人类反馈的强化学习（RLHF）及其替代方法。", "search_query": "reinforcement learning from human feedback", "top_k": 1}
+{"qid": "q032", "topic": "rlhf", "lang": "zh", "idea": "我想研究基于人类反馈的强化学习（RLHF）及其替代方法。", "search_query": "reinforcement learning from human feedback", "top_k": 2}
+{"qid": "q033", "topic": "rlhf", "lang": "zh", "idea": "我想研究基于人类反馈的强化学习（RLHF）及其替代方法。", "search_query": "reinforcement learning from human feedback", "top_k": 3}
+{"qid": "q034", "topic": "rlhf", "lang": "zh", "idea": "我想研究基于人类反馈的强化学习（RLHF）及其替代方法。", "search_query": "reinforcement learning from human feedback", "top_k": 4}
+{"qid": "q035", "topic": "rlhf", "lang": "zh", "idea": "我想研究基于人类反馈的强化学习（RLHF）及其替代方法。", "search_query": "reinforcement learning from human feedback", "top_k": 5}
+{"qid": "q036", "topic": "gnn", "lang": "zh", "idea": "我想研究图神经网络在节点分类中的过平滑问题。", "search_query": "over-smoothing", "top_k": 1}
+{"qid": "q037", "topic": "gnn", "lang": "zh", "idea": "我想研究图神经网络在节点分类中的过平滑问题。", "search_query": "over-smoothing", "top_k": 2}
+{"qid": "q038", "topic": "gnn", "lang": "zh", "idea": "我想研究图神经网络在节点分类中的过平滑问题。", "search_query": "over-smoothing", "top_k": 3}
+{"qid": "q039", "topic": "gnn", "lang": "zh", "idea": "我想研究图神经网络在节点分类中的过平滑问题。", "search_query": "over-smoothing", "top_k": 4}
+{"qid": "q040", "topic": "gnn", "lang": "zh", "idea": "我想研究图神经网络在节点分类中的过平滑问题。", "search_query": "over-smoothing", "top_k": 5}
+{"qid": "q041", "topic": "timeseries", "lang": "zh", "idea": "我想研究基于 Transformer 的时间序列预测方法。", "search_query": "time series forecasting", "top_k": 1}
+{"qid": "q042", "topic": "timeseries", "lang": "zh", "idea": "我想研究基于 Transformer 的时间序列预测方法。", "search_query": "time series forecasting", "top_k": 2}
+{"qid": "q043", "topic": "timeseries", "lang": "zh", "idea": "我想研究基于 Transformer 的时间序列预测方法。", "search_query": "time series forecasting", "top_k": 3}
+{"qid": "q044", "topic": "timeseries", "lang": "zh", "idea": "我想研究基于 Transformer 的时间序列预测方法。", "search_query": "time series forecasting", "top_k": 4}
+{"qid": "q045", "topic": "timeseries", "lang": "zh", "idea": "我想研究基于 Transformer 的时间序列预测方法。", "search_query": "time series forecasting", "top_k": 5}
+{"qid": "q046", "topic": "medical", "lang": "zh", "idea": "我想研究医学影像分割中的小样本学习方法。", "search_query": "medical image segmentation", "top_k": 1}
+{"qid": "q047", "topic": "medical", "lang": "zh", "idea": "我想研究医学影像分割中的小样本学习方法。", "search_query": "medical image segmentation", "top_k": 2}
+{"qid": "q048", "topic": "medical", "lang": "zh", "idea": "我想研究医学影像分割中的小样本学习方法。", "search_query": "medical image segmentation", "top_k": 3}
+{"qid": "q049", "topic": "medical", "lang": "zh", "idea": "我想研究医学影像分割中的小样本学习方法。", "search_query": "medical image segmentation", "top_k": 4}
+{"qid": "q050", "topic": "medical", "lang": "zh", "idea": "我想研究医学影像分割中的小样本学习方法。", "search_query": "medical image segmentation", "top_k": 5}
+{"qid": "q051", "topic": "recsys", "lang": "zh", "idea": "我想研究大语言模型在序列推荐系统中的应用。", "search_query": "sequential recommendation", "top_k": 1}
+{"qid": "q052", "topic": "recsys", "lang": "zh", "idea": "我想研究大语言模型在序列推荐系统中的应用。", "search_query": "sequential recommendation", "top_k": 2}
+{"qid": "q053", "topic": "recsys", "lang": "zh", "idea": "我想研究大语言模型在序列推荐系统中的应用。", "search_query": "sequential recommendation", "top_k": 3}
+{"qid": "q054", "topic": "recsys", "lang": "zh", "idea": "我想研究大语言模型在序列推荐系统中的应用。", "search_query": "sequential recommendation", "top_k": 4}
+{"qid": "q055", "topic": "recsys", "lang": "zh", "idea": "我想研究大语言模型在序列推荐系统中的应用。", "search_query": "sequential recommendation", "top_k": 5}
+{"qid": "q056", "topic": "codegen", "lang": "zh", "idea": "我想研究代码大模型的自动生成与程序修复能力。", "search_query": "code generation", "top_k": 1}
+{"qid": "q057", "topic": "codegen", "lang": "zh", "idea": "我想研究代码大模型的自动生成与程序修复能力。", "search_query": "code generation", "top_k": 2}
+{"qid": "q058", "topic": "codegen", "lang": "zh", "idea": "我想研究代码大模型的自动生成与程序修复能力。", "search_query": "code generation", "top_k": 3}
+{"qid": "q059", "topic": "codegen", "lang": "zh", "idea": "我想研究代码大模型的自动生成与程序修复能力。", "search_query": "code generation", "top_k": 4}
+{"qid": "q060", "topic": "codegen", "lang": "zh", "idea": "我想研究代码大模型的自动生成与程序修复能力。", "search_query": "code generation", "top_k": 5}
+{"qid": "q061", "topic": "safety", "lang": "zh", "idea": "我想研究大模型越狱攻击与防御方法。", "search_query": "jailbreak attacks", "top_k": 1}
+{"qid": "q062", "topic": "safety", "lang": "zh", "idea": "我想研究大模型越狱攻击与防御方法。", "search_query": "jailbreak attacks", "top_k": 2}
+{"qid": "q063", "topic": "safety", "lang": "zh", "idea": "我想研究大模型越狱攻击与防御方法。", "search_query": "jailbreak attacks", "top_k": 3}
+{"qid": "q064", "topic": "safety", "lang": "zh", "idea": "我想研究大模型越狱攻击与防御方法。", "search_query": "jailbreak attacks", "top_k": 4}
+{"qid": "q065", "topic": "safety", "lang": "zh", "idea": "我想研究大模型越狱攻击与防御方法。", "search_query": "jailbreak attacks", "top_k": 5}
+{"qid": "q066", "topic": "agent", "lang": "zh", "idea": "我想研究基于大语言模型的智能体工具调用与规划。", "search_query": "LLM agents", "top_k": 1}
+{"qid": "q067", "topic": "agent", "lang": "zh", "idea": "我想研究基于大语言模型的智能体工具调用与规划。", "search_query": "LLM agents", "top_k": 2}
+{"qid": "q068", "topic": "agent", "lang": "zh", "idea": "我想研究基于大语言模型的智能体工具调用与规划。", "search_query": "LLM agents", "top_k": 3}
+{"qid": "q069", "topic": "agent", "lang": "zh", "idea": "我想研究基于大语言模型的智能体工具调用与规划。", "search_query": "LLM agents", "top_k": 4}
+{"qid": "q070", "topic": "agent", "lang": "zh", "idea": "我想研究基于大语言模型的智能体工具调用与规划。", "search_query": "LLM agents", "top_k": 5}
+{"qid": "q071", "topic": "diffusion", "lang": "zh", "idea": "我想研究扩散模型的高效采样与加速方法。", "search_query": "diffusion model sampling", "top_k": 1}
+{"qid": "q072", "topic": "diffusion", "lang": "zh", "idea": "我想研究扩散模型的高效采样与加速方法。", "search_query": "diffusion model sampling", "top_k": 2}
+{"qid": "q073", "topic": "diffusion", "lang": "zh", "idea": "我想研究扩散模型的高效采样与加速方法。", "search_query": "diffusion model sampling", "top_k": 3}
+{"qid": "q074", "topic": "diffusion", "lang": "zh", "idea": "我想研究扩散模型的高效采样与加速方法。", "search_query": "diffusion model sampling", "top_k": 4}
+{"qid": "q075", "topic": "diffusion", "lang": "zh", "idea": "我想研究扩散模型的高效采样与加速方法。", "search_query": "diffusion model sampling", "top_k": 5}
+{"qid": "q076", "topic": "moe", "lang": "en", "idea": "I want to study mixture-of-experts architectures for scaling language models.", "search_query": "mixture of experts", "top_k": 1}
+{"qid": "q077", "topic": "moe", "lang": "en", "idea": "I want to study mixture-of-experts architectures for scaling language models.", "search_query": "mixture of experts", "top_k": 2}
+{"qid": "q078", "topic": "moe", "lang": "en", "idea": "I want to study mixture-of-experts architectures for scaling language models.", "search_query": "mixture of experts", "top_k": 3}
+{"qid": "q079", "topic": "moe", "lang": "en", "idea": "I want to study mixture-of-experts architectures for scaling language models.", "search_query": "mixture of experts", "top_k": 4}
+{"qid": "q080", "topic": "moe", "lang": "en", "idea": "I want to study mixture-of-experts architectures for scaling language models.", "search_query": "mixture of experts", "top_k": 5}
+{"qid": "q081", "topic": "continual", "lang": "en", "idea": "I want to learn about continual learning and catastrophic forgetting in neural networks.", "search_query": "catastrophic forgetting", "top_k": 1}
+{"qid": "q082", "topic": "continual", "lang": "en", "idea": "I want to learn about continual learning and catastrophic forgetting in neural networks.", "search_query": "catastrophic forgetting", "top_k": 2}
+{"qid": "q083", "topic": "continual", "lang": "en", "idea": "I want to learn about continual learning and catastrophic forgetting in neural networks.", "search_query": "catastrophic forgetting", "top_k": 3}
+{"qid": "q084", "topic": "continual", "lang": "en", "idea": "I want to learn about continual learning and catastrophic forgetting in neural networks.", "search_query": "catastrophic forgetting", "top_k": 4}
+{"qid": "q085", "topic": "continual", "lang": "en", "idea": "I want to learn about continual learning and catastrophic forgetting in neural networks.", "search_query": "catastrophic forgetting", "top_k": 5}
+{"qid": "q086", "topic": "ssl", "lang": "en", "idea": "I am interested in self-supervised contrastive representation learning for images.", "search_query": "contrastive learning", "top_k": 1}
+{"qid": "q087", "topic": "ssl", "lang": "en", "idea": "I am interested in self-supervised contrastive representation learning for images.", "search_query": "contrastive learning", "top_k": 2}
+{"qid": "q088", "topic": "ssl", "lang": "en", "idea": "I am interested in self-supervised contrastive representation learning for images.", "search_query": "contrastive learning", "top_k": 3}
+{"qid": "q089", "topic": "ssl", "lang": "en", "idea": "I am interested in self-supervised contrastive representation learning for images.", "search_query": "contrastive learning", "top_k": 4}
+{"qid": "q090", "topic": "ssl", "lang": "en", "idea": "I am interested in self-supervised contrastive representation learning for images.", "search_query": "contrastive learning", "top_k": 5}
+{"qid": "q091", "topic": "federated", "lang": "en", "idea": "I want to explore federated learning with privacy guarantees and non-IID data.", "search_query": "federated learning", "top_k": 1}
+{"qid": "q092", "topic": "federated", "lang": "en", "idea": "I want to explore federated learning with privacy guarantees and non-IID data.", "search_query": "federated learning", "top_k": 2}
+{"qid": "q093", "topic": "federated", "lang": "en", "idea": "I want to explore federated learning with privacy guarantees and non-IID data.", "search_query": "federated learning", "top_k": 3}
+{"qid": "q094", "topic": "federated", "lang": "en", "idea": "I want to explore federated learning with privacy guarantees and non-IID data.", "search_query": "federated learning", "top_k": 4}
+{"qid": "q095", "topic": "federated", "lang": "en", "idea": "I want to explore federated learning with privacy guarantees and non-IID data.", "search_query": "federated learning", "top_k": 5}
+{"qid": "q096", "topic": "cot", "lang": "en", "idea": "I want to study chain-of-thought reasoning in large language models.", "search_query": "chain-of-thought reasoning", "top_k": 1}
+{"qid": "q097", "topic": "cot", "lang": "en", "idea": "I want to study chain-of-thought reasoning in large language models.", "search_query": "chain-of-thought reasoning", "top_k": 2}
+{"qid": "q098", "topic": "cot", "lang": "en", "idea": "I want to study chain-of-thought reasoning in large language models.", "search_query": "chain-of-thought reasoning", "top_k": 3}
+{"qid": "q099", "topic": "cot", "lang": "en", "idea": "I want to study chain-of-thought reasoning in large language models.", "search_query": "chain-of-thought reasoning", "top_k": 4}
+{"qid": "q100", "topic": "cot", "lang": "en", "idea": "I want to study chain-of-thought reasoning in large language models.", "search_query": "chain-of-thought reasoning", "top_k": 5}

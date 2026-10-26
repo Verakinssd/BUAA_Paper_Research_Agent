@@ -36,6 +36,35 @@ class LocalLLMTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(requests[1][1]["chat_template_kwargs"], {"enable_thinking": False})
         self.assertEqual(requests[1][1]["max_tokens"], 1024)
 
+    async def test_observer_receives_usage_and_defaults_to_off(self):
+        body = {"choices": [{"finish_reason": "stop", "message": {"role": "assistant", "content": "ok"}}],
+                "usage": {"prompt_tokens": 12, "completion_tokens": 3},
+                "timings": {"predicted_per_second": 42.0}}
+        def handler(request):
+            if request.url.path == "/tokenize":
+                return httpx.Response(200, json={"count": 10, "max_model_len": 8192, "tokens": []})
+            return httpx.Response(200, json=body)
+        original = httpx.AsyncClient
+        def client(**kwargs):
+            return original(transport=httpx.MockTransport(handler), **kwargs)
+        with patch.dict(os.environ, LOCAL_ENV), patch("research.llm.httpx.AsyncClient", new=client):
+            llm = LLM()
+            self.assertIsNone(llm.observer)
+            await llm.chat([{"role": "user", "content": "hello"}])
+            seen = []
+            llm.observer = lambda *args: seen.append(args)
+            await llm.chat([{"role": "user", "content": "hello"}])
+            llm.observer = lambda *args: 1 / 0  # a broken observer must not break inference
+            with self.assertLogs("research.llm", "ERROR"):
+                result = await llm.chat([{"role": "user", "content": "hello"}])
+            self.assertEqual(result["content"], "ok")
+        self.assertEqual(len(seen), 1)
+        elapsed, usage, timings, finish = seen[0]
+        self.assertGreaterEqual(elapsed, 0)
+        self.assertEqual(usage["completion_tokens"], 3)
+        self.assertEqual(timings["predicted_per_second"], 42.0)
+        self.assertEqual(finish, "stop")
+
     async def test_prompt_overflow_stops_before_generation(self):
         def handler(request):
             self.assertEqual(request.url.path, "/tokenize")
