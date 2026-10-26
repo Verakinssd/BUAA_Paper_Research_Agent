@@ -15,6 +15,10 @@ def check_comparable(a, b):
     for name, summary in (("A", a), ("B", b)):
         if not summary["meta"].get("full_dataset"):
             raise ValueError(f"{name} 不是完整 100 条数据集的结果，不能用于正式对比")
+    for name, summary in (("A", a), ("B", b)):
+        verdict = summary.get("validity") or {}
+        if verdict.get("ok") is False:
+            raise ValueError(f"{name} 的结果无效：" + "；".join(verdict.get("reasons", [])))
     for key in MUST_MATCH:
         left, right = a["meta"].get(key, DEFAULTS.get(key)), b["meta"].get(key, DEFAULTS.get(key))
         if left != right:

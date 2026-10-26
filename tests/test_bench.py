@@ -1,6 +1,8 @@
 import asyncio
 import json
 import os
+import threading
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,7 +10,7 @@ from unittest.mock import AsyncMock, patch
 from support import FakeTaskAgent, fake_download, sample_papers
 import io
 import tarfile
-from benchmarks import build_dataset, compare, freeze_corpus, prepare_corpus, run_benchmark, summary
+from benchmarks import build_dataset, compare, freeze_corpus, prepare_corpus, preflight, run_all, run_benchmark, summary
 from benchmarks.corpus import Corpus, query_key
 from research.pipeline import process_papers
 
@@ -278,6 +280,199 @@ class WorkersTests(SyntheticCorpusCase):
 
     async def test_router_ignores_calls_outside_any_query(self):
         run_benchmark.Router()(1.0, None, None, "stop")  # no collector set: must not raise
+
+
+class FakeLlamaServer:
+    """Just enough of llama-server for the preflight: /health, /props and chat completions."""
+    def __init__(self, health=200, n_ctx=8192, slots=2, chat=200):
+        outer = self
+        self.health, self.n_ctx, self.slots, self.chat = health, n_ctx, slots, chat
+
+        class Handler(BaseHTTPRequestHandler):
+            def log_message(self, *args):
+                pass
+
+            def reply(self, status, payload):
+                data = json.dumps(payload).encode()
+                self.send_response(status)
+                self.send_header("Content-Length", str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+
+            def do_GET(self):
+                if self.path == "/health":
+                    self.reply(outer.health, {"status": "ok"})
+                elif self.path == "/props":
+                    self.reply(200, {"default_generation_settings": {"n_ctx": outer.n_ctx},
+                                     "total_slots": outer.slots, "model_path": "m/qwen.gguf"})
+                else:
+                    self.reply(404, {})
+
+            def do_POST(self):
+                self.rfile.read(int(self.headers.get("Content-Length", 0)))
+                self.reply(outer.chat, {"choices": [{"message": {"content": "OK"}}]})
+
+        self.httpd = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        threading.Thread(target=self.httpd.serve_forever, daemon=True).start()
+        self.url = f"http://127.0.0.1:{self.httpd.server_port}/v1"
+
+    def close(self):
+        self.httpd.shutdown()
+        self.httpd.server_close()
+
+
+class PreflightTests(unittest.TestCase):
+    def serve(self, **kwargs):
+        server = FakeLlamaServer(**kwargs)
+        self.addCleanup(server.close)
+        return server
+
+    def env(self, server, **override):
+        env = {"LLM_BASE_URL": server.url, "LLM_MODEL": "qwen-local", "LLM_TEMPERATURE": "0",
+               "LLM_ENABLE_THINKING": "0", "LLM_CONTEXT_TOKENS": "8192"}
+        env.update(override)
+        return env
+
+    def test_good_setup_passes_and_reports_server_facts(self):
+        server = self.serve()
+        report = preflight.check(self.env(server))
+        self.assertTrue(report.ok, report.errors)
+        self.assertEqual((report.info["n_ctx_per_slot"], report.info["total_slots"]), (8192, 2))
+        self.assertIn("预检通过", preflight.render(report))
+
+    def test_unreachable_server_is_an_error(self):
+        server = self.serve()
+        env = self.env(server)
+        server.close()
+        report = preflight.check(env)
+        self.assertFalse(report.ok)
+        self.assertIn("连不上", report.errors[0])
+
+    def test_loading_server_and_failing_chat_are_errors(self):
+        self.assertIn("加载", preflight.check(self.env(self.serve(health=503))).errors[0])
+        self.assertIn("试调用失败", preflight.check(self.env(self.serve(chat=500))).errors[0])
+
+    def test_sampling_must_be_pinned_for_full_runs_only(self):
+        server = self.serve()
+        for override in ({"LLM_TEMPERATURE": ""}, {"LLM_TEMPERATURE": "0.2"}, {"LLM_ENABLE_THINKING": ""}):
+            env = self.env(server, **override)
+            self.assertFalse(preflight.check(env, full=True).ok, override)
+            debug = preflight.check(env, full=False)
+            self.assertTrue(debug.ok and debug.warnings, override)
+
+    def test_context_smaller_than_client_budget_is_an_error(self):
+        report = preflight.check(self.env(self.serve(n_ctx=4096)))
+        self.assertFalse(report.ok)
+        self.assertIn("4096", report.errors[0])
+
+    def test_too_few_slots_only_warns(self):
+        server = self.serve(slots=2)
+        report = preflight.check(self.env(server), workers=4)
+        self.assertTrue(report.ok)
+        self.assertIn("LLAMA_PARALLEL=4", report.warnings[0])
+        self.assertIn("LLAMA_PARALLEL=8", preflight.check(self.env(server), workers=4, concurrent=True).warnings[0])
+        self.assertFalse(preflight.check(self.env(server), workers=2).warnings)
+
+    def test_missing_config_is_an_error(self):
+        self.assertIn("LLM_BASE_URL", preflight.check({}).errors[0])
+
+
+class ValidityTests(unittest.TestCase):
+    def row(self, ok=True, calls=True):
+        llm = {"select": {"calls": 1, "seconds": 1.0, "prompt_tokens": 1, "completion_tokens": 1,
+                          "truncated": 0, "prompt_n": 0, "prompt_ms": 0.0, "predicted_n": 0,
+                          "predicted_ms": 0.0}} if calls else {}
+        return {"qid": "a", "top_k": 1, "lang": "zh", "repeat": 0, "query_seconds": 1.0,
+                "task_success": ok, "stages": {}, "llm": llm}
+
+    def test_all_failed_run_is_invalid(self):
+        result = summary.summarize([self.row(ok=False)], {"label": "x", "mode": "stage"})
+        self.assertFalse(result["validity"]["ok"])
+        self.assertIn("成功率为 0", result["validity"]["reasons"][0])
+        self.assertIn("结果无效", summary.render_markdown(result))
+
+    def test_stage_run_without_llm_calls_is_invalid_but_e2e_is_not(self):
+        stage = summary.summarize([self.row(calls=False)], {"label": "x", "mode": "stage"})
+        self.assertIn("没有记录到任何 LLM 调用", stage["validity"]["reasons"][0])
+        e2e = summary.summarize([self.row(calls=False)], {"label": "x", "mode": "e2e"})
+        self.assertTrue(e2e["validity"]["ok"])
+
+    def test_empty_run_is_invalid_and_partial_failure_only_warns(self):
+        self.assertFalse(summary.summarize([], {"label": "x", "mode": "stage"})["validity"]["ok"])
+        rows = [self.row()] + [self.row(ok=False)] * 3
+        result = summary.summarize(rows, {"label": "x", "mode": "stage"})
+        self.assertTrue(result["validity"]["ok"])
+        self.assertTrue(result["validity"]["warnings"])
+
+    def test_compare_refuses_an_invalid_summary(self):
+        good = CompareTests().make("a", 1.0)
+        bad = CompareTests().make("b", 1.0)
+        bad["validity"] = {"ok": False, "reasons": ["任务成功率为 0"], "warnings": []}
+        with self.assertRaisesRegex(ValueError, "B 的结果无效"):
+            compare.compare(good, bad)
+
+
+class GuardedRunTests(SyntheticCorpusCase):
+    """main() exit codes and the one-command run_all, against the synthetic corpus."""
+
+    async def asyncSetUp(self):
+        await super().asyncSetUp()
+        previous = os.getcwd()
+        os.chdir(self.tmp.name)  # run_all writes to a relative outputs/
+        self.addCleanup(os.chdir, previous)
+        self.ok_report = preflight.Report()
+        for target in (patch("benchmarks.preflight.check", return_value=self.ok_report),
+                       patch("benchmarks.run_benchmark.load_dotenv"),
+                       patch("benchmarks.run_all.load_dotenv"),
+                       patch("benchmarks.run_all.ensure_corpus"),
+                       patch("benchmarks.run_benchmark.collect_environment", return_value={})):
+            target.start()
+            self.addCleanup(target.stop)
+
+    def argv(self, *extra):
+        return ["--label", "t", "--limit", "3", "--warmup", "0", "--corpus-dir", str(self.corpus.root), *extra]
+
+    async def test_main_exit_codes(self):
+        out = Path(self.tmp.name) / "m"
+        code = await asyncio.to_thread(run_benchmark.main, self.argv("--out", str(out)), SlowAgent)
+        self.assertEqual(code, 0)
+        out2 = Path(self.tmp.name) / "m2"  # FakeTaskAgent never reaches the LLM client -> nothing was measured
+        code = await asyncio.to_thread(run_benchmark.main, self.argv("--out", str(out2)), FakeTaskAgent)
+        self.assertEqual(code, 2)
+        self.assertFalse(json.loads((out2 / "summary.json").read_text(encoding="utf-8"))["validity"]["ok"])
+
+    async def test_main_stops_on_failed_preflight_before_creating_output(self):
+        bad = preflight.Report()
+        bad.errors.append("连不上模型服务")
+        out = Path(self.tmp.name) / "never"
+        with patch("benchmarks.preflight.check", return_value=bad):
+            code = await asyncio.to_thread(run_benchmark.main, self.argv("--out", str(out)), SlowAgent)
+        self.assertEqual(code, 1)
+        self.assertFalse(out.exists())
+
+    async def test_main_preflight_treats_filtered_runs_as_debug(self):
+        with patch("benchmarks.preflight.check", return_value=self.ok_report) as check:
+            await asyncio.to_thread(run_benchmark.main, self.argv("--out", str(Path(self.tmp.name) / "d")), SlowAgent)
+        self.assertFalse(check.call_args.kwargs["full"])
+
+    async def test_run_all_smokes_then_runs_and_resume_skips_smoke(self):
+        out = Path(self.tmp.name) / "full"
+        argv = ["--label", "t", "--limit", "3", "--workers", "2", "--out", str(out),
+                "--corpus-dir", str(self.corpus.root)]
+        self.assertEqual(await asyncio.to_thread(run_all.main, argv, SlowAgent), 0)
+        smokes = list((Path(self.tmp.name) / "outputs").glob("bench-t-smoke-*"))
+        self.assertEqual(len(smokes), 1)
+        self.assertEqual(len((smokes[0] / "results.jsonl").read_text(encoding="utf-8").splitlines()), 3)
+        self.assertEqual(json.loads((out / "run_meta.json").read_text(encoding="utf-8"))["workers"], 2)
+        self.assertTrue((out / "summary.md").is_file())
+        self.assertEqual(await asyncio.to_thread(run_all.main, argv, SlowAgent), 0)  # resume
+        self.assertEqual(len(list((Path(self.tmp.name) / "outputs").glob("bench-t-smoke-*"))), 1)
+
+    async def test_run_all_aborts_when_the_smoke_run_is_invalid(self):
+        out = Path(self.tmp.name) / "full"
+        argv = ["--label", "t", "--limit", "3", "--out", str(out), "--corpus-dir", str(self.corpus.root)]
+        self.assertEqual(await asyncio.to_thread(run_all.main, argv, FakeTaskAgent), 2)
+        self.assertFalse(out.exists())
 
 
 class CorpusArchiveTests(SyntheticCorpusCase):

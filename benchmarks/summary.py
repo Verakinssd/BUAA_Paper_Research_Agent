@@ -96,6 +96,25 @@ def throughput(rows, completion_tokens):
             "completion_tps_aggregate": round(completion_tokens / busy, 2) if completion_tokens else None}
 
 
+def validity(summary):
+    """A run can finish and still measure nothing (server down, observer not hooked up).
+    `reasons` make the result unusable; `warnings` only deserve a look."""
+    reasons, warnings = [], []
+    meta = summary["meta"]
+    if not summary["n_queries"]:
+        reasons.append("没有任何有效查询")
+    elif not summary["success_rate"]:
+        reasons.append("任务成功率为 0：模型服务可能没启动，或每条查询都失败了（看 results.jsonl 里的 error）")
+    elif summary["success_rate"] < 0.9:
+        warnings.append(f"任务成功率只有 {summary['success_rate']}，失败的查询会拉偏平均耗时")
+    total = summary["llm"]["total"]
+    if meta.get("mode", "stage") == "stage" and summary["n_queries"] and not total.get("calls"):
+        reasons.append("没有记录到任何 LLM 调用，耗时不是模型推理时间")
+    if total.get("truncated"):
+        warnings.append(f"{total['truncated']} 次调用被输出长度上限截断")
+    return {"ok": not reasons, "reasons": reasons, "warnings": warnings}
+
+
 def summarize(rows, meta):
     rows = [r for r in rows if not r.get("warmup")]
     times = [r["query_seconds"] for r in rows]
@@ -111,7 +130,7 @@ def summarize(rows, meta):
     overlaps = [r["select_overlap"] for r in rows if r.get("select_overlap") is not None]
     ok = [r for r in rows if r.get("task_success")]
     llm = llm_totals(rows)
-    return {
+    result = {
         "meta": meta,
         "n_queries": len(rows),
         "success_rate": round(len(ok) / len(rows), 4) if rows else None,
@@ -130,6 +149,8 @@ def summarize(rows, meta):
         "llm": llm,
         "throughput": throughput(rows, llm["total"].get("completion_tokens", 0)),
     }
+    result["validity"] = validity(result)
+    return result
 
 
 def _row(label, s):
@@ -140,7 +161,13 @@ def _row(label, s):
 
 def render_markdown(summary):
     meta = summary["meta"]
-    lines = [f"# Benchmark `{meta.get('label')}`", "",
+    check = summary.get("validity") or {"ok": True, "reasons": [], "warnings": []}
+    lines = [f"# Benchmark `{meta.get('label')}`", ""]
+    if not check["ok"]:
+        lines += ["> **结果无效，不要用于对比：** " + "；".join(check["reasons"]), ""]
+    if check["warnings"]:
+        lines += ["> 注意：" + "；".join(check["warnings"]), ""]
+    lines += [
              f"- 模式：{meta.get('mode')}（负载：{meta.get('workload')}，论文并发：{meta.get('concurrent')}，同时查询数：{meta.get('workers', 1)}）",
              f"- 数据集哈希：`{meta.get('dataset_hash')}`；完整数据集：{meta.get('full_dataset')}",
              f"- 有效查询数：{summary['n_queries']}；任务成功率：{summary['success_rate']}", ""]
