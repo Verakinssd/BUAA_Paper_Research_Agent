@@ -89,8 +89,9 @@ def validate(rows):
 
 
 def load_queries(path=QUERIES_PATH):
-    """Return (rows, dataset_hash). The hash is over the exact file bytes."""
-    raw = Path(path).read_bytes()
+    """Return (rows, dataset_hash). The hash ignores CRLF vs LF so Windows autocrlf
+    checkouts and Linux checkouts agree."""
+    raw = Path(path).read_bytes().replace(b"\r\n", b"\n")
     rows = [json.loads(line) for line in raw.decode("utf-8").splitlines() if line.strip()]
     validate(rows)
     return rows, hashlib.sha256(raw).hexdigest()[:16]
