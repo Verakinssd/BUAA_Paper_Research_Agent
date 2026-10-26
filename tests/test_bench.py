@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import tempfile
@@ -83,6 +84,16 @@ class SummaryTests(unittest.TestCase):
         self.assertIn("top_k=2", summary.render_markdown(result))
 
 
+    def test_busy_seconds_merges_overlap_and_ignores_idle_gaps(self):
+        rows = [{"started_at": 0, "ended_at": 10}, {"started_at": 5, "ended_at": 12},
+                {"started_at": 100, "ended_at": 104}, {"query_seconds": 1}]
+        self.assertEqual(summary.busy_seconds(rows), 16.0)
+        self.assertEqual(summary.busy_seconds([]), 0.0)
+        self.assertIsNone(summary.throughput([{"query_seconds": 1}], 10))
+        self.assertEqual(summary.throughput(rows[:3], 160)["queries_per_hour"], 675.0)
+        self.assertEqual(summary.throughput(rows[:3], 160)["completion_tps_aggregate"], 10.0)
+
+
 class CompareTests(unittest.TestCase):
     def make(self, label, mean, **meta):
         base = {"label": label, "dataset_hash": "h", "mode": "stage", "workload": "frozen",
@@ -103,6 +114,11 @@ class CompareTests(unittest.TestCase):
             compare.compare(self.make("a", 1.0), self.make("b", 1.0, full_dataset=False))
         with self.assertRaisesRegex(ValueError, "mode"):
             compare.compare(self.make("a", 1.0), self.make("b", 1.0, mode="e2e"))
+
+    def test_compare_refuses_different_workers_and_treats_missing_as_one(self):
+        with self.assertRaisesRegex(ValueError, "workers"):
+            compare.compare(self.make("a", 1.0, workers=1), self.make("b", 1.0, workers=4))
+        compare.compare(self.make("a", 1.0), self.make("b", 1.0, workers=1))  # old summary has no key
 
 
 class OrderTests(unittest.TestCase):
@@ -200,6 +216,68 @@ class RunnerTests(SyntheticCorpusCase):
         self.assertFalse(result["meta"]["full_dataset"])
         self.assertEqual(json.loads((out / "summary.json").read_text(encoding="utf-8"))["n_queries"], 2)
         self.assertTrue((out / "summary.md").is_file())
+
+
+class SlowAgent(FakeTaskAgent):
+    """Sleeps like a real model and reports each call through llm.observer."""
+    def __init__(self):
+        self.llm = type("Llm", (), {"observer": None})()
+
+    async def select(self, idea, papers, k):
+        await asyncio.sleep(0.05)
+        self.llm.observer(0.05, {"completion_tokens": k}, None, "stop")  # tagged with k
+        return await super().select(idea, papers, k)
+
+
+class WorkersTests(SyntheticCorpusCase):
+    """--workers runs several queries at once; every call must land in its own query's row."""
+
+    async def run_with(self, workers, extra=()):
+        out = Path(self.tmp.name) / f"out{workers}"
+        argv = ["--label", "t", "--limit", "5", "--warmup", "0", "--workers", str(workers),
+                "--out", str(out), "--corpus-dir", str(self.corpus.root), *extra]
+        with patch("benchmarks.run_benchmark.collect_environment", return_value={}),                 patch("benchmarks.run_benchmark.load_dotenv"),                 patch("research.pipeline.download_pdf", new_callable=AsyncMock):
+            result = await run_benchmark.run(run_benchmark.parse_args(argv), agent_factory=SlowAgent)
+        rows = [json.loads(line) for line in (out / "results.jsonl").read_text(encoding="utf-8").splitlines()]
+        return out, result, rows
+
+    async def test_concurrent_queries_keep_their_own_llm_counters(self):
+        _, result, rows = await self.run_with(5)
+        self.assertEqual(len(rows), 5)
+        for row in rows:
+            self.assertEqual(row["llm"]["select"]["completion_tokens"], row["top_k"])
+            self.assertEqual(row["llm"]["select"]["calls"], 1)
+        self.assertEqual(result["meta"]["workers"], 5)
+
+    async def test_workers_overlap_in_time_and_serial_does_not(self):
+        _, serial, serial_rows = await self.run_with(1)
+        _, parallel, parallel_rows = await self.run_with(5)
+        self.assertGreater(serial["throughput"]["busy_seconds"], 0)
+        self.assertLess(parallel["throughput"]["busy_seconds"], sum(r["query_seconds"] for r in parallel_rows))
+        self.assertAlmostEqual(serial["throughput"]["busy_seconds"],
+                               sum(r["query_seconds"] for r in serial_rows), delta=0.5)
+        self.assertIn("同时查询数：5", summary.render_markdown(parallel))
+
+    async def test_resume_refuses_a_different_workers_value(self):
+        out, _, _ = await self.run_with(2)
+        argv = ["--label", "t", "--limit", "5", "--warmup", "0", "--workers", "3", "--out", str(out),
+                "--corpus-dir", str(self.corpus.root)]
+        with patch("benchmarks.run_benchmark.collect_environment", return_value={}),                 patch("benchmarks.run_benchmark.load_dotenv"):
+            with self.assertRaisesRegex(SystemExit, "workers"):
+                await run_benchmark.run(run_benchmark.parse_args(argv), agent_factory=SlowAgent)
+
+    async def test_resume_of_an_old_run_without_workers_key_counts_as_one(self):
+        out, _, _ = await self.run_with(1)
+        meta_path = out / "run_meta.json"
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        del meta["workers"]
+        meta_path.write_text(json.dumps(meta), encoding="utf-8")
+        _, again, rows = await self.run_with(1)  # same --out, so this resumes the old run
+        self.assertEqual(again["meta"]["workers"], 1)
+        self.assertEqual(len(rows), 5)  # nothing was repeated
+
+    async def test_router_ignores_calls_outside_any_query(self):
+        run_benchmark.Router()(1.0, None, None, "stop")  # no collector set: must not raise
 
 
 class CorpusArchiveTests(SyntheticCorpusCase):

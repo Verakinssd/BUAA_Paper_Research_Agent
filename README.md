@@ -155,7 +155,8 @@ python -m benchmarks.compare outputs/bench-q4-*/summary.json outputs/bench-q5-*/
 - **stage 模式**（默认）：候选论文、参考 Top-k 和全文全部来自 `benchmarks/corpus/`（由 `corpus.tar.gz` 解压得到，目录本身不入库），每个模型处理完全相同的论文，不访问网络。`select` 仍由当前模型真实执行，其结果与参考选择的重合率会记录下来；参考 Top-k 是该想法冻结的 Top-5 的前 k 篇，所以 k<5 时重合率低于 1 是正常的，只用于模型之间相对比较。
 - **重新冻结语料**（仅维护者，会改变测试集内容，旧结果不再可比）：先启动模型服务，运行 `python -m benchmarks.freeze_corpus`（需联网，约 1 小时；arXiv 限流时会自动重试），再运行 `python -m benchmarks.prepare_corpus pack` 并提交新的 `corpus.tar.gz`。修改 `queries.jsonl` 后也必须这样做，否则测试 `test_committed_archive_covers_all_100_queries` 会失败。
 - **e2e 模式**（`--mode e2e --limit 10`）：真实启动 `main_agent.py`，包含联网检索与 PDF 下载，只用于估算端到端耗时，不能与 stage 结果对比。
-- 查询之间严格串行，顺序由 `--seed` 决定；`--warmup`（默认 3）额外跑几条预热查询，不计入统计；`--repeats` 重复整套查询。
+- 查询顺序由 `--seed` 决定，默认一条接一条串行；`--warmup`（默认 3）额外跑几条预热查询（总是串行），不计入统计；`--repeats` 重复整套查询。
+- **缩短总时长：`--workers N` 同时跑 N 条查询。** 模型服务要同时有足够槽位：`LLAMA_PARALLEL=N`（加 `--concurrent` 时需要 2N）重启 `deploy/serve_gguf.py`，否则多出的请求在服务端排队。并发后单条查询耗时包含争用，会变长，所以 summary 额外给出吞吐（条/小时）；**`compare` 只对比 `workers` 相同的结果**，需要延迟数据（如 Q4 与 Q5 的单次响应速度）时请用默认的串行。显存放得下时一般越并行越快，但预填充是算力瓶颈，不随并发加速，收益会逐渐递减；在 16GB 显存溢出到 CPU 的机器上实测（一次一档，仅供参考）：`--parallel 4` 约快 1.9 倍，`--parallel 8` 只快 1.6 倍，建议从 4 开始试。
 - 结果目录 `outputs/bench-<label>-<时间>/`：`results.jsonl`（逐条）、`summary.json` / `summary.md`（按 top_k、语言、阶段汇总，含 tokens/s 与 `耗时 ≈ a×top_k + b` 拟合）。中断后用相同参数加 `--out <该目录>` 即可续跑。
 - `--limit`、`--top-k`、`--lang` 只用于调试，结果标记为非完整数据集，`compare` 会拒绝对比。
 - 对比 Q4/Q5 时，请固定 `LLM_TEMPERATURE=0` 和 llama-server 的 `--seed`，并保持 `LLM_ENABLE_THINKING` 一致。
