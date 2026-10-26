@@ -352,6 +352,7 @@ function renderJob(job) {
   renderProgress(job);
   renderPapers(job);
   renderActivity(job);
+  if (typeof renderInsights === "function") renderInsights(job);
   $("#report-content").innerHTML = job.report ? markdown(job.report) : emptyState("让发现慢慢汇成报告", activeStatuses.has(job.status) ? "全文阅读完成后，Agent 会整合论文证据和研究建议。" : "本次没有生成研究报告，可查看日志了解原因。");
   const log = $("#log-output"), nearBottom = log.scrollHeight - log.scrollTop - log.clientHeight < 50;
   log.textContent = (Array.isArray(job.logs) ? job.logs : []).join("\n") || "等待运行日志…";

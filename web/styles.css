@@ -906,3 +906,46 @@ kbd { color: #6e815a; font-size: 10px; }
 .concurrent-option input { accent-color: #3e7468; width: 15px; height: 15px; }
 .concurrent-option small { font-size: 10px; color: #798579; }
 .composer-options { flex-wrap: wrap; gap: 16px; }
+
+/* Run insights: stage runtimes and candidate ranking */
+.insight-card { margin-bottom: 23px; padding: 20px 25px 22px; border: 1px solid var(--line); border-radius: 11px; background: white; box-shadow: var(--shadow); }
+.insight-card[hidden] { display: none; }
+.insight-card .section-heading { margin-bottom: 12px; }
+.insight-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.insight-chip { padding: 3px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--accent-soft); color: var(--accent-dark); font-size: 11px; }
+.insight-grid { display: grid; grid-template-columns: minmax(250px, 4fr) minmax(0, 7fr); gap: 26px; }
+.insight-block { min-width: 0; }
+.insight-title { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; color: var(--ink); font-size: 13px; font-weight: 650; }
+.insight-count { margin-left: auto; color: var(--muted); font-size: 11px; font-weight: 400; }
+.method-pill { padding: 1px 8px; border-radius: 4px; background: var(--accent-soft); color: var(--accent-dark); font-size: 10px; font-weight: 600; }
+.insight-empty, .insight-note, .insight-total { margin: 0 0 10px; color: var(--secondary); font-size: 12px; line-height: 1.6; }
+.insight-note b { color: var(--accent-dark); }
+.insight-total { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line-soft); }
+.stage-list { display: grid; gap: 13px; margin: 0; padding: 0; list-style: none; }
+.stage-head { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 5px; font-size: 12px; }
+.stage-name { color: var(--ink); font-weight: 600; }
+.stage-value { color: var(--secondary); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.stage-bar, .rank-bar { height: 6px; overflow: hidden; border-radius: 3px; background: var(--line-soft); }
+.stage-bar i, .rank-bar i { display: block; height: 100%; border-radius: inherit; background: var(--accent); }
+.stage-hint { display: block; margin-top: 4px; color: var(--muted); font-size: 10px; }
+.rank-table-wrap { max-height: 300px; overflow: auto; border: 1px solid var(--line-soft); border-radius: 8px; }
+.rank-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.rank-table th { position: sticky; top: 0; padding: 7px 8px; background: #fafbfa; color: var(--muted); font-size: 10px; font-weight: 600; text-align: left; border-bottom: 1px solid var(--line); }
+.rank-table td { padding: 7px 8px; border-bottom: 1px solid var(--line-soft); vertical-align: middle; }
+.rank-table tr:last-child td { border-bottom: 0; }
+.rank-table tr.picked { background: var(--accent-soft); }
+.rank-no { width: 36px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rank-id { width: 40px; color: var(--secondary); font-size: 11px; }
+.rank-title { max-width: 0; width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rank-year { margin-left: 6px; color: var(--muted); font-size: 10px; }
+.rank-score { width: 130px; white-space: nowrap; }
+.rank-score .rank-bar { display: inline-block; width: 64px; margin-right: 8px; vertical-align: middle; }
+.rank-score span { font-variant-numeric: tabular-nums; color: var(--secondary); }
+.rank-flag { width: 46px; text-align: right; }
+.picked-tag { padding: 1px 6px; border-radius: 4px; background: var(--accent); color: white; font-size: 10px; font-weight: 600; }
+@media (max-width: 900px) {
+  .insight-card { padding: 16px 16px 18px; }
+  .insight-grid { grid-template-columns: 1fr; gap: 20px; }
+  .rank-score .rank-bar { display: none; }
+  .rank-score { width: 56px; }
+}
