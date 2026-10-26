@@ -37,13 +37,13 @@ class Corpus:
     def candidates(self, query):
         path = self.candidates_path(query["search_query"])
         if not path.is_file():
-            raise FileNotFoundError(f"缺少候选文件 {path}，请先运行 python -m benchmarks.freeze_corpus")
+            raise FileNotFoundError(f"缺少候选文件 {path}，请先运行 python -m benchmarks.prepare_corpus unpack（或用 freeze_corpus 重新冻结）")
         return json.loads(path.read_text(encoding="utf-8"))
 
     def manifest(self):
         if self._manifest is None:
             if not self.manifest_path.is_file():
-                raise FileNotFoundError(f"缺少 {self.manifest_path}，请先运行 python -m benchmarks.freeze_corpus")
+                raise FileNotFoundError(f"缺少 {self.manifest_path}，请先运行 python -m benchmarks.prepare_corpus unpack（或用 freeze_corpus 重新冻结）")
             self._manifest = json.loads(self.manifest_path.read_text(encoding="utf-8"))
         return self._manifest
 
@@ -93,8 +93,8 @@ class Corpus:
         """Raise unless every query can run without touching the network."""
         manifest = self.manifest()
         if manifest.get("dataset_hash") != dataset_hash:
-            raise RuntimeError("冻结语料与当前 queries.jsonl 版本不一致，请重新运行 freeze_corpus")
+            raise RuntimeError("冻结语料与当前 queries.jsonl 版本不一致，请运行 python -m benchmarks.prepare_corpus unpack（或重新冻结后 prepare_corpus pack）")
         missing = sorted({p["id"] + "@" + q["search_query"] for q in queries
                           for p in self.reference_papers(q) if not self.paper_cached(p)})
         if missing:
-            raise RuntimeError("以下论文全文不在冻结缓存中：" + "; ".join(missing[:5]))
+            raise RuntimeError("以下论文全文不在冻结缓存中：" + "; ".join(missing[:5]) + "；请运行 " + "python -m benchmarks.prepare_corpus unpack")
