@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 from research.pipeline import process_papers, save_json
 from research.task_agent import TaskAgent
 from benchmarks.build_dataset import QUERIES_PATH, load_queries
+from benchmarks import preflight
 from benchmarks.corpus import Corpus, CORPUS_DIR
 from benchmarks.summary import render_markdown, summarize
 
@@ -251,6 +252,7 @@ def parse_args(argv=None):
     p.add_argument("--top-k", type=int, choices=range(1, 6), help="只跑某个 top_k（调试用）")
     p.add_argument("--lang", choices=("zh", "en"), help="只跑某种语言（调试用）")
     p.add_argument("--e2e-timeout", type=int, default=3600)
+    p.add_argument("--skip-preflight", action="store_true", help="跳过启动前的服务与配置检查（不建议）")
     return p.parse_args(argv)
 
 
@@ -293,11 +295,6 @@ async def run(args, agent_factory=TaskAgent):
     else:
         meta.update(started_at=time.strftime("%Y-%m-%d %H:%M:%S"), environment=collect_environment())
         save_json(meta_path, meta)
-    slots = ((meta.get("environment") or {}).get("server") or {}).get("total_slots")
-    need = args.workers * (2 if args.concurrent else 1)
-    if stage_mode and slots and slots < need:
-        print(f"警告：服务端只有 {slots} 个并行槽位，少于需要的 {need}；多出的请求会在服务端排队，"
-              f"单条查询耗时会被拉长。请用 LLAMA_PARALLEL={need} 重启模型服务。", file=sys.stderr, flush=True)
 
     agent = collector = None
     previous_cache = os.environ.get("PAPER_CACHE_DIR")
@@ -365,7 +362,25 @@ async def run(args, agent_factory=TaskAgent):
     return summary
 
 
+def main(argv=None, agent_factory=TaskAgent):
+    """CLI entry: preflight, run, and a non-zero exit code when the result is unusable."""
+    args = parse_args(argv)
+    load_dotenv()
+    if not args.skip_preflight:
+        full = not (args.limit or args.top_k or args.lang)
+        report = preflight.check(full=full, workers=args.workers, concurrent=args.concurrent)
+        print(preflight.render(report), flush=True)
+        if not report.ok:
+            return 1
+    summary = asyncio.run(run(args, agent_factory=agent_factory))
+    verdict = summary["validity"]
+    if not verdict["ok"]:
+        print("结果无效：" + "；".join(verdict["reasons"]), file=sys.stderr, flush=True)
+        return 2
+    return 0
+
+
 if __name__ == "__main__":
     # Windows consoles default to gbk; never let a summary glyph crash a finished run.
     sys.stdout.reconfigure(errors="replace")
-    asyncio.run(run(parse_args()))
+    sys.exit(main())
