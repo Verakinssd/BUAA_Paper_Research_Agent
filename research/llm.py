@@ -1,9 +1,14 @@
 """Small Chat Completions client. No paid service or model is hard-coded."""
 import asyncio
 import json
+import logging
 import os
+import time
 import httpx
 from urllib.parse import urlsplit
+
+
+log = logging.getLogger(__name__)
 
 
 class OutputTruncatedError(ValueError):
@@ -62,6 +67,8 @@ class LLM:
             raise ValueError("LLM_BACKEND 必须为 llamacpp、vllm 或 openai")
         self.server_root = self.base.removesuffix("/v1")
         self.tokenize_url = env.get("LLM_TOKENIZE_URL", self.base.removesuffix("/v1") + "/tokenize")
+        # Optional hook for benchmarks: observer(elapsed, usage, timings, finish_reason).
+        self.observer = None
         self.options = {}
         for name, field, cast in (("LLM_TEMPERATURE", "temperature", float),
                                  ("LLM_TOP_P", "top_p", float), ("LLM_TOP_K", "top_k", int)):
@@ -169,6 +176,7 @@ class LLM:
             payload.update(tools=tools, tool_choice="auto")
         async with httpx.AsyncClient(timeout=300, trust_env=self.trust_env) as client:
             for attempt in range(3):
+                call_started = time.perf_counter()
                 try:
                     response = await client.post(
                         self.base + "/chat/completions", json=payload, headers=self.headers()
@@ -195,7 +203,14 @@ class LLM:
                 if response.is_error:
                     # Avoid leaking keys, provider URLs, or response bodies into logs.
                     raise RuntimeError(api_error(response, self.base))
-                choice = response.json()["choices"][0]
+                body = response.json()
+                choice = body["choices"][0]
+                if self.observer:
+                    try:
+                        self.observer(time.perf_counter() - call_started, body.get("usage"),
+                                      body.get("timings"), choice.get("finish_reason"))
+                    except Exception:
+                        log.exception("LLM observer failed")
                 if choice.get("finish_reason") == "length":
                     raise OutputTruncatedError("模型回复被输出长度上限截断，未作为完整结果使用；请提高输出上限或换用推理开销较小的模型。")
                 message = choice["message"]

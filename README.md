@@ -141,6 +141,25 @@ python main_agent.py \
 python -m unittest discover -s tests -v
 ```
 
+## 推理速度基准
+
+固定 100 条查询（20 个研究想法 × `top_k` 1~5，中文 75 条、英文 25 条，见 `benchmarks/queries.jsonl`），在本地模型上测平均查询时间。查询集固定，不同模型/量化的结果才能对比。
+
+```bash
+python -m benchmarks.freeze_corpus                       # 一次性，需联网、需模型服务已启动：冻结候选论文、参考 Top-5 和全文
+python -m benchmarks.run_benchmark --label q4            # 默认 stage 模式：完全离线，只测 select + 摘要 + 报告的推理耗时
+python -m benchmarks.run_benchmark --label q5 --repeats 3
+python -m benchmarks.compare outputs/bench-q4-*/summary.json outputs/bench-q5-*/summary.json
+```
+
+- **stage 模式**（默认）：候选论文、参考 Top-k 和全文全部来自 `benchmarks/corpus/`（不入库），每个模型处理完全相同的论文，不访问网络。`select` 仍由当前模型真实执行，其结果与参考选择的重合率会记录下来；参考 Top-k 是该想法冻结的 Top-5 的前 k 篇，所以 k<5 时重合率低于 1 是正常的，只用于模型之间相对比较。
+- **e2e 模式**（`--mode e2e --limit 10`）：真实启动 `main_agent.py`，包含联网检索与 PDF 下载，只用于估算端到端耗时，不能与 stage 结果对比。
+- 查询之间严格串行，顺序由 `--seed` 决定；`--warmup`（默认 3）额外跑几条预热查询，不计入统计；`--repeats` 重复整套查询。
+- 结果目录 `outputs/bench-<label>-<时间>/`：`results.jsonl`（逐条）、`summary.json` / `summary.md`（按 top_k、语言、阶段汇总，含 tokens/s 与 `耗时 ≈ a×top_k + b` 拟合）。中断后用相同参数加 `--out <该目录>` 即可续跑。
+- `--limit`、`--top-k`、`--lang` 只用于调试，结果标记为非完整数据集，`compare` 会拒绝对比。
+- 对比 Q4/Q5 时，请固定 `LLM_TEMPERATURE=0` 和 llama-server 的 `--seed`，并保持 `LLM_ENABLE_THINKING` 一致。
+- 耗时不含 PDF 缓存读取时间；`summary` 里的 `decode_tps_server` / `prefill_tps_server` 来自 llama-server 返回的 `timings`（vLLM 或远程 API 没有这项，会回退到 `completion_tps_overall`）。
+
 ## 相关性排序方法扩展
 
 在原来basic方法的基础上，新增了bm25、dense_linear、hybrid_rrf方法。dense_linear、hybrid_rrf方法需要部署embedding模型。这里用的BGE-M3模型。
