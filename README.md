@@ -184,6 +184,56 @@ PAPER_RANKING_METHOD=bm25
 
 如果没有`PAPER_RANKING_METHOD`，默认使用`basic`方法。
 
+### Cross-Encoder 二阶段精排（可选）
+
+项目支持在 `basic`、`bm25`、`dense_linear` 或 `hybrid_rrf` 第一阶段排序后，使用 Cross-Encoder 对候选论文的标题和摘要进行二阶段精排，再交给 TaskAgent 选择最终 Top-K。该功能默认关闭，不会改变原有运行流程；精排失败时默认回退到第一阶段顺序。
+
+启用前安装可选依赖：
+
+```bash
+python -m pip install -r requirements-reranker.txt
+```
+
+本地 CPU 模式：
+
+```dotenv
+PAPER_RERANKING_METHOD=local
+RERANKER_MODEL=BAAI/bge-reranker-v2-m3
+RERANKER_DEVICE=cpu
+RERANKER_TOP_N=16
+RERANKER_AGENT_TOP_M=8
+```
+
+也可以单独启动 HTTP 精排服务，避免每个任务进程重复加载模型：
+
+```bash
+python deploy/serve_reranker.py --port 8003
+```
+
+然后在 `.env` 中配置：
+
+```dotenv
+PAPER_RERANKING_METHOD=http
+RERANKER_SERVICE_URL=http://127.0.0.1:8003
+```
+
+推荐先使用固定候选集评测 `none`、`local` 和 `http` 三种配置，再决定是否在实际任务中启用。Cross-Encoder 只能改善候选排序，不能补充第一阶段没有召回的论文。
+
+运行时可以从网页服务或命令行终端查看以下日志：
+
+```text
+Cross-Encoder reranking started: method=http candidates=16 processing=16
+Cross-Encoder reranking completed: method=http processed=16/16 seconds=1.234 top=P2:2->1(0.9123), P1:1->2(0.8741)
+```
+
+每次任务还会保存精排状态：
+
+- `trace.jsonl`：`reranking_completed` 事件，包含方法、状态、候选数、耗时和前 5 个排名变化。
+- `candidates.json`：每篇论文的 `base_rank`、`base_score`、`rerank_score`、`rerank_rank` 和 `final_rank`。
+- `metrics.json`：在 `sources.reranking` 中保存精排统计。
+
+如果看到 `Cross-Encoder reranking skipped: method=none`，表示功能未启用；如果看到 `fallback`，表示精排服务失败，系统使用了第一阶段排序结果。
+
 ---
 
 ## 新增功能和使用说明

@@ -145,7 +145,10 @@ async def process_papers(papers, output, agent, concurrent=False, trace=None):
     async def one(p):
         async with semaphore:
             started = time.perf_counter()
-            result = {key: p.get(key) for key in ("id", "title", "url", "sources", "selection_reason")}
+            result = {key: p.get(key) for key in (
+                "id", "title", "url", "sources", "selection_reason",
+                "base_rank", "base_score", "rerank_score", "rerank_rank", "final_rank",
+            )}
             result["status"] = "failed"
             pdf = output / "fulltext" / (p["id"] + ".pdf")
             errors = []
