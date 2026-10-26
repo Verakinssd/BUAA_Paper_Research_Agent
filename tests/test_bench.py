@@ -5,7 +5,9 @@ import unittest
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 from support import FakeTaskAgent, fake_download, sample_papers
-from benchmarks import build_dataset, compare, freeze_corpus, run_benchmark, summary
+import io
+import tarfile
+from benchmarks import build_dataset, compare, freeze_corpus, prepare_corpus, run_benchmark, summary
 from benchmarks.corpus import Corpus, query_key
 from research.pipeline import process_papers
 
@@ -126,8 +128,8 @@ class OrderTests(unittest.TestCase):
         self.assertEqual(collector.drain(), {})
 
 
-class RunnerTests(unittest.IsolatedAsyncioTestCase):
-    """Frozen-workload runs against a tiny synthetic corpus; no model, no network."""
+class SyntheticCorpusCase(unittest.IsolatedAsyncioTestCase):
+    """Base: a tiny synthetic frozen corpus (no model, no network). Has no tests itself."""
 
     async def asyncSetUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -148,6 +150,10 @@ class RunnerTests(unittest.IsolatedAsyncioTestCase):
         # Populate the cache the way freeze_corpus does, then forbid any download.
         with patch("research.pipeline.download_pdf", new=fake_download):
             await process_papers(papers[:5], root / "freeze", run_benchmark.StubAgent(), False)
+
+
+class RunnerTests(SyntheticCorpusCase):
+    """Frozen-workload runs against the synthetic corpus."""
 
     async def test_run_query_uses_only_frozen_inputs(self):
         query = self.rows[2]  # q003: first idea, top_k=3
@@ -194,6 +200,61 @@ class RunnerTests(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result["meta"]["full_dataset"])
         self.assertEqual(json.loads((out / "summary.json").read_text(encoding="utf-8"))["n_queries"], 2)
         self.assertTrue((out / "summary.md").is_file())
+
+
+class CorpusArchiveTests(SyntheticCorpusCase):
+    """pack/unpack on the synthetic corpus."""
+
+    async def test_roundtrip_is_reproducible_and_runs_with_placeholder_pdfs(self):
+        tmp = Path(self.tmp.name)
+        first, second = tmp / "a.tar.gz", tmp / "b.tar.gz"
+        prepare_corpus.pack(self.corpus, first)
+        prepare_corpus.pack(self.corpus, second)
+        self.assertEqual(first.read_bytes(), second.read_bytes())
+
+        restored = Corpus(tmp / "restored")
+        prepare_corpus.unpack(first, restored.root)
+        restored.check_ready(self.rows[:2], self.digest)
+        pdfs = list(restored.cache_dir.glob("*.pdf"))
+        self.assertEqual(len(pdfs), 5)
+        self.assertTrue(all(p.read_bytes().startswith(b"%PDF-") for p in pdfs))
+
+        # The unchanged pipeline must accept the placeholders without any download.
+        work = tmp / "work"
+        work.mkdir()
+        with restored.cache_env(), patch("research.pipeline.download_pdf", new_callable=AsyncMock) as download:
+            row = await run_benchmark.run_query(self.rows[2], FakeTaskAgent(), restored,
+                                                run_benchmark.Collector(), False, work)
+        download.assert_not_called()
+        self.assertTrue(row["task_success"])
+
+    async def test_unpack_never_clobbers_a_real_pdf(self):
+        archive = Path(self.tmp.name) / "a.tar.gz"
+        prepare_corpus.pack(self.corpus, archive)
+        before = {p.name: p.stat().st_size for p in self.corpus.cache_dir.glob("*.pdf")}
+        prepare_corpus.unpack(archive, self.corpus.root)  # same dir that holds real PDFs
+        self.assertEqual(before, {p.name: p.stat().st_size for p in self.corpus.cache_dir.glob("*.pdf")})
+
+    async def test_unpack_rejects_unexpected_members(self):
+        archive = Path(self.tmp.name) / "evil.tar.gz"
+        with tarfile.open(archive, "w:gz") as tar:
+            info = tarfile.TarInfo("../evil.txt")
+            info.size = 1
+            tar.addfile(info, io.BytesIO(b"x"))
+        target = Path(self.tmp.name) / "target"
+        with self.assertRaisesRegex(ValueError, "不允许"):
+            prepare_corpus.unpack(archive, target)
+        self.assertFalse((Path(self.tmp.name) / "evil.txt").exists())
+        self.assertFalse(target.exists())
+
+
+class CommittedArchiveTests(unittest.TestCase):
+    def test_committed_archive_covers_all_100_queries(self):
+        """Fails if queries.jsonl changes without re-running freeze_corpus + prepare_corpus pack."""
+        rows, digest = build_dataset.load_queries()
+        with tempfile.TemporaryDirectory() as tmp:
+            prepare_corpus.unpack(prepare_corpus.ARCHIVE_PATH, tmp)
+            Corpus(tmp).check_ready(rows, digest)
 
 
 class FreezeAndE2ETests(unittest.IsolatedAsyncioTestCase):
