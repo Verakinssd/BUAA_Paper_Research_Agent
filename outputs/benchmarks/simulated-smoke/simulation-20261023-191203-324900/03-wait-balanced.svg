@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1040" height="560" viewBox="0 0 1040 560">
+<rect width="100%" height="100%" rx="18" fill="#F8FAFC"/>
+<text x="92" y="42" font-size="25" font-weight="700" fill="#0F172A">均衡流水线：阶段等待时间</text>
+<text x="92" y="70" font-size="14" fill="#64748B">每根柱为一轮中 10 篇论文的累计信号量等待时间中位数</text>
+<line x1="92" y1="456.0" x2="1008" y2="456.0" stroke="#CBD5E1" stroke-width="1"/>
+<text x="80" y="461.0" text-anchor="end" font-size="12" fill="#64748B">0.000</text>
+<line x1="92" y1="367.0" x2="1008" y2="367.0" stroke="#CBD5E1" stroke-width="1"/>
+<text x="80" y="372.0" text-anchor="end" font-size="12" fill="#64748B">0.527</text>
+<line x1="92" y1="278.0" x2="1008" y2="278.0" stroke="#CBD5E1" stroke-width="1"/>
+<text x="80" y="283.0" text-anchor="end" font-size="12" fill="#64748B">1.053</text>
+<line x1="92" y1="189.0" x2="1008" y2="189.0" stroke="#CBD5E1" stroke-width="1"/>
+<text x="80" y="194.0" text-anchor="end" font-size="12" fill="#64748B">1.580</text>
+<line x1="92" y1="100.0" x2="1008" y2="100.0" stroke="#CBD5E1" stroke-width="1"/>
+<text x="80" y="105.0" text-anchor="end" font-size="12" fill="#64748B">2.107</text>
+<rect x="125.3" y="456.0" width="86.0" height="0.0" rx="7" fill="#475569"/>
+<text x="168.3" y="446.0" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">0.000</text>
+<text x="168.3" y="484.0" text-anchor="middle" font-size="13" fill="#334155">下载</text>
+<text x="168.3" y="503.0" text-anchor="middle" font-size="13" fill="#334155">legacy</text>
+<rect x="278.0" y="427.7" width="86.0" height="28.3" rx="7" fill="#0F766E"/>
+<text x="321.0" y="417.7" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">0.167</text>
+<text x="321.0" y="484.0" text-anchor="middle" font-size="13" fill="#334155">下载</text>
+<text x="321.0" y="503.0" text-anchor="middle" font-size="13" fill="#334155">staged</text>
+<rect x="430.7" y="451.8" width="86.0" height="4.2" rx="7" fill="#475569"/>
+<text x="473.7" y="441.8" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">0.025</text>
+<text x="473.7" y="484.0" text-anchor="middle" font-size="13" fill="#334155">转换</text>
+<text x="473.7" y="503.0" text-anchor="middle" font-size="13" fill="#334155">legacy</text>
+<rect x="583.3" y="402.6" width="86.0" height="53.4" rx="7" fill="#0F766E"/>
+<text x="626.3" y="392.6" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">0.316</text>
+<text x="626.3" y="484.0" text-anchor="middle" font-size="13" fill="#334155">转换</text>
+<text x="626.3" y="503.0" text-anchor="middle" font-size="13" fill="#334155">staged</text>
+<rect x="736.0" y="456.0" width="86.0" height="0.0" rx="7" fill="#475569"/>
+<text x="779.0" y="446.0" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">0.000</text>
+<text x="779.0" y="484.0" text-anchor="middle" font-size="13" fill="#334155">总结</text>
+<text x="779.0" y="503.0" text-anchor="middle" font-size="13" fill="#334155">legacy</text>
+<rect x="888.7" y="154.3" width="86.0" height="301.7" rx="7" fill="#0F766E"/>
+<text x="931.7" y="144.3" text-anchor="middle" font-size="13" font-weight="700" fill="#0F172A">1.785</text>
+<text x="931.7" y="484.0" text-anchor="middle" font-size="13" fill="#334155">总结</text>
+<text x="931.7" y="503.0" text-anchor="middle" font-size="13" fill="#334155">staged</text>
+<text x="22" y="278.0" transform="rotate(-90 22 278.0)" text-anchor="middle" font-size="13" fill="#475569">累计等待（秒）</text>
+</svg>

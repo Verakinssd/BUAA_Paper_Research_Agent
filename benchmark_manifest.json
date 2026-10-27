@@ -1,0 +1,33 @@
+{
+  "name": "公开论文固定三篇测试集",
+  "description": "用于比较 legacy 与 staged；两种模式必须使用此处完全相同的顺序和论文。",
+  "papers": [
+    {
+      "id": "P1",
+      "title": "Attention Is All You Need",
+      "url": "https://arxiv.org/abs/1706.03762",
+      "pdf_urls": ["https://arxiv.org/pdf/1706.03762"],
+      "sources": ["arxiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "P2",
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "url": "https://arxiv.org/abs/2106.09685",
+      "pdf_urls": ["https://arxiv.org/pdf/2106.09685"],
+      "sources": ["arxiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "P3",
+      "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+      "url": "https://arxiv.org/abs/2305.14314",
+      "pdf_urls": ["https://arxiv.org/pdf/2305.14314"],
+      "sources": ["arxiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    }
+  ]
+}

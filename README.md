@@ -1,3 +1,13 @@
+# README
+
+* 将“整篇并发”改成“分阶段并发”：修改前的 [pipeline.py](research/pipeline.py) 使用一个信号量包住整篇论文处理流程，并发度固定为 2。拆成：
+  - PDF 下载：并发 3～4
+  - PDF 转换：并发 1，避免 CPU 和内存压力
+  - API 总结：并发 2，避免 API 限流
+  - arXiv 下载：继续保持限速
+* 完善对比。做了benchmark对比，选用十篇论文（5篇arxiv，5篇其他渠道，在benchmark_manifest_10.json）生成了真实环境下时间对比详细报告。由于报告结果受网络速度等客观因素影响过大，还进行了模拟实验，证明了并发策略优化后的有效性。
+* **完整 benchmark 及说明报告在 `outputs/benchmarks/` 文件夹下**。
+
 # Paper Research Agent
 
 一个本地论文研究 Agent：根据研究想法检索 arXiv 和 OpenAlex，筛选 Top-K 论文，读取可访问的 PDF，并生成逐篇总结和研究报告。
@@ -210,6 +220,56 @@ PAPER_RANKING_METHOD=bm25
 
 如果没有`PAPER_RANKING_METHOD`，默认使用`basic`方法。
 
+### Cross-Encoder 二阶段精排（可选）
+
+项目支持在 `basic`、`bm25`、`dense_linear` 或 `hybrid_rrf` 第一阶段排序后，使用 Cross-Encoder 对候选论文的标题和摘要进行二阶段精排，再交给 TaskAgent 选择最终 Top-K。该功能默认关闭，不会改变原有运行流程；精排失败时默认回退到第一阶段顺序。
+
+启用前安装可选依赖：
+
+```bash
+python -m pip install -r requirements-reranker.txt
+```
+
+本地 CPU 模式：
+
+```dotenv
+PAPER_RERANKING_METHOD=local
+RERANKER_MODEL=BAAI/bge-reranker-v2-m3
+RERANKER_DEVICE=cpu
+RERANKER_TOP_N=16
+RERANKER_AGENT_TOP_M=8
+```
+
+也可以单独启动 HTTP 精排服务，避免每个任务进程重复加载模型：
+
+```bash
+python deploy/serve_reranker.py --port 8003
+```
+
+然后在 `.env` 中配置：
+
+```dotenv
+PAPER_RERANKING_METHOD=http
+RERANKER_SERVICE_URL=http://127.0.0.1:8003
+```
+
+推荐先使用固定候选集评测 `none`、`local` 和 `http` 三种配置，再决定是否在实际任务中启用。Cross-Encoder 只能改善候选排序，不能补充第一阶段没有召回的论文。
+
+运行时可以从网页服务或命令行终端查看以下日志：
+
+```text
+Cross-Encoder reranking started: method=http candidates=16 processing=16
+Cross-Encoder reranking completed: method=http processed=16/16 seconds=1.234 top=P2:2->1(0.9123), P1:1->2(0.8741)
+```
+
+每次任务还会保存精排状态：
+
+- `trace.jsonl`：`reranking_completed` 事件，包含方法、状态、候选数、耗时和前 5 个排名变化。
+- `candidates.json`：每篇论文的 `base_rank`、`base_score`、`rerank_score`、`rerank_rank` 和 `final_rank`。
+- `metrics.json`：在 `sources.reranking` 中保存精排统计。
+
+如果看到 `Cross-Encoder reranking skipped: method=none`，表示功能未启用；如果看到 `fallback`，表示精排服务失败，系统使用了第一阶段排序结果。
+
 ---
 
 ## 新增功能和使用说明
@@ -288,7 +348,40 @@ outputs/_web/runs/任务ID/运行ID/
 
 这个开关控制的是一项研究内部是否并行处理，不是让多个人同时开始研究。目前一个网页服务进程同一时间只运行一个研究任务；其他人仍然可以打开网站、登录和查看自己的记录。
 
-### 4. 建立临时 HTTPS 测试链接
+默认未设置 `PIPELINE_MODE` 时，上述开关保持原行为：不勾选为串行，勾选后以整篇论文为单位并发 2。需要启用分阶段调度时，在 `.env` 中设置：
+
+```dotenv
+PIPELINE_MODE=staged
+DOWNLOAD_CONCURRENCY=4
+CONVERT_CONCURRENCY=1
+SUMMARY_CONCURRENCY=2
+PIPELINE_MAX_IN_FLIGHT=8
+```
+
+`staged` 只在对应阶段持有信号量：下载完成后立即释放下载槽，再等待转换槽；转换完成后释放转换槽，再等待总结槽。arXiv 下载仍由原有限速锁串行执行并保持至少 3.1 秒请求间隔。`PIPELINE_MAX_IN_FLIGHT` 使用固定 worker 数限制同时在流水线中的论文数量。
+
+### 4. 对比 legacy 与 staged
+
+仓库提供固定测试集 `benchmark_manifest_10.json` 和独立脚本 `scripts/benchmark_pipeline.py`。脚本按顺序运行两种模式，每轮使用独立输出目录和缓存，并自动生成 `benchmark_results.json` 与 `benchmark_report.md`。
+
+Benchmark 是独立 CLI，不会解密任一网页账号保存的个人 API 配置。使用网络模型时，请先把同一套模型配置写入本机 `.env`（该文件已被 Git 忽略），例如 `LLM_BACKEND=openai`、`LLM_BASE_URL=https://openrouter.ai/api/v1`、`LLM_MODEL=固定模型ID`、`LLM_API_KEY=你的Key`、`LLM_ALLOW_NO_KEY=0`；报告只记录非秘密配置，不记录 Key。
+
+真实测试会重复下载论文并调用模型 API，可能产生费用、消耗免费额度或触发服务商限流。确认风险后运行：
+
+```bash
+python scripts/benchmark_pipeline.py \
+  --manifest benchmark_manifest_10.json \
+  --repeats 3 \
+  --download-concurrency 4 \
+  --convert-concurrency 1 \
+  --summary-concurrency 2 \
+  --max-in-flight 8 \
+  --acknowledge-api-cost
+```
+
+结果默认保存到 `outputs/benchmarks/benchmark-<时间>/`。也可以用 `--mode legacy` 或 `--mode staged` 单独执行一种模式；默认 `--mode both` 仍是严格顺序执行，不会同时运行两种模式。为了公平比较，应使用固定模型 ID；`openrouter/free` 可能在不同请求间选择不同模型，不适合严谨性能结论。
+
+### 5. 建立临时 HTTPS 测试链接
 
 先完成前面的依赖安装和配置。打开两个终端，都进入项目目录，并使用项目的 Python 环境。
 

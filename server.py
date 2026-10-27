@@ -56,8 +56,13 @@ async def search_papers(query: str, max_per_source: int = 8) -> dict:
     state[run_id] = {"papers": papers, "output": output, "sources": sources, "search_seconds": elapsed}
     save_json(output / "candidates.json", papers)
     trace(output, "sources_searched", {"sources": sources, "deduplicated_count": len(papers)})
+    if isinstance(sources.get("reranking"), dict):
+        trace(output, "reranking_completed", sources["reranking"])
     # Main Agent receives bounded candidate metadata; full records remain server-side.
-    candidates = [{k: p.get(k) for k in ("id", "title", "abstract", "year", "sources", "rank_score")}
+    candidates = [{k: p.get(k) for k in (
+        "id", "title", "abstract", "year", "sources", "rank_score",
+        "base_rank", "base_score", "rerank_score", "rerank_rank", "final_rank",
+    )}
                   for p in papers]
     for candidate in candidates:
         abstract = candidate.get("abstract") or ""
@@ -82,7 +87,15 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
     save_json(output / "run_meta.json", metadata)
     trace(output, "selection_started", {"requested_top_k": top_k})
     agent = TaskAgent()
-    selected = await agent.select(idea, papers, top_k)
+    agent_papers = papers
+    reranking = run["sources"].get("reranking", {})
+    if reranking.get("status") == "ok" and reranking.get("method") != "none":
+        try:
+            agent_limit = max(top_k, int(os.getenv("RERANKER_AGENT_TOP_M", "8")))
+        except ValueError:
+            agent_limit = max(top_k, 8)
+        agent_papers = papers[:min(len(papers), agent_limit)]
+    selected = await agent.select(idea, agent_papers, top_k)
     for paper in selected:
         paper["research_idea"] = idea
     save_json(output / "selection.json", selected)
@@ -108,8 +121,8 @@ async def build_report(run_id: str, idea: str, top_k: int = 3) -> dict:
                    requested_top_k=top_k,
                    model_id=os.getenv("PAPER_MODEL_ID"), model_label=os.getenv("PAPER_MODEL_LABEL"),
                    task_success=(report_success and metrics["completed_count"] == len(selected) == top_k
-                                 and all(s["status"] == "ok" for s in run["sources"].values()
-                                         if isinstance(s, dict))),
+                                 and all(run["sources"].get(name, {}).get("status") == "ok"
+                                         for name in ("arxiv", "openalex"))),
                    sources=run["sources"])
     save_json(output / "metrics.json", metrics)
     trace(output, "report_completed", {"metrics": metrics})

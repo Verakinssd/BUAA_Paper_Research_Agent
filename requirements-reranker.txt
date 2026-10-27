@@ -1,0 +1,5 @@
+# Optional dependencies for local Cross-Encoder reranking.
+# Install a CPU or CUDA PyTorch wheel appropriate for the host before this file
+# if the default PyPI wheel is not suitable for the deployment environment.
+torch>=2.0
+sentence-transformers>=3.0

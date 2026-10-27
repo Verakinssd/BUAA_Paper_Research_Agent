@@ -1,0 +1,96 @@
+{
+  "name": "10 篇公开论文混合来源固定测试集",
+  "description": "5 篇 arXiv 与 5 篇其他公开 PDF 来源；用于三轮 legacy/staged 可复现对比。",
+  "papers": [
+    {
+      "id": "A1",
+      "title": "Attention Is All You Need",
+      "url": "https://arxiv.org/abs/1706.03762",
+      "pdf_urls": ["https://arxiv.org/pdf/1706.03762"],
+      "sources": ["arXiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "A2",
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "url": "https://arxiv.org/abs/2106.09685",
+      "pdf_urls": ["https://arxiv.org/pdf/2106.09685"],
+      "sources": ["arXiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "A3",
+      "title": "Denoising Diffusion Probabilistic Models",
+      "url": "https://arxiv.org/abs/2006.11239",
+      "pdf_urls": ["https://arxiv.org/pdf/2006.11239"],
+      "sources": ["arXiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "A4",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "url": "https://arxiv.org/abs/2005.11401",
+      "pdf_urls": ["https://arxiv.org/pdf/2005.11401"],
+      "sources": ["arXiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "A5",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "url": "https://arxiv.org/abs/2210.03629",
+      "pdf_urls": ["https://arxiv.org/pdf/2210.03629"],
+      "sources": ["arXiv"],
+      "selection_reason": "固定公开测试论文",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "O1",
+      "title": "Deep Residual Learning for Image Recognition",
+      "url": "https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html",
+      "pdf_urls": ["https://openaccess.thecvf.com/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf"],
+      "sources": ["CVF Open Access"],
+      "selection_reason": "非 arXiv 的公开出版方 PDF",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "O2",
+      "title": "Mask R-CNN",
+      "url": "https://openaccess.thecvf.com/content_ICCV_2017/html/He_Mask_R-CNN_ICCV_2017_paper.html",
+      "pdf_urls": ["https://openaccess.thecvf.com/content_ICCV_2017/papers/He_Mask_R-CNN_ICCV_2017_paper.pdf"],
+      "sources": ["CVF Open Access"],
+      "selection_reason": "非 arXiv 的公开出版方 PDF",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "O3",
+      "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+      "url": "https://aclanthology.org/N19-1423/",
+      "pdf_urls": ["https://aclanthology.org/N19-1423.pdf"],
+      "sources": ["ACL Anthology"],
+      "selection_reason": "非 arXiv 的公开出版方 PDF",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "O4",
+      "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+      "url": "https://proceedings.mlr.press/v37/ioffe15.html",
+      "pdf_urls": ["https://proceedings.mlr.press/v37/ioffe15.pdf"],
+      "sources": ["PMLR"],
+      "selection_reason": "非 arXiv 的公开出版方 PDF",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    },
+    {
+      "id": "O5",
+      "title": "Distributed Representations of Words and Phrases and their Compositionality",
+      "url": "https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality",
+      "pdf_urls": ["https://papers.nips.cc/paper_files/paper/2013/file/9aa42b31882ec039965f3c4923ce901b-Paper.pdf"],
+      "sources": ["NeurIPS Proceedings"],
+      "selection_reason": "非 arXiv 的公开出版方 PDF",
+      "research_idea": "比较论文研究流水线的并发调度性能"
+    }
+  ]
+}
