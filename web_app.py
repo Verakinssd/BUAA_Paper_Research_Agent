@@ -206,7 +206,8 @@ class JobManager:
             result["run_id"] = run.name
             candidates = read_json(self.artifact(run, "candidates.json"), [])
             result["candidates"] = [{key: p.get(key) for key in
-                ("id", "title", "abstract", "year", "authors", "url", "sources", "rank_score")}
+                ("id", "title", "abstract", "year", "authors", "url", "sources", "rank_score",
+                 "base_rank", "base_score", "rerank_score", "rerank_rank", "final_rank")}
                 for p in candidates if isinstance(p, dict)]
             selected = read_json(self.artifact(run, "selection.json"), [])
             topk = read_json(self.artifact(run, "topk.json"), [])
@@ -239,7 +240,8 @@ class JobManager:
                 if not PAPER_PATTERN.fullmatch(pid):
                     continue
                 item = {key: paper.get(key) for key in
-                    ("id", "title", "url", "year", "authors", "sources", "selection_reason", "error")}
+                    ("id", "title", "url", "year", "authors", "sources", "selection_reason", "error",
+                     "base_rank", "base_score", "rerank_score", "rerank_rank", "final_rank")}
                 item["status"] = paper.get("status", "pending")
                 if job["status"] in {"cancelled", "failed"} and item["status"] in {"pending", "running"}:
                     item["status"] = job["status"]

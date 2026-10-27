@@ -227,7 +227,10 @@ async def process_papers(papers, output, agent, concurrent=False, trace=None, mo
                           if whole_paper_gate is not None else 0.0)
         started = time.perf_counter()
         timings = _stage_timings()
-        result = {key: p.get(key) for key in ("id", "title", "url", "sources", "selection_reason")}
+        result = {key: p.get(key) for key in (
+            "id", "title", "url", "sources", "selection_reason",
+            "base_rank", "base_score", "rerank_score", "rerank_rank", "final_rank",
+        )}
         result["status"] = "failed"
         pdf = output / "fulltext" / (p["id"] + ".pdf")
         errors = []

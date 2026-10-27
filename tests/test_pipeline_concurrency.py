@@ -5,9 +5,11 @@ import threading
 import time
 import unittest
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 from research.pipeline import pipeline_settings, process_papers
+from research.reranking import rerank
+from research.task_agent import validate_selection
 from support import sample_papers
 
 
@@ -43,6 +45,50 @@ class ThreadTracker:
 
 
 class PipelineConcurrencyTests(unittest.IsolatedAsyncioTestCase):
+    async def test_reranking_metadata_survives_selection_and_both_pipeline_modes(self):
+        async def download(url, path, progress=None):
+            path.write_bytes(b"%PDF-test")
+
+        class Agent:
+            async def summarize(self, paper, markdown, progress=None):
+                if paper["id"] == "P3":
+                    raise RuntimeError("test summary failure")
+                return "summary"
+
+        environment = {
+            "PAPER_RERANKING_METHOD": "local", "RERANKER_TOP_N": "3",
+            "RERANKER_FALLBACK": "0", "PIPELINE_MAX_IN_FLIGHT": "2",
+        }
+        fields = ("base_rank", "base_score", "rerank_score", "rerank_rank", "final_rank")
+        for mode in ("legacy", "staged"):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as folder, \
+                    patch.dict(os.environ, environment), \
+                    patch("research.reranking._local_scores", new=AsyncMock(return_value=[0.2, 0.9, 0.5])), \
+                    patch("research.pipeline.restore_cached_fulltext", return_value=None), \
+                    patch("research.pipeline.store_cached_fulltext"), \
+                    patch("research.pipeline.download_pdf", side_effect=download), \
+                    patch("research.pipeline.convert_pdf", return_value="[Page 1]\n" + "text " * 30):
+                ranked, stats = await rerank("paper retrieval", sample_papers(3))
+                self.assertFalse(stats["fallback"])
+                self.assertEqual([paper["id"] for paper in ranked], ["P2", "P3", "P1"])
+                selected = validate_selection({"selected": [
+                    {"id": paper["id"], "reason": "Relevant test evidence"} for paper in ranked[:2]
+                ]}, ranked, 2)
+                events = []
+                results, metrics = await process_papers(
+                    selected, Path(folder), Agent(), concurrent=True, mode=mode,
+                    trace=lambda event, data: events.append((event, data)),
+                )
+
+            self.assertEqual([paper["status"] for paper in results], ["ok", "failed"])
+            self.assertEqual(metrics["pipeline_mode"], mode)
+            processed = {data["id"]: data for event, data in events if event == "paper_processed"}
+            for source, result in zip(selected, results):
+                self.assertEqual(result["id"], source["id"])
+                for field in fields:
+                    self.assertEqual(result[field], source[field])
+                    self.assertEqual(processed[source["id"]][field], source[field])
+
     async def test_staged_limits_each_stage_and_inflight_tasks(self):
         download_tracker = AsyncTracker()
         convert_tracker = ThreadTracker()

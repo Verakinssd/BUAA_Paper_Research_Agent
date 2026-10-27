@@ -178,6 +178,7 @@ def merge_dedup(papers):
 
 async def retrieve(query, limit=8, concurrent=False, ranking_method=None):
     from .ranking import rank, VALID_METHODS, DEFAULT_METHOD
+    from .reranking import rerank
     stats = {}
     async def one(name, func):
         started = time.perf_counter()
@@ -196,10 +197,12 @@ async def retrieve(query, limit=8, concurrent=False, ranking_method=None):
         parts = [await one(name, fn) for name, fn in jobs]
     papers = [p for part in parts for p in part]
     ranked = rank(query, merge_dedup(papers), method=ranking_method)
+    ranked, rerank_stats = await rerank(query, ranked)
     used = (ranking_method
             or os.getenv("PAPER_RANKING_METHOD", DEFAULT_METHOD)
             or DEFAULT_METHOD)
     if used not in VALID_METHODS:
         used = DEFAULT_METHOD
     stats["ranking_method"] = used
+    stats["reranking"] = rerank_stats
     return ranked, stats
