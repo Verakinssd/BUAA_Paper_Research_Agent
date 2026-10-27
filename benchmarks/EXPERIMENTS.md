@@ -1,6 +1,6 @@
 # 优化实验设计
 
-任务书要求：从“增加免费数据来源 / 改进相关性排序 / 实现并发处理”中选做优化，并比较**优化前后的 Top-k 相关性、任务成功率或运行时间**。本文规定怎么测，保证任何优化都能和同一个基线公平对比。
+任务书要求：从“增加免费数据来源 / 改进相关性排序 / 实现并发处理”中选做优化，并比较**优化前后的 Top-k 相关性、任务成功率或运行时间**。本文规定怎么测，保证任何优化都能和同一个基线公平对比。第一轮的结果见 [`RESULTS.md`](RESULTS.md)。
 
 ## 对比规则（所有实验通用）
 
@@ -40,6 +40,7 @@ python -m benchmarks.ab_e2e --variants ../variants/variants-pr2.json --limit 8 -
 ```
 - `variants-pr2.json` 含 4 个版本：`base-concurrent`（基线）、`base-control`（噪声）、`base-serial`（参考）、`pr2-staged`（`PIPELINE_MODE=staged`）。
 - 同一条查询的各版本背靠背跑、顺序随机；每次运行用全新 PDF 缓存，下载和转换都计入耗时。
+- **检索结果默认冻结**（`benchmarks/e2e_replay.py` 让 MCP 服务返回该想法冻结的 arXiv/OpenAlex 原始结果）：真实检索中 arXiv 用精确短语匹配，主 Agent 写的多词检索词常常返回 0 篇，各版本的候选会不同、失败率高。主 Agent、任务 Agent、下载、转换、总结仍然是真的。`--live-search` 可关闭。各版本的检出目录里都要有这个文件（它在基线之后的提交里）。
 - 看 `summary.md` 的“配对差值”和 95% 区间；差值要明显大于“噪声基线”。
 - 规模：4 版本 x 8 条 x 2 轮 = 64 次运行，按每次约 2 分钟估算约 2 小时（估算，未实测）。
 - PR #2 自带的真实实验中位耗时 315.8 s → 341.1 s，并没有变快；它的“有效”结论来自模拟实验，不能用作真实运行时间的证据。本实验就是为了给出真实数据。
@@ -65,6 +66,7 @@ python -m benchmarks.rank_eval compare outputs/rankeval-base-*/results.json outp
 ```
 - 精排用 `--rerank http` 时要先启动 PR #3 的重排服务（`deploy/serve_reranker.py`，默认端口 8003）；`--rerank local` 在进程内加载模型，需要装 `requirements-reranker.txt`。`rank_eval` 会校验精排真的成功，回退到第一阶段顺序算无效，防止测成“没精排”。
 - 精排开启后任务 Agent 只看到前 `RERANKER_AGENT_TOP_M`（默认 8）篇，`rank_eval` 按同样的规则截取；`recall@M` 衡量这一截取丢掉了多少相关论文。
+- 诊断选项 `--agent-limit N`：不论是否精排，任务 Agent 只看排名前 N 篇。第一轮用它把 PR #3 的负面影响拆成“只截取前 8 篇”和“精排后的顺序”两个因素（见 RESULTS.md）。
 - 稠密/混合排序（`dense_linear`、`hybrid_rrf`）需要 BGE 服务，未设置 `BGE_M3_SERVICE_URL` 会直接报错，避免悄悄退回 bm25 却标成别的方法。
 - 评测的第一阶段排序用的是 `retrieve()` 本身，所以任何版本自带的排序方法、精排原样运行。
 

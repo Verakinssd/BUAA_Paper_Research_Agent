@@ -316,6 +316,20 @@ class EvaluateTests(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(len(rank_eval.agent_candidates(ranked, {"reranking": {"status": "failed", "method": "http"}}, 3)), 20)
             self.assertEqual(len(rank_eval.agent_candidates(ranked, {"reranking": {"status": "ok", "method": "none"}}, 3)), 20)
 
+    def test_forced_agent_limit_applies_with_or_without_a_reranker(self):
+        ranked = list(range(20))
+        self.assertEqual(len(rank_eval.agent_candidates(ranked, {}, 3, forced_limit=8)), 8)
+        self.assertEqual(len(rank_eval.agent_candidates(ranked, {}, 12, forced_limit=8)), 12)
+        ok = {"reranking": {"status": "ok", "method": "http"}}
+        with patch.dict(os.environ, {"RERANKER_AGENT_TOP_M": "8"}):
+            self.assertEqual(len(rank_eval.agent_candidates(ranked, ok, 3, forced_limit=16)), 16)
+            self.assertEqual(len(rank_eval.agent_candidates(ranked, ok, 3)), 8)
+
+    async def test_select_sees_only_the_forced_number_of_candidates(self):
+        ideas, _ = await self.evaluate(select=True, agent=FakeTaskAgent(), agent_limit=4)
+        self.assertEqual(ideas[0]["select"]["2"]["shown"], 4)
+        self.assertEqual(ideas[0]["select"]["5"]["shown"], 5)  # never fewer than k
+
     async def test_a_reranker_that_fell_back_silently_is_flagged(self):
         real = sources.retrieve
 

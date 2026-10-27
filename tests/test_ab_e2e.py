@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from benchmarks import ab_e2e, preflight, run_benchmark
+from benchmarks import ab_e2e, e2e_replay, preflight, rank_pools, run_benchmark
 from benchmarks.build_dataset import load_queries
 
 FAKE_MAIN_AGENT = """import json, os, pathlib, sys, time
@@ -15,6 +15,7 @@ if os.environ.get("FAKE_FAIL") == "1":
 run = pathlib.Path(os.environ["PAPER_OUTPUT_ROOT"]) / "run1"
 run.mkdir(parents=True)
 (run / "cache_dir.txt").write_text(os.environ["PAPER_CACHE_DIR"])
+(run / "seen.json").write_text(json.dumps({"script": sys.argv[0], "qkey": os.environ.get("BENCH_REPLAY_QKEY")}))
 json.dump({"search_seconds": 0.01, "processing_seconds": delay, "server_total_seconds": delay + 0.01,
            "task_success": True, "completed_count": 1}, open(run / "metrics.json", "w"))
 """
@@ -24,6 +25,8 @@ def make_repo(root, name):
     repo = Path(root) / name
     repo.mkdir()
     (repo / "main_agent.py").write_text(FAKE_MAIN_AGENT, encoding="utf-8")
+    (repo / "benchmarks").mkdir()
+    (repo / "benchmarks" / "e2e_replay.py").write_text(FAKE_MAIN_AGENT, encoding="utf-8")  # stands in for the wrapper
     return str(repo)
 
 
@@ -46,6 +49,29 @@ class AbTests(unittest.IsolatedAsyncioTestCase):
     def args(self, *extra, out="out", variants=None):
         return ab_e2e.parse_args(["--variants", str(variants or self.variants()), "--out", str(self.root / out),
                                   "--limit", "3", "--repeats", "2", "--timeout", "60", *extra])
+
+    async def test_search_is_frozen_by_default_and_the_idea_key_is_passed(self):
+        await ab_e2e.run(self.args())
+        out = self.root / "out" / "e2e"
+        seen = [json.loads(p.read_text()) for p in out.glob("*/*/run1/seen.json")]
+        self.assertEqual(len(seen), 18)
+        self.assertTrue(all(s["script"].replace("\\", "/").endswith("benchmarks/e2e_replay.py") for s in seen))
+        self.assertTrue(all(len(s["qkey"]) == 12 for s in seen))
+        meta = json.loads((self.root / "out" / "run_meta.json").read_text(encoding="utf-8"))
+        self.assertEqual(meta["search"], "frozen")
+        self.assertIn("冻结", (self.root / "out" / "summary.md").read_text(encoding="utf-8"))
+
+    async def test_live_search_runs_main_agent_directly(self):
+        await ab_e2e.run(self.args("--live-search"))
+        seen = [json.loads(p.read_text()) for p in (self.root / "out" / "e2e").glob("*/*/run1/seen.json")]
+        self.assertTrue(all(s["script"].endswith("main_agent.py") and s["qkey"] is None for s in seen))
+        self.assertEqual(json.loads((self.root / "out" / "run_meta.json").read_text(encoding="utf-8"))["search"], "live")
+
+    def test_a_checkout_without_the_wrapper_is_refused_unless_live(self):
+        (Path(self.slow) / "benchmarks" / "e2e_replay.py").unlink()
+        with self.assertRaisesRegex(ValueError, "e2e_replay"):
+            ab_e2e.load_variants(self.variants(), replay=True)
+        ab_e2e.load_variants(self.variants(), replay=False)
 
     def test_variants_are_validated(self):
         with self.assertRaisesRegex(ValueError, "至少"):
@@ -141,6 +167,23 @@ class AbTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(code, 1)
         self.assertFalse((self.root / "never").exists())
         self.assertTrue(check.call_args.kwargs["full"])
+
+
+class ReplayTests(unittest.IsolatedAsyncioTestCase):
+    def test_wrapper_serves_the_frozen_lists_of_one_idea(self):
+        pools = rank_pools.load_pools()
+        qkey, idea = next(iter(pools["ideas"].items()))
+        arxiv, openalex = e2e_replay.replay_searches(qkey)
+
+        async def both():
+            return await arxiv("any multi word query", 8), await openalex("another", 5)
+        first, second = asyncio.run(both())
+        self.assertEqual([p["title"] for p in first], [p["title"] for p in idea["arxiv"][:8]])
+        self.assertEqual(len(second), 5)
+        first[0]["title"] = "mutated"  # callers annotate what they get; the frozen data must not change
+        self.assertNotEqual(asyncio.run(arxiv("q", 8))[0]["title"], "mutated")
+        with self.assertRaises(SystemExit):
+            e2e_replay.replay_searches("0" * 12)
 
 
 class FreshCacheTests(unittest.IsolatedAsyncioTestCase):

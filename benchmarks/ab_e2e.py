@@ -16,6 +16,9 @@ variants.json (first entry is the baseline):
 `benchmarks.make_variants` writes such a file for the base / PR #2 / PR #3 / both checkouts.
 
     python -m benchmarks.ab_e2e --variants variants.json --limit 8 --repeats 2 --out outputs/ab-pr2
+By default the search results are frozen (benchmarks/e2e_replay.py): live arXiv search is an exact-phrase match,
+so the multi-word queries the main agent writes often return nothing and every run would see different
+candidates. Downloads, conversion, summaries and the agents stay real. --live-search turns this off.
 Runs a variant needs 2 server slots when it processes papers concurrently (LLAMA_PARALLEL=2); keep the
 server configuration identical for every variant.
 """
@@ -30,6 +33,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from benchmarks import preflight
 from benchmarks.build_dataset import QUERIES_PATH, load_queries
+from benchmarks.corpus import query_key
 from benchmarks.rank_eval import paired_bootstrap
 from benchmarks.run_benchmark import collect_environment, read_rows, run_query_e2e, save_json, stratified
 from benchmarks.summary import stats
@@ -37,7 +41,10 @@ from benchmarks.summary import stats
 NOISE_NOTE = "对照组（control）与基线配置完全相同，二者的差距就是噪声；B 与 A 的差距要明显大于它才算有效。"
 
 
-def load_variants(path):
+REPLAY_SCRIPT = "benchmarks/e2e_replay.py"
+
+
+def load_variants(path, replay=False):
     variants = json.loads(Path(path).read_text(encoding="utf-8"))
     if not isinstance(variants, list) or len(variants) < 2:
         raise ValueError("variants 至少要有基线和一个对比版本")
@@ -48,6 +55,8 @@ def load_variants(path):
         repo = Path(v.get("repo", ""))
         if not (repo / "main_agent.py").is_file():
             raise ValueError(f"{v['label']}: repo 下没有 main_agent.py：{repo}")
+        if replay and not (repo / REPLAY_SCRIPT).is_file():
+            raise ValueError(f"{v['label']}: repo 下没有 {REPLAY_SCRIPT}（该版本早于冻结检索功能）：{repo}")
     if variants[0].get("control"):
         raise ValueError("第一个 variant 是基线，不能是 control")
     return variants
@@ -140,7 +149,8 @@ def render_markdown(summary, check, meta):
         lines += ["> **结果无效：** " + "；".join(check["reasons"]), ""]
     if check["warnings"]:
         lines += ["> 注意：" + "；".join(check["warnings"]), ""]
-    lines += [f"- 查询 {meta['queries']} 条 x 重复 {meta['repeats']} 次；每次运行使用全新 PDF 缓存；基线 `{summary['baseline']}`",
+    lines += [f"- 查询 {meta['queries']} 条 x 重复 {meta['repeats']} 次；每次运行使用全新 PDF 缓存；"
+              f"检索结果：{'冻结（各版本候选完全相同）' if meta.get('search') == 'frozen' else '实时'}；基线 `{summary['baseline']}`",
               f"- {NOISE_NOTE}", "", "## 各版本", "| 版本 | 运行数 | 成功率 | 平均(s) | 中位数(s) | P95(s) |", "|---|---|---|---|---|---|"]
     for label, v in summary["variants"].items():
         q = v["query_seconds"]
@@ -171,12 +181,13 @@ def parse_args(argv=None):
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--out", help="输出目录；指向已有目录即续跑")
     p.add_argument("--timeout", type=int, default=1800)
+    p.add_argument("--live-search", action="store_true", help="用真实的 arXiv/OpenAlex 检索（候选不固定，失败率高）")
     p.add_argument("--skip-preflight", action="store_true")
     return p.parse_args(argv)
 
 
 async def run(args, runner=run_query_e2e):
-    variants = load_variants(args.variants)
+    variants = load_variants(args.variants, replay=not args.live_search)
     all_rows, dataset_hash = load_queries(args.queries)
     pool = [q for q in all_rows if not args.top_k or q["top_k"] == args.top_k]
     queries = stratified(pool, args.seed)[:args.limit]
@@ -188,10 +199,11 @@ async def run(args, runner=run_query_e2e):
 
     meta_path = out / "run_meta.json"
     meta = {"label": args.label, "queries": len(queries), "repeats": args.repeats, "seed": args.seed,
-            "dataset_hash": dataset_hash, "variants": variants, "qids": [q["qid"] for q in queries]}
+            "dataset_hash": dataset_hash, "variants": variants, "qids": [q["qid"] for q in queries],
+            "search": "live" if args.live_search else "frozen"}
     if meta_path.is_file():
         old = json.loads(meta_path.read_text(encoding="utf-8"))
-        for key in ("repeats", "seed", "dataset_hash", "variants", "qids"):
+        for key in ("repeats", "seed", "dataset_hash", "variants", "qids", "search"):
             if old.get(key) != meta[key]:
                 raise SystemExit(f"断点续跑参数与已有 run_meta.json 不一致：{key}")
     else:
@@ -201,9 +213,14 @@ async def run(args, runner=run_query_e2e):
     pending = [item for item in plan if (item[2]["label"], item[0], item[1]["qid"]) not in done]
     print(f"{len(variants)} 个版本 x {len(queries)} 条查询 x {args.repeats} 轮 = {len(plan)} 次运行，待跑 {len(pending)}", flush=True)
     for index, (repeat, query, variant, position) in enumerate(pending, 1):
+        env = {k: str(v) for k, v in (variant.get("env") or {}).items()}
+        extra = {}
+        if not args.live_search:
+            env["BENCH_REPLAY_QKEY"] = query_key(query["search_query"])
+            extra["script"] = REPLAY_SCRIPT
         row = await runner(query, out, bool(variant.get("concurrent")), args.timeout, repo=variant["repo"],
-                           env={k: str(v) for k, v in (variant.get("env") or {}).items()},
-                           args=variant.get("args") or (), name=f"{variant['label']}/r{repeat}-{query['qid']}")
+                           env=env, args=variant.get("args") or (),
+                           name=f"{variant['label']}/r{repeat}-{query['qid']}", **extra)
         row.update(variant=variant["label"], repeat=repeat, position=position)
         with results.open("a", encoding="utf-8") as stream:
             stream.write(json.dumps(row, ensure_ascii=False) + "\n")
@@ -225,7 +242,7 @@ def main(argv=None, runner=run_query_e2e):
     args = parse_args(argv)
     load_dotenv()
     if not args.skip_preflight:
-        variants = load_variants(args.variants)
+        variants = load_variants(args.variants, replay=not args.live_search)
         needs_two = any(v.get("concurrent") or (v.get("env") or {}).get("PIPELINE_MODE") == "staged" for v in variants)
         report = preflight.check(full=True, workers=1, concurrent=needs_two)
         print(preflight.render(report), flush=True)
