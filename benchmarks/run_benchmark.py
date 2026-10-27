@@ -163,18 +163,20 @@ async def run_query(query, agent, corpus, collector, concurrent, work_dir):
     return row
 
 
-async def run_query_e2e(query, out_dir, concurrent, timeout, *, repo=None, env=None, args=(), name=None):
+async def run_query_e2e(query, out_dir, concurrent, timeout, *, repo=None, env=None, args=(), name=None,
+                        script="main_agent.py"):
     """Spawn the real main_agent.py; the whole wall time includes network.
 
     Each run gets its own empty PDF cache, otherwise whichever run comes second would find the
     papers already downloaded and converted and look faster for the wrong reason.
-    `repo`, `env` and `args` let one runner drive several code versions / settings (see ab_e2e).
+    `repo`, `env` and `args` let one runner drive several code versions / settings (see ab_e2e);
+    `script` is relative to `repo` (ab_e2e uses benchmarks/e2e_replay.py to freeze the search results).
     """
     root = Path(out_dir) / "e2e" / (name or query["qid"])
     root.mkdir(parents=True, exist_ok=True)
     env = dict(os.environ, PAPER_OUTPUT_ROOT=str(root), PYTHONIOENCODING="utf-8",
                PAPER_CACHE_DIR=str(root / "cache"), **(env or {}))
-    cmd = [sys.executable, "main_agent.py", "--idea", query["idea"], "--top-k", str(query["top_k"]), *args]
+    cmd = [sys.executable, script, "--idea", query["idea"], "--top-k", str(query["top_k"]), *args]
     if concurrent:
         cmd.append("--concurrent")
     row = {"qid": query["qid"], "topic": query["topic"], "lang": query["lang"],

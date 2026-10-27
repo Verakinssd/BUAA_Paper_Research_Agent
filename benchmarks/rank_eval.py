@@ -105,9 +105,13 @@ def mean_or_none(values):
 
 # --- running ---------------------------------------------------------------------------------
 
-def agent_candidates(ranked, stats, k):
+def agent_candidates(ranked, stats, k, forced_limit=None):
     """What the Task Agent is shown. Mirrors server.build_report on the PR #3 branch: after a
-    successful rerank only the top RERANKER_AGENT_TOP_M candidates are passed to select()."""
+    successful rerank only the top RERANKER_AGENT_TOP_M candidates are passed to select().
+    `forced_limit` overrides that for diagnosis: show exactly the top max(k, forced_limit), reranked or
+    not, which separates "the reranker's order" from "the Task Agent sees fewer candidates"."""
+    if forced_limit:
+        return ranked[:min(len(ranked), max(k, forced_limit))]
     rerank = (stats or {}).get("reranking")
     if isinstance(rerank, dict) and rerank.get("status") == "ok" and rerank.get("method") != "none":
         try:
@@ -143,7 +147,7 @@ def configure_rerank(rerank):
 
 
 async def evaluate(pools, scores, *, limit, method, recall_m=RECALL_M_DEFAULT, select=False, agent=None,
-                   rerank="none", progress=print):
+                   rerank="none", agent_limit=None, progress=print):
     ideas, issues = [], {"unlabeled": 0, "rerank_failed": [], "select_errors": 0}
     for idea in pools["ideas"].values():
         with replay(idea, limit):
@@ -165,7 +169,7 @@ async def evaluate(pools, scores, *, limit, method, recall_m=RECALL_M_DEFAULT, s
         if select:
             entry["select"] = {}
             for k in TOP_KS:
-                shown = agent_candidates(ranked, stats, k)
+                shown = agent_candidates(ranked, stats, k, agent_limit)
                 try:
                     chosen = await agent.select(idea["idea"], shown, k)
                 except Exception as exc:
@@ -226,7 +230,8 @@ def render_markdown(result):
     if result["validity"]["warnings"]:
         lines += ["> 注意：" + "；".join(result["validity"]["warnings"]), ""]
     lines += [f"- 候选池：每源 {meta['pool_limit']} 篇（哈希 `{meta['pools_hash']}`）；标签哈希 `{meta['labels_hash']}`",
-              f"- 第一阶段排序：{meta['ranking_method']}；精排：{meta['rerank']}；评测想法数：{len(result['ideas'])}",
+              f"- 第一阶段排序：{meta['ranking_method']}；精排：{meta['rerank']}；评测想法数：{len(result['ideas'])}"
+              f"{'；任务 Agent 可见上限（诊断）：' + str(meta['agent_limit']) if meta.get('agent_limit') else ''}",
               f"- 代码：{meta['environment'].get('git_sha')}"
               f"{'（有未提交改动）' if meta['environment'].get('git_dirty') else ''}", "",
               "## 候选池排序质量", "| 指标 | 均值 | 有效想法数 |", "|---|---|---|"]
@@ -261,8 +266,8 @@ def compare(a, b, resamples=10000):
     la, lb = a["meta"]["label"], b["meta"]["label"]
     lines = [f"# 对比：`{la}`（A）vs `{lb}`（B）", "",
              f"- 候选池每源 {a['meta']['pool_limit']} 篇；模式 {a['meta']['mode']}；想法数 {len(a['ideas'])}",
-             f"- A：排序 {a['meta']['ranking_method']} / 精排 {a['meta']['rerank']}；"
-             f"B：排序 {b['meta']['ranking_method']} / 精排 {b['meta']['rerank']}",
+             f"- A：排序 {a['meta']['ranking_method']} / 精排 {a['meta']['rerank']} / 任务 Agent 可见上限 {a['meta'].get('agent_limit') or '默认'}；"
+             f"B：排序 {b['meta']['ranking_method']} / 精排 {b['meta']['rerank']} / 任务 Agent 可见上限 {b['meta'].get('agent_limit') or '默认'}",
              "- 差值 = B - A，括号为 95% bootstrap 区间（按想法配对）；区间不含 0 才说明差异不是噪声", "",
              "| 指标 | A | B | 差值 | 95% 区间 | B胜/平/B负 |", "|---|---|---|---|---|---|"]
     sections = [("rank", RANK_METRICS, lambda i, n: i["metrics"][n])]
@@ -297,7 +302,7 @@ async def run(args, agent_factory=TaskAgent):
     configure_rerank(args.rerank)
     from benchmarks.run_benchmark import collect_environment
     meta = {"label": args.label, "mode": "rank+select" if args.select else "rank",
-            "pool_limit": args.pool_limit, "recall_m": recall_cut(), "pools_hash": pools["hash"], "labels_hash": labels_hash(scores),
+            "pool_limit": args.pool_limit, "recall_m": recall_cut(), "agent_limit": args.agent_limit, "pools_hash": pools["hash"], "labels_hash": labels_hash(scores),
             "ranking_method": method, "rerank": args.rerank, "created": time.strftime("%Y-%m-%d %H:%M:%S"),
             "judges": sorted({r.get("judge", "") for r in rank_labels.load_scores(args.labels).values()}),
             "human_labels": len(rank_labels.load_scores(args.human)), "environment": collect_environment()}
@@ -305,7 +310,8 @@ async def run(args, agent_factory=TaskAgent):
     print(f"评测 {len(pools['ideas'])} 个想法，每源 {args.pool_limit} 篇，排序 {method}，精排 {args.rerank}"
           f"{'，含 select' if args.select else ''}", flush=True)
     ideas, issues = await evaluate(pools, scores, limit=args.pool_limit, method=method, select=args.select,
-                                   recall_m=meta["recall_m"], agent=agent, rerank=args.rerank)
+                                   recall_m=meta["recall_m"], agent=agent, rerank=args.rerank,
+                                   agent_limit=args.agent_limit)
     result = {"meta": meta, "ideas": ideas, "aggregate": aggregate(ideas),
               "validity": judge_validity(issues, args.allow_unlabeled, len(ideas))}
     out = Path(args.out) if args.out else Path("outputs") / f"rankeval-{args.label}-{time.strftime('%Y%m%d-%H%M%S')}"
@@ -326,6 +332,7 @@ def parse_args(argv=None):
     run_p.add_argument("--ranking-method", help="默认读 PAPER_RANKING_METHOD")
     run_p.add_argument("--rerank", choices=RERANK_CHOICES, default="none")
     run_p.add_argument("--select", action="store_true", help="同时评测任务 Agent 的选择（需要模型服务）")
+    run_p.add_argument("--agent-limit", type=int, help="诊断用：不论是否精排，任务 Agent 只看排名前 N 篇")
     run_p.add_argument("--allow-unlabeled", action="store_true")
     run_p.add_argument("--pools", default=str(POOLS_PATH))
     run_p.add_argument("--labels", default=str(rank_labels.LABELS_PATH))

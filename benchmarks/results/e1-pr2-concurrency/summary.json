@@ -1,0 +1,138 @@
+{
+  "baseline": "base-concurrent",
+  "controls": [
+    "base-control"
+  ],
+  "variants": {
+    "base-concurrent": {
+      "n": 16,
+      "success_rate": 0.625,
+      "query_seconds": {
+        "n": 10,
+        "mean": 73.529,
+        "median": 74.257,
+        "p95": 113.838,
+        "min": 31.343,
+        "max": 114.644
+      },
+      "processing_seconds": {
+        "n": 10,
+        "mean": 50.694,
+        "median": 51.784,
+        "p95": 88.238,
+        "min": 12.057,
+        "max": 89.082
+      }
+    },
+    "base-control": {
+      "n": 16,
+      "success_rate": 0.625,
+      "query_seconds": {
+        "n": 10,
+        "mean": 71.654,
+        "median": 72.421,
+        "p95": 116.155,
+        "min": 26.158,
+        "max": 117.349
+      },
+      "processing_seconds": {
+        "n": 10,
+        "mean": 49.223,
+        "median": 49.938,
+        "p95": 89.631,
+        "min": 8.922,
+        "max": 90.218
+      }
+    },
+    "base-serial": {
+      "n": 16,
+      "success_rate": 0.625,
+      "query_seconds": {
+        "n": 10,
+        "mean": 80.599,
+        "median": 83.368,
+        "p95": 128.017,
+        "min": 26.252,
+        "max": 128.813
+      },
+      "processing_seconds": {
+        "n": 10,
+        "mean": 58.683,
+        "median": 61.225,
+        "p95": 102.973,
+        "min": 8.859,
+        "max": 103.825
+      }
+    },
+    "pr2-staged": {
+      "n": 16,
+      "success_rate": 0.625,
+      "query_seconds": {
+        "n": 10,
+        "mean": 72.242,
+        "median": 74.701,
+        "p95": 114.653,
+        "min": 26.699,
+        "max": 115.809
+      },
+      "processing_seconds": {
+        "n": 10,
+        "mean": 49.99,
+        "median": 52.016,
+        "p95": 88.442,
+        "min": 9.182,
+        "max": 89.881
+      }
+    }
+  },
+  "vs_baseline": {
+    "base-control": {
+      "pairs": 10,
+      "dropped_pairs": 6,
+      "mean_diff_seconds": -1.874,
+      "ci95": [
+        -4.141,
+        0.577
+      ],
+      "median_ratio": 0.9752,
+      "faster": 6,
+      "slower": 4
+    },
+    "base-serial": {
+      "pairs": 10,
+      "dropped_pairs": 6,
+      "mean_diff_seconds": 7.07,
+      "ci95": [
+        1.126,
+        12.732
+      ],
+      "median_ratio": 1.1237,
+      "faster": 3,
+      "slower": 7
+    },
+    "pr2-staged": {
+      "pairs": 10,
+      "dropped_pairs": 6,
+      "mean_diff_seconds": -1.286,
+      "ci95": [
+        -3.639,
+        0.745
+      ],
+      "median_ratio": 1.0059,
+      "faster": 4,
+      "slower": 6
+    }
+  },
+  "noise_floor_seconds": 1.874,
+  "validity": {
+    "ok": true,
+    "reasons": [],
+    "warnings": [
+      "base-concurrent 成功率只有 0.625，配对样本会减少",
+      "base-control 成功率只有 0.625，配对样本会减少",
+      "base-serial 成功率只有 0.625，配对样本会减少",
+      "pr2-staged 成功率只有 0.625，配对样本会减少",
+      "pr2-staged 与基线的差距（-1.286 s）不大于噪声（1.874 s）"
+    ]
+  }
+}

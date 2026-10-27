@@ -1,0 +1,52 @@
+{
+  "label": "baseline-q4",
+  "mode": "stage",
+  "workload": "frozen",
+  "concurrent": false,
+  "workers": 1,
+  "repeats": 1,
+  "warmup": 3,
+  "seed": 0,
+  "dataset_hash": "d7cd9ea8509be3e4",
+  "full_dataset": true,
+  "filters": {
+    "limit": null,
+    "top_k": null,
+    "lang": null
+  },
+  "started_at": "2026-10-27 13:21:15",
+  "environment": {
+    "env": {
+      "LLM_BACKEND": "llamacpp",
+      "LLM_BASE_URL": "http://127.0.0.1:8000/v1",
+      "LLM_MODEL": "qwen-local",
+      "LLM_ALLOW_NO_KEY": "1",
+      "LLM_TRUST_ENV": "0",
+      "LLM_ENABLE_THINKING": "0",
+      "LLM_MAX_TOKENS": "2048",
+      "LLM_TEMPERATURE": "0",
+      "LLM_TOP_P": "0.8",
+      "LLM_TOP_K": "20",
+      "LLM_TOKENIZE": "1",
+      "LLM_CONTEXT_TOKENS": "8192",
+      "PDF_LAYOUT_MODE": "legacy",
+      "SUMMARY_CHUNK_CHARS": "24000",
+      "SUMMARY_NOTE_MAX_TOKENS": "384",
+      "SUMMARY_FINAL_MAX_TOKENS": "1024",
+      "REPORT_MAX_TOKENS": "1536",
+      "PAPER_RANKING_METHOD": "bm25"
+    },
+    "python": "3.12.3",
+    "git_sha": "095efbd",
+    "git_dirty": false,
+    "gpu": [
+      "NVIDIA GeForce RTX 5090, 32607 MiB"
+    ],
+    "server": {
+      "n_ctx": 8192,
+      "total_slots": 1,
+      "model": "Qwen3.8-27B-Q4_K_M.gguf",
+      "build_info": "b1-30f7df1"
+    }
+  }
+}

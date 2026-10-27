@@ -1,0 +1,475 @@
+{
+  "meta": {
+    "label": "base-basic-L8",
+    "mode": "rank",
+    "pool_limit": 8,
+    "recall_m": 8,
+    "pools_hash": "10e562ee5d291086",
+    "labels_hash": "064bb22c08b2bc14",
+    "ranking_method": "basic",
+    "rerank": "none",
+    "created": "2026-10-27 11:16:10",
+    "judges": [
+      "qwen-local"
+    ],
+    "human_labels": 0,
+    "environment": {
+      "env": {
+        "LLM_BACKEND": "llamacpp",
+        "LLM_BASE_URL": "http://127.0.0.1:8000/v1",
+        "LLM_MODEL": "qwen-local",
+        "LLM_ALLOW_NO_KEY": "1",
+        "LLM_TRUST_ENV": "0",
+        "LLM_ENABLE_THINKING": "0",
+        "LLM_MAX_TOKENS": "2048",
+        "LLM_TEMPERATURE": "0",
+        "LLM_TOP_P": "0.8",
+        "LLM_TOP_K": "20",
+        "LLM_TOKENIZE": "1",
+        "LLM_CONTEXT_TOKENS": "8192",
+        "PDF_LAYOUT_MODE": "legacy",
+        "SUMMARY_CHUNK_CHARS": "24000",
+        "SUMMARY_NOTE_MAX_TOKENS": "384",
+        "SUMMARY_FINAL_MAX_TOKENS": "1024",
+        "REPORT_MAX_TOKENS": "1536",
+        "PAPER_RANKING_METHOD": "bm25",
+        "RERANKER_DEVICE": "cuda"
+      },
+      "python": "3.12.3",
+      "git_sha": "095efbd",
+      "git_dirty": false,
+      "gpu": [
+        "NVIDIA GeForce RTX 5090, 32607 MiB"
+      ],
+      "server": {
+        "n_ctx": 8192,
+        "total_slots": 4,
+        "model": "Qwen3.8-27B-Q4_K_M.gguf",
+        "build_info": "b1-30f7df1"
+      }
+    }
+  },
+  "ideas": [
+    {
+      "qkey": "1102408acd23",
+      "topic": "ssl",
+      "lang": "en",
+      "search_query": "contrastive learning",
+      "n_pool": 16,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 0.4636814559739926,
+        "ndcg@5": 0.37472539909725444,
+        "ndcg@10": 0.5024804011078826,
+        "p@1": 0.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.4,
+        "mrr": 0.5,
+        "recall@M": 0.3333333333333333
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "13acfddc3707",
+      "topic": "kvcache",
+      "lang": "zh",
+      "search_query": "KV cache compression",
+      "n_pool": 12,
+      "n_relevant": 12,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6666666666666666
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "17ab463e7fa0",
+      "topic": "recsys",
+      "lang": "zh",
+      "search_query": "sequential recommendation",
+      "n_pool": 15,
+      "n_relevant": 3,
+      "metrics": {
+        "ndcg@3": 0.2050392536704803,
+        "ndcg@5": 0.2630129630780688,
+        "ndcg@10": 0.5687328575571411,
+        "p@1": 0.0,
+        "p@3": 0.0,
+        "p@5": 0.0,
+        "mrr": 0.16666666666666666,
+        "recall@M": 0.3333333333333333
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "1917e406080c",
+      "topic": "rag",
+      "lang": "zh",
+      "search_query": "retrieval-augmented generation",
+      "n_pool": 16,
+      "n_relevant": 13,
+      "metrics": {
+        "ndcg@3": 0.2098969608603938,
+        "ndcg@5": 0.3539972084792197,
+        "ndcg@10": 0.4699129576159691,
+        "p@1": 0.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 0.3333333333333333,
+        "recall@M": 0.38461538461538464
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "225a6ceaa35c",
+      "topic": "multimodal",
+      "lang": "zh",
+      "search_query": "vision-language models",
+      "n_pool": 16,
+      "n_relevant": 7,
+      "metrics": {
+        "ndcg@3": 0.3012598134176201,
+        "ndcg@5": 0.568782362630488,
+        "ndcg@10": 0.645770145302168,
+        "p@1": 0.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 0.3333333333333333,
+        "recall@M": 0.5714285714285714
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "49b907abe37c",
+      "topic": "moe",
+      "lang": "en",
+      "search_query": "mixture of experts",
+      "n_pool": 16,
+      "n_relevant": 8,
+      "metrics": {
+        "ndcg@3": 0.42857142857142855,
+        "ndcg@5": 0.45966837134122335,
+        "ndcg@10": 0.641299873393074,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.625
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "5225dee04332",
+      "topic": "cot",
+      "lang": "en",
+      "search_query": "chain-of-thought reasoning",
+      "n_pool": 16,
+      "n_relevant": 16,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.9250256699929476,
+        "ndcg@10": 0.8668727951102436,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.5
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "5393757b21cc",
+      "topic": "diffusion",
+      "lang": "zh",
+      "search_query": "diffusion model sampling",
+      "n_pool": 10,
+      "n_relevant": 8,
+      "metrics": {
+        "ndcg@3": 0.42857142857142855,
+        "ndcg@5": 0.5443586863728009,
+        "ndcg@10": 0.7433522526126947,
+        "p@1": 0.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.8,
+        "mrr": 0.5,
+        "recall@M": 0.75
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "5b08c1d1d6f1",
+      "topic": "timeseries",
+      "lang": "zh",
+      "search_query": "time series forecasting",
+      "n_pool": 15,
+      "n_relevant": 8,
+      "metrics": {
+        "ndcg@3": 0.5188972012643011,
+        "ndcg@5": 0.6107549150810956,
+        "ndcg@10": 0.6456140985446225,
+        "p@1": 1.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.5
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "5beeacf0e2da",
+      "topic": "agent",
+      "lang": "zh",
+      "search_query": "LLM agents",
+      "n_pool": 16,
+      "n_relevant": 11,
+      "metrics": {
+        "ndcg@3": 0.6151177610114408,
+        "ndcg@5": 0.6283717105436261,
+        "ndcg@10": 0.7975355440712493,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.6363636363636364
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "5cacfe0b2690",
+      "topic": "codegen",
+      "lang": "zh",
+      "search_query": "code generation",
+      "n_pool": 15,
+      "n_relevant": 10,
+      "metrics": {
+        "ndcg@3": 0.49493168932408493,
+        "ndcg@5": 0.575530086035005,
+        "ndcg@10": 0.608839153964165,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "5e664941de24",
+      "topic": "quant",
+      "lang": "zh",
+      "search_query": "language model quantization",
+      "n_pool": 10,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 0.8308103365909342,
+        "ndcg@5": 0.8777221344374128,
+        "ndcg@10": 0.9450846062954429,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.7777777777777778
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "6f862edbfe24",
+      "topic": "safety",
+      "lang": "zh",
+      "search_query": "jailbreak attacks",
+      "n_pool": 12,
+      "n_relevant": 12,
+      "metrics": {
+        "ndcg@3": 0.7318407279869963,
+        "ndcg@5": 0.8061941684150765,
+        "ndcg@10": 0.874233276401097,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6666666666666666
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "79eaa52f46f6",
+      "topic": "speculative",
+      "lang": "zh",
+      "search_query": "speculative decoding",
+      "n_pool": 9,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.8888888888888888
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "9b856653d145",
+      "topic": "medical",
+      "lang": "zh",
+      "search_query": "medical image segmentation",
+      "n_pool": 16,
+      "n_relevant": 4,
+      "metrics": {
+        "ndcg@3": 0.6461858173485043,
+        "ndcg@5": 0.8156325058538716,
+        "ndcg@10": 0.8460547224430763,
+        "p@1": 1.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 1.0,
+        "recall@M": 0.75
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "a9cb83e3c604",
+      "topic": "gnn",
+      "lang": "zh",
+      "search_query": "over-smoothing",
+      "n_pool": 14,
+      "n_relevant": 13,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.9250256699929476,
+        "ndcg@10": 0.9513467899190737,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6153846153846154
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "f27ee03db5ca",
+      "topic": "federated",
+      "lang": "en",
+      "search_query": "federated learning",
+      "n_pool": 16,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 0.6461858173485043,
+        "ndcg@5": 0.7442890884191097,
+        "ndcg@10": 0.8199281507293016,
+        "p@1": 1.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 1.0,
+        "recall@M": 0.5555555555555556
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "f3ca88af0102",
+      "topic": "peft",
+      "lang": "zh",
+      "search_query": "parameter-efficient fine-tuning",
+      "n_pool": 15,
+      "n_relevant": 14,
+      "metrics": {
+        "ndcg@3": 0.5977610919804944,
+        "ndcg@5": 0.7092912526226147,
+        "ndcg@10": 0.7484665528021941,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.5
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "f8602975ad85",
+      "topic": "continual",
+      "lang": "en",
+      "search_query": "catastrophic forgetting",
+      "n_pool": 15,
+      "n_relevant": 15,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.9165323715184533,
+        "ndcg@10": 0.9010362095152994,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.5333333333333333
+      },
+      "reranking": null
+    },
+    {
+      "qkey": "fdfda4c8974f",
+      "topic": "rlhf",
+      "lang": "zh",
+      "search_query": "reinforcement learning from human feedback",
+      "n_pool": 14,
+      "n_relevant": 13,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6153846153846154
+      },
+      "reranking": null
+    }
+  ],
+  "aggregate": {
+    "rank": {
+      "ndcg@3": {
+        "mean": 0.6559375391960302,
+        "n": 20
+      },
+      "ndcg@5": {
+        "mean": 0.7049457281955608,
+        "n": 20
+      },
+      "ndcg@10": {
+        "mean": 0.7788280193692347,
+        "n": 20
+      },
+      "p@1": {
+        "mean": 0.75,
+        "n": 20
+      },
+      "p@3": {
+        "mean": 0.7666666666666667,
+        "n": 20
+      },
+      "p@5": {
+        "mean": 0.8,
+        "n": 20
+      },
+      "mrr": {
+        "mean": 0.8416666666666666,
+        "n": 20
+      },
+      "recall@M": {
+        "mean": 0.590186618936619,
+        "n": 20
+      }
+    }
+  },
+  "validity": {
+    "ok": true,
+    "reasons": [],
+    "warnings": []
+  }
+}
