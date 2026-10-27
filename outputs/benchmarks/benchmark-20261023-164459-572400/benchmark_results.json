@@ -1,0 +1,2732 @@
+{
+  "schema_version": 1,
+  "started_from": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent",
+  "finished_at": "2026-10-23T09:25:23.393931+00:00",
+  "manifest_path": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\benchmark_manifest_10.json",
+  "manifest_sha256": "3faa6767c4cf818d396fe07986e6c3a70cecc883b6485cc2082997e53bea0e53",
+  "manifest": {
+    "name": "10 篇公开论文混合来源固定测试集",
+    "description": "5 篇 arXiv 与 5 篇其他公开 PDF 来源；用于三轮 legacy/staged 可复现对比。",
+    "papers": [
+      {
+        "id": "A1",
+        "title": "Attention Is All You Need",
+        "url": "https://arxiv.org/abs/1706.03762",
+        "pdf_urls": [
+          "https://arxiv.org/pdf/1706.03762"
+        ],
+        "sources": [
+          "arXiv"
+        ],
+        "selection_reason": "固定公开测试论文",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "A2",
+        "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+        "url": "https://arxiv.org/abs/2106.09685",
+        "pdf_urls": [
+          "https://arxiv.org/pdf/2106.09685"
+        ],
+        "sources": [
+          "arXiv"
+        ],
+        "selection_reason": "固定公开测试论文",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "A3",
+        "title": "Denoising Diffusion Probabilistic Models",
+        "url": "https://arxiv.org/abs/2006.11239",
+        "pdf_urls": [
+          "https://arxiv.org/pdf/2006.11239"
+        ],
+        "sources": [
+          "arXiv"
+        ],
+        "selection_reason": "固定公开测试论文",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "A4",
+        "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+        "url": "https://arxiv.org/abs/2005.11401",
+        "pdf_urls": [
+          "https://arxiv.org/pdf/2005.11401"
+        ],
+        "sources": [
+          "arXiv"
+        ],
+        "selection_reason": "固定公开测试论文",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "A5",
+        "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+        "url": "https://arxiv.org/abs/2210.03629",
+        "pdf_urls": [
+          "https://arxiv.org/pdf/2210.03629"
+        ],
+        "sources": [
+          "arXiv"
+        ],
+        "selection_reason": "固定公开测试论文",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "O1",
+        "title": "Deep Residual Learning for Image Recognition",
+        "url": "https://openaccess.thecvf.com/content_cvpr_2016/html/He_Deep_Residual_Learning_CVPR_2016_paper.html",
+        "pdf_urls": [
+          "https://openaccess.thecvf.com/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf"
+        ],
+        "sources": [
+          "CVF Open Access"
+        ],
+        "selection_reason": "非 arXiv 的公开出版方 PDF",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "O2",
+        "title": "Mask R-CNN",
+        "url": "https://openaccess.thecvf.com/content_ICCV_2017/html/He_Mask_R-CNN_ICCV_2017_paper.html",
+        "pdf_urls": [
+          "https://openaccess.thecvf.com/content_ICCV_2017/papers/He_Mask_R-CNN_ICCV_2017_paper.pdf"
+        ],
+        "sources": [
+          "CVF Open Access"
+        ],
+        "selection_reason": "非 arXiv 的公开出版方 PDF",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "O3",
+        "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+        "url": "https://aclanthology.org/N19-1423/",
+        "pdf_urls": [
+          "https://aclanthology.org/N19-1423.pdf"
+        ],
+        "sources": [
+          "ACL Anthology"
+        ],
+        "selection_reason": "非 arXiv 的公开出版方 PDF",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "O4",
+        "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+        "url": "https://proceedings.mlr.press/v37/ioffe15.html",
+        "pdf_urls": [
+          "https://proceedings.mlr.press/v37/ioffe15.pdf"
+        ],
+        "sources": [
+          "PMLR"
+        ],
+        "selection_reason": "非 arXiv 的公开出版方 PDF",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      },
+      {
+        "id": "O5",
+        "title": "Distributed Representations of Words and Phrases and their Compositionality",
+        "url": "https://papers.nips.cc/paper/5021-distributed-representations-of-words-and-phrases-and-their-compositionality",
+        "pdf_urls": [
+          "https://papers.nips.cc/paper_files/paper/2013/file/9aa42b31882ec039965f3c4923ce901b-Paper.pdf"
+        ],
+        "sources": [
+          "NeurIPS Proceedings"
+        ],
+        "selection_reason": "非 arXiv 的公开出版方 PDF",
+        "research_idea": "比较论文研究流水线的并发调度性能"
+      }
+    ]
+  },
+  "pipeline_config": {
+    "legacy_concurrency": 2,
+    "download_concurrency": 4,
+    "convert_concurrency": 1,
+    "summary_concurrency": 2,
+    "max_in_flight": 8
+  },
+  "model_config": {
+    "LLM_BACKEND": "openai",
+    "LLM_BASE_URL": "https://api.deepseek.com/v1",
+    "LLM_MODEL": "deepseek-flash",
+    "LLM_MAX_TOKENS": "8192",
+    "LLM_CONTEXT_TOKENS": "32768",
+    "LLM_TEMPERATURE": "",
+    "LLM_TOP_P": "",
+    "LLM_TOP_K": "",
+    "LLM_ENABLE_THINKING": "",
+    "SUMMARY_CHUNK_CHARS": "",
+    "SUMMARY_NOTE_MAX_TOKENS": "",
+    "SUMMARY_FINAL_MAX_TOKENS": "",
+    "PDF_LAYOUT_MODE": "",
+    "llm_retry_policy": "transport/429/5xx：最多 3 次，退避 1s/2s",
+    "llm_timeout_seconds": 300,
+    "pdf_timeout_seconds": 60,
+    "task_agent.py_sha256": "5f4560c34d41b4e6e0083679a3bd7b330da28bf2f225ad61fc2d4616abf63596",
+    "llm.py_sha256": "2bf147307fddb112e482867a8ae20b6073aaf243129d570b7d2bf0911778a9ff"
+  },
+  "runs": [
+    {
+      "sequence": 1,
+      "repeat": 1,
+      "mode": "legacy",
+      "started_at": "2026-10-23T08:44:59.356118+00:00",
+      "finished_at": "2026-10-23T08:50:15.155035+00:00",
+      "wall_seconds": 315.798988,
+      "output_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\01-legacy-repeat-1\\artifacts",
+      "cache_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\01-legacy-repeat-1\\cache",
+      "metrics": {
+        "processing_seconds": 315.785,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 0.031667,
+        "successful_papers_per_second": 0.031667,
+        "concurrent": true,
+        "pipeline_mode": "legacy",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 1150.398204,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 2.160003,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 95.036089,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 36.299452,
+            "wait_seconds": 4.086924,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 487.755525,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "title": "Attention Is All You Need",
+          "status": "ok",
+          "seconds": 39.979,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 1.6e-05,
+            "stages": {
+              "cache": {
+                "seconds": 0.066127,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 9.566273,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.793717,
+                "wait_seconds": 7e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 27.5461,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A2",
+          "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+          "status": "ok",
+          "seconds": 79.567,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 2.6e-05,
+            "stages": {
+              "cache": {
+                "seconds": 0.585372,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 17.40071,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 3.568619,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 58.003802,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A3",
+          "title": "Denoising Diffusion Probabilistic Models",
+          "status": "ok",
+          "seconds": 78.067,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 39.953363,
+            "stages": {
+              "cache": {
+                "seconds": 0.044624,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 29.595355,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.064621,
+                "wait_seconds": 7e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 46.354074,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A4",
+          "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+          "status": "ok",
+          "seconds": 53.491,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 79.564876,
+            "stages": {
+              "cache": {
+                "seconds": 0.027989,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 5.205515,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.006614,
+                "wait_seconds": 9e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 46.243311,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A5",
+          "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "status": "ok",
+          "seconds": 74.192,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 118.02,
+            "stages": {
+              "cache": {
+                "seconds": 0.029731,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 3.292254,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 3.829079,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 67.031386,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O1",
+          "title": "Deep Residual Learning for Image Recognition",
+          "status": "ok",
+          "seconds": 46.344,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 133.056196,
+            "stages": {
+              "cache": {
+                "seconds": 0.024772,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 7.379727,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.539926,
+                "wait_seconds": 4e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 37.390026,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O2",
+          "title": "Mask R-CNN",
+          "status": "ok",
+          "seconds": 85.738,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 179.400205,
+            "stages": {
+              "cache": {
+                "seconds": 0.026454,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 8.656259,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.910998,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 75.096508,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O3",
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "status": "ok",
+          "seconds": 70.356,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 192.211761,
+            "stages": {
+              "cache": {
+                "seconds": 0.027444,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 5.695215,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.730154,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 61.865285,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O4",
+          "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+          "status": "ok",
+          "seconds": 53.187,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 222.616523,
+            "stages": {
+              "cache": {
+                "seconds": 1.118048,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 3.125212,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 8.78892,
+                "wait_seconds": 1.2e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 40.06535,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O5",
+          "title": "Distributed Representations of Words and Phrases and their Compositionality",
+          "status": "ok",
+          "seconds": 44.719,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 185.575238,
+            "stages": {
+              "cache": {
+                "seconds": 0.209442,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 5.119569,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 7.066804,
+                "wait_seconds": 4.086861,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 28.159683,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 2,
+      "repeat": 1,
+      "mode": "staged",
+      "started_at": "2026-10-23T08:50:15.205859+00:00",
+      "finished_at": "2026-10-23T08:55:56.315335+00:00",
+      "wall_seconds": 341.108954,
+      "output_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\02-staged-repeat-1\\artifacts",
+      "cache_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\02-staged-repeat-1\\cache",
+      "metrics": {
+        "processing_seconds": 341.085,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 0.029318,
+        "successful_papers_per_second": 0.029318,
+        "concurrent": true,
+        "pipeline_mode": "staged",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 0.0,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 2.020258,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 267.817817,
+            "wait_seconds": 108.74451,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 43.757293,
+            "wait_seconds": 0.000211,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 591.94126,
+            "wait_seconds": 834.208955,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "title": "Attention Is All You Need",
+          "status": "ok",
+          "seconds": 56.918,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.141981,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 7.560708,
+                "wait_seconds": 3.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 9.957087,
+                "wait_seconds": 3.7e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 39.241076,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A2",
+          "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+          "status": "ok",
+          "seconds": 102.805,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.560891,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 18.290021,
+                "wait_seconds": 1.2e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 16.10496,
+                "wait_seconds": 3.7e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 67.834009,
+                "wait_seconds": 1.7e-05,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A3",
+          "title": "Denoising Diffusion Probabilistic Models",
+          "status": "ok",
+          "seconds": 235.521,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.065583,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 63.858208,
+                "wait_seconds": 1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.446693,
+                "wait_seconds": 1.1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 49.926151,
+                "wait_seconds": 120.210469,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A4",
+          "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+          "status": "ok",
+          "seconds": 275.184,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.106606,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 69.978517,
+                "wait_seconds": 8e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.510392,
+                "wait_seconds": 1.7e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 61.498282,
+                "wait_seconds": 142.054051,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A5",
+          "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "status": "ok",
+          "seconds": 341.073,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.240934,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 68.187708,
+                "wait_seconds": 7.35486,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.719384,
+                "wait_seconds": 1.4e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 105.551357,
+                "wait_seconds": 157.002377,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O1",
+          "title": "Deep Residual Learning for Image Recognition",
+          "status": "ok",
+          "seconds": 164.044,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.238305,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 6.651422,
+                "wait_seconds": 47.45443,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.295063,
+                "wait_seconds": 1.5e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 34.034966,
+                "wait_seconds": 74.36147,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O2",
+          "title": "Mask R-CNN",
+          "status": "ok",
+          "seconds": 130.006,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.254391,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 17.756081,
+                "wait_seconds": 18.084479,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 6.820568,
+                "wait_seconds": 3.7e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 73.093676,
+                "wait_seconds": 13.982785,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O3",
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "status": "ok",
+          "seconds": 185.572,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.247259,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 11.602691,
+                "wait_seconds": 35.850658,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.990346,
+                "wait_seconds": 1.4e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 82.77163,
+                "wait_seconds": 53.096825,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O4",
+          "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+          "status": "ok",
+          "seconds": 156.737,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.093464,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 2.884857,
+                "wait_seconds": 1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.233768,
+                "wait_seconds": 1.4e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 49.585165,
+                "wait_seconds": 102.919438,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O5",
+          "title": "Distributed Representations of Words and Phrases and their Compositionality",
+          "status": "ok",
+          "seconds": 200.804,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.070844,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 1.047604,
+                "wait_seconds": 1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.679032,
+                "wait_seconds": 1.5e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 28.404948,
+                "wait_seconds": 170.58151,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 3,
+      "repeat": 2,
+      "mode": "staged",
+      "started_at": "2026-10-23T08:55:56.507586+00:00",
+      "finished_at": "2026-10-23T09:02:44.354483+00:00",
+      "wall_seconds": 407.846899,
+      "output_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\03-staged-repeat-2\\artifacts",
+      "cache_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\03-staged-repeat-2\\cache",
+      "metrics": {
+        "processing_seconds": 407.72,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 0.024527,
+        "successful_papers_per_second": 0.024527,
+        "concurrent": true,
+        "pipeline_mode": "staged",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 0.0,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 4.687515,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 364.706214,
+            "wait_seconds": 117.95993,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 37.195994,
+            "wait_seconds": 0.028815,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 703.186163,
+            "wait_seconds": 906.539436,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "title": "Attention Is All You Need",
+          "status": "ok",
+          "seconds": 59.429,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.111255,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 10.748581,
+                "wait_seconds": 3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 5.463127,
+                "wait_seconds": 2.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 43.087069,
+                "wait_seconds": 3.9e-05,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A2",
+          "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+          "status": "ok",
+          "seconds": 143.538,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.124387,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 40.654763,
+                "wait_seconds": 1.4e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 8.043838,
+                "wait_seconds": 0.001024,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 84.1036,
+                "wait_seconds": 10.507832,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A3",
+          "title": "Denoising Diffusion Probabilistic Models",
+          "status": "ok",
+          "seconds": 342.493,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.095765,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 105.162764,
+                "wait_seconds": 1.2e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.111757,
+                "wait_seconds": 1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 63.044387,
+                "wait_seconds": 173.073964,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A4",
+          "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+          "status": "ok",
+          "seconds": 93.588,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.100498,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 20.228373,
+                "wait_seconds": 1.6e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 10.315381,
+                "wait_seconds": 2.4e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 62.929685,
+                "wait_seconds": 2.3e-05,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A5",
+          "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "status": "ok",
+          "seconds": 407.708,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.070902,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 109.162191,
+                "wait_seconds": 10.750581,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.126123,
+                "wait_seconds": 1.2e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 101.239535,
+                "wait_seconds": 184.354247,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O1",
+          "title": "Deep Residual Learning for Image Recognition",
+          "status": "ok",
+          "seconds": 197.315,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 1.598206,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 11.159764,
+                "wait_seconds": 47.696623,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.997355,
+                "wait_seconds": 1.6e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 53.818348,
+                "wait_seconds": 79.996578,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O2",
+          "title": "Mask R-CNN",
+          "status": "ok",
+          "seconds": 206.671,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 1.217942,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 28.532192,
+                "wait_seconds": 19.075952,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.475185,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 113.124791,
+                "wait_seconds": 43.236307,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O3",
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "status": "ok",
+          "seconds": 306.43,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 1.20727,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 21.978053,
+                "wait_seconds": 39.850296,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.633461,
+                "wait_seconds": 0.027664,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 109.109559,
+                "wait_seconds": 131.599007,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O4",
+          "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+          "status": "ok",
+          "seconds": 191.51,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.101635,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 7.048362,
+                "wait_seconds": 0.586395,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.498376,
+                "wait_seconds": 2.1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 44.222281,
+                "wait_seconds": 137.044868,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O5",
+          "title": "Distributed Representations of Words and Phrases and their Compositionality",
+          "status": "ok",
+          "seconds": 185.859,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.059655,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 10.031171,
+                "wait_seconds": 1.1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.531391,
+                "wait_seconds": 8e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 28.506908,
+                "wait_seconds": 146.726571,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 4,
+      "repeat": 2,
+      "mode": "legacy",
+      "started_at": "2026-10-23T09:02:44.364009+00:00",
+      "finished_at": "2026-10-23T09:13:12.851383+00:00",
+      "wall_seconds": 628.486629,
+      "output_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\04-legacy-repeat-2\\artifacts",
+      "cache_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\04-legacy-repeat-2\\cache",
+      "metrics": {
+        "processing_seconds": 628.482,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 9,
+        "failed_count": 1,
+        "failure_rate": 0.1,
+        "paper_success_rate": 0.9,
+        "throughput_papers_per_second": 0.015911,
+        "successful_papers_per_second": 0.01432,
+        "concurrent": true,
+        "pipeline_mode": "legacy",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 2188.983265,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 1.462324,
+            "wait_seconds": 0.0,
+            "attempts": 19,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 324.479306,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 1
+          },
+          "convert": {
+            "seconds": 9.290502,
+            "wait_seconds": 6.4e-05,
+            "attempts": 9,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 892.410693,
+            "wait_seconds": 0.0,
+            "attempts": 9,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "title": "Attention Is All You Need",
+          "status": "ok",
+          "seconds": 53.86,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 4e-06,
+            "stages": {
+              "cache": {
+                "seconds": 0.017236,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 19.942469,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.880597,
+                "wait_seconds": 8e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 33.014413,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A2",
+          "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+          "status": "ok",
+          "seconds": 123.582,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 3e-06,
+            "stages": {
+              "cache": {
+                "seconds": 0.017259,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 39.044993,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.81955,
+                "wait_seconds": 8e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 82.696301,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A3",
+          "title": "Denoising Diffusion Probabilistic Models",
+          "status": "ok",
+          "seconds": 114.694,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 53.859668,
+            "stages": {
+              "cache": {
+                "seconds": 0.030221,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 63.65729,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.953881,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 50.04841,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A4",
+          "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+          "status": "ok",
+          "seconds": 100.778,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 123.582139,
+            "stages": {
+              "cache": {
+                "seconds": 0.014853,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 7.412667,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.918683,
+                "wait_seconds": 7e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 92.427162,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A5",
+          "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "status": "ok",
+          "seconds": 175.682,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 168.553567,
+            "stages": {
+              "cache": {
+                "seconds": 0.014412,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 17.880945,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.958314,
+                "wait_seconds": 1.1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 156.823666,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O1",
+          "title": "Deep Residual Learning for Image Recognition",
+          "status": "ok",
+          "seconds": 126.469,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 224.362418,
+            "stages": {
+              "cache": {
+                "seconds": 0.016414,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 41.649968,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.229593,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 83.569496,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O2",
+          "title": "Mask R-CNN",
+          "status": "ok",
+          "seconds": 240.96,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 344.235752,
+            "stages": {
+              "cache": {
+                "seconds": 1.316625,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 40.797527,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.756705,
+                "wait_seconds": 5e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 198.085117,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O3",
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "status": "ok",
+          "seconds": 164.972,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 350.831559,
+            "stages": {
+              "cache": {
+                "seconds": 0.015821,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 25.591035,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.978864,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 138.382439,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O4",
+          "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+          "status": "ok",
+          "seconds": 112.678,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 461.94389,
+            "stages": {
+              "cache": {
+                "seconds": 0.01861,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 54.49741,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.794315,
+                "wait_seconds": 7e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 57.363689,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O5",
+          "title": "Distributed Representations of Words and Phrases and their Compositionality",
+          "status": "failed",
+          "seconds": 14.008,
+          "error": "没有可用的公开 PDF；Server disconnected without sending a response.",
+          "evidence": "no_completed_summary",
+          "timings": {
+            "scheduler_wait_seconds": 461.614265,
+            "stages": {
+              "cache": {
+                "seconds": 0.000873,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 14.005002,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 1
+              },
+              "convert": {
+                "seconds": 0.0,
+                "wait_seconds": 0.0,
+                "attempts": 0,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 0.0,
+                "wait_seconds": 0.0,
+                "attempts": 0,
+                "failures": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 5,
+      "repeat": 3,
+      "mode": "legacy",
+      "started_at": "2026-10-23T09:13:12.857377+00:00",
+      "finished_at": "2026-10-23T09:20:19.406974+00:00",
+      "wall_seconds": 426.549802,
+      "output_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\05-legacy-repeat-3\\artifacts",
+      "cache_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\05-legacy-repeat-3\\cache",
+      "metrics": {
+        "processing_seconds": 426.546,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 0.023444,
+        "successful_papers_per_second": 0.023444,
+        "concurrent": true,
+        "pipeline_mode": "legacy",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 1819.056613,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 0.426414,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 278.207949,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 21.096237,
+            "wait_seconds": 0.000173,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 537.474255,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "title": "Attention Is All You Need",
+          "status": "ok",
+          "seconds": 117.739,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 5e-06,
+            "stages": {
+              "cache": {
+                "seconds": 0.020286,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 81.623065,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.75606,
+                "wait_seconds": 6e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 35.334762,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A2",
+          "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+          "status": "ok",
+          "seconds": 171.903,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 3e-06,
+            "stages": {
+              "cache": {
+                "seconds": 0.035218,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 101.767838,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 7.885727,
+                "wait_seconds": 2.5e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 62.201908,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A3",
+          "title": "Denoising Diffusion Probabilistic Models",
+          "status": "ok",
+          "seconds": 87.121,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 117.739306,
+            "stages": {
+              "cache": {
+                "seconds": 0.054437,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 45.185323,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.35791,
+                "wait_seconds": 1.6e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 39.506774,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A4",
+          "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+          "status": "ok",
+          "seconds": 74.587,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 171.903586,
+            "stages": {
+              "cache": {
+                "seconds": 0.03363,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 4.414793,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.530212,
+                "wait_seconds": 2.6e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 68.597838,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A5",
+          "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "status": "ok",
+          "seconds": 95.12,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 204.860707,
+            "stages": {
+              "cache": {
+                "seconds": 0.025378,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 5.087352,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.429752,
+                "wait_seconds": 1.5e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 87.562233,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O1",
+          "title": "Deep Residual Learning for Image Recognition",
+          "status": "ok",
+          "seconds": 56.452,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 246.491281,
+            "stages": {
+              "cache": {
+                "seconds": 0.037973,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 11.621196,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.149751,
+                "wait_seconds": 1.5e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 43.631076,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O2",
+          "title": "Mask R-CNN",
+          "status": "ok",
+          "seconds": 89.737,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 299.98106,
+            "stages": {
+              "cache": {
+                "seconds": 0.025582,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 14.955111,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.710836,
+                "wait_seconds": 1.6e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 73.036069,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O3",
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "status": "ok",
+          "seconds": 72.119,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 302.943389,
+            "stages": {
+              "cache": {
+                "seconds": 0.146374,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 10.391023,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.588357,
+                "wait_seconds": 1.2e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 59.911588,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O4",
+          "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+          "status": "ok",
+          "seconds": 51.483,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 257.322981,
+            "stages": {
+              "cache": {
+                "seconds": 0.027854,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 1.570587,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.993831,
+                "wait_seconds": 2.9e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 48.879669,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O5",
+          "title": "Distributed Representations of Words and Phrases and their Compositionality",
+          "status": "ok",
+          "seconds": 21.126,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 217.814295,
+            "stages": {
+              "cache": {
+                "seconds": 0.019682,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 1.591661,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.693801,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 18.812338,
+                "wait_seconds": 0.0,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "sequence": 6,
+      "repeat": 3,
+      "mode": "staged",
+      "started_at": "2026-10-23T09:20:19.431987+00:00",
+      "finished_at": "2026-10-23T09:25:23.375838+00:00",
+      "wall_seconds": 303.943421,
+      "output_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\06-staged-repeat-3\\artifacts",
+      "cache_dir": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\outputs\\benchmarks\\benchmark-20261023-164459-572400\\06-staged-repeat-3\\cache",
+      "metrics": {
+        "processing_seconds": 303.934,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 0.032902,
+        "successful_papers_per_second": 0.032902,
+        "concurrent": true,
+        "pipeline_mode": "staged",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 0.0,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 1.425266,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 205.919198,
+            "wait_seconds": 57.262838,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 16.759578,
+            "wait_seconds": 0.000135,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 532.37784,
+            "wait_seconds": 699.059726,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "title": "Attention Is All You Need",
+          "status": "ok",
+          "seconds": 44.205,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.098981,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 8.378477,
+                "wait_seconds": 1.4e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.258882,
+                "wait_seconds": 1.4e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 34.46348,
+                "wait_seconds": 1.7e-05,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A2",
+          "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+          "status": "ok",
+          "seconds": 108.652,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.123947,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 15.646565,
+                "wait_seconds": 4e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.960027,
+                "wait_seconds": 1.1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 64.442457,
+                "wait_seconds": 25.47089,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A3",
+          "title": "Denoising Diffusion Probabilistic Models",
+          "status": "ok",
+          "seconds": 222.764,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.068309,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 50.426485,
+                "wait_seconds": 4e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.405077,
+                "wait_seconds": 1.8e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 59.042926,
+                "wait_seconds": 111.811529,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A4",
+          "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+          "status": "ok",
+          "seconds": 244.169,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.178552,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 51.561819,
+                "wait_seconds": 4.372325,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.43325,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 57.379324,
+                "wait_seconds": 129.232847,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "A5",
+          "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+          "status": "ok",
+          "seconds": 303.933,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.257165,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 52.313231,
+                "wait_seconds": 8.253177,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.761951,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 81.166168,
+                "wait_seconds": 159.174619,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O1",
+          "title": "Deep Residual Learning for Image Recognition",
+          "status": "ok",
+          "seconds": 47.651,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.133274,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 4.422737,
+                "wait_seconds": 1e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.380799,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 41.701587,
+                "wait_seconds": 2.6e-05,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O2",
+          "title": "Mask R-CNN",
+          "status": "ok",
+          "seconds": 121.158,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.164271,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 13.603673,
+                "wait_seconds": 15.515638,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.646098,
+                "wait_seconds": 1.8e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 73.523199,
+                "wait_seconds": 16.697723,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O3",
+          "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+          "status": "ok",
+          "seconds": 163.693,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.165154,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 6.203843,
+                "wait_seconds": 29.121651,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 2.017253,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 55.058668,
+                "wait_seconds": 71.113966,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O4",
+          "title": "Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift",
+          "status": "ok",
+          "seconds": 117.536,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.148064,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 2.209806,
+                "wait_seconds": 7e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 1.073903,
+                "wait_seconds": 1.3e-05,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 40.55692,
+                "wait_seconds": 73.539923,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        },
+        {
+          "id": "O5",
+          "title": "Distributed Representations of Words and Phrases and their Compositionality",
+          "status": "ok",
+          "seconds": 139.135,
+          "evidence": "extracted_fulltext",
+          "timings": {
+            "scheduler_wait_seconds": 0.0,
+            "stages": {
+              "cache": {
+                "seconds": 0.087549,
+                "wait_seconds": 0.0,
+                "attempts": 2,
+                "failures": 0
+              },
+              "download": {
+                "seconds": 1.152562,
+                "wait_seconds": 8e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "convert": {
+                "seconds": 0.822338,
+                "wait_seconds": 9e-06,
+                "attempts": 1,
+                "failures": 0
+              },
+              "summary": {
+                "seconds": 25.043111,
+                "wait_seconds": 112.018186,
+                "attempts": 1,
+                "failures": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "结果受论文站点、API 服务商负载、网络质量和限流策略影响。",
+    "arXiv PDF 下载仍严格串行并保持至少 3.1 秒间隔，因此下载并发不会绕过其限速。",
+    "每轮使用独立输出与缓存；服务商侧缓存、连接预热或动态路由无法由本脚本清除。",
+    "若服务商动态路由实际承载模型，请将这种变化视为外部实验变量。",
+    "本报告只测量 PDF 下载、Markdown 转换和逐篇总结，不包含检索、筛选和综合报告生成。"
+  ],
+  "comparison": {
+    "modes": {
+      "legacy": {
+        "mode": "legacy",
+        "rounds": 3,
+        "total_seconds": 1370.835419,
+        "median_seconds": 426.549802,
+        "min_seconds": 315.798988,
+        "max_seconds": 628.486629,
+        "attempted_count": 30,
+        "completed_count": 29,
+        "failed_count": 1,
+        "failure_rate": 0.03333333333333333,
+        "throughput_papers_per_second": 0.02188446518392738
+      },
+      "staged": {
+        "mode": "staged",
+        "rounds": 3,
+        "total_seconds": 1052.8992739999999,
+        "median_seconds": 341.108954,
+        "min_seconds": 303.943421,
+        "max_seconds": 407.846899,
+        "attempted_count": 30,
+        "completed_count": 30,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "throughput_papers_per_second": 0.028492753999182645
+      }
+    },
+    "improvement_rate": 0.20030685185970387,
+    "failure_rate_delta": -0.03333333333333333
+  }
+}

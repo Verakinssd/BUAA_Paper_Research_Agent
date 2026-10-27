@@ -1,0 +1,958 @@
+{
+  "schema_version": 1,
+  "benchmark_kind": "deterministic_offline_simulation",
+  "finished_at": "2026-10-23T11:12:09.082327+00:00",
+  "manifest_path": "D:\\BUAA\\homework\\26-27-Autumn\\ai\\BUAA_Paper_Research_Agent\\benchmark_manifest_10.json",
+  "manifest_name": "10 篇公开论文混合来源固定测试集",
+  "paper_count": 10,
+  "paper_ids": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5",
+    "O1",
+    "O2",
+    "O3",
+    "O4",
+    "O5"
+  ],
+  "repeats": 1,
+  "scenarios": {
+    "balanced": {
+      "label": "均衡流水线",
+      "download_seconds": 0.04,
+      "convert_seconds": 0.015,
+      "summary_seconds": 0.12,
+      "description": "三个阶段均有可观耗时，检验流水线重叠收益"
+    },
+    "api_dominated": {
+      "label": "API 主导",
+      "download_seconds": 0.01,
+      "convert_seconds": 0.005,
+      "summary_seconds": 0.2,
+      "description": "总结远慢于其他阶段，模拟当前真实系统瓶颈"
+    },
+    "download_dominated": {
+      "label": "下载主导",
+      "download_seconds": 0.12,
+      "convert_seconds": 0.01,
+      "summary_seconds": 0.03,
+      "description": "下载占主导，检验下载并发 4 的收益"
+    }
+  },
+  "pipeline_config": {
+    "legacy_concurrency": 2,
+    "download_concurrency": 4,
+    "convert_concurrency": 1,
+    "summary_concurrency": 2,
+    "max_in_flight": 8
+  },
+  "paper_duration_factors": [
+    1.0,
+    1.15,
+    0.85,
+    1.2,
+    0.9,
+    1.1,
+    0.8,
+    1.25,
+    0.95,
+    1.05
+  ],
+  "runs": [
+    {
+      "sequence": 1,
+      "scenario": "balanced",
+      "repeat": 1,
+      "mode": "legacy",
+      "wall_seconds": 1.071775,
+      "metrics": {
+        "processing_seconds": 1.064,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 9.397387,
+        "successful_papers_per_second": 9.397387,
+        "concurrent": true,
+        "pipeline_mode": "legacy",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 3.610846,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 0.014435,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 0.498808,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 0.16239,
+            "wait_seconds": 0.024795,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 1.246608,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "observed_max_concurrency": {
+        "download": 2,
+        "convert": 1,
+        "summary": 2
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "status": "ok",
+          "seconds": 0.219
+        },
+        {
+          "id": "A2",
+          "status": "ok",
+          "seconds": 0.215
+        },
+        {
+          "id": "A3",
+          "status": "ok",
+          "seconds": 0.169
+        },
+        {
+          "id": "A4",
+          "status": "ok",
+          "seconds": 0.217
+        },
+        {
+          "id": "A5",
+          "status": "ok",
+          "seconds": 0.187
+        },
+        {
+          "id": "O1",
+          "status": "ok",
+          "seconds": 0.19
+        },
+        {
+          "id": "O2",
+          "status": "ok",
+          "seconds": 0.171
+        },
+        {
+          "id": "O3",
+          "status": "ok",
+          "seconds": 0.232
+        },
+        {
+          "id": "O4",
+          "status": "ok",
+          "seconds": 0.173
+        },
+        {
+          "id": "O5",
+          "status": "ok",
+          "seconds": 0.204
+        }
+      ]
+    },
+    {
+      "sequence": 2,
+      "scenario": "balanced",
+      "repeat": 1,
+      "mode": "staged",
+      "wall_seconds": 0.764933,
+      "metrics": {
+        "processing_seconds": 0.761,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 13.133394,
+        "successful_papers_per_second": 13.133394,
+        "concurrent": true,
+        "pipeline_mode": "staged",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 0.0,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 0.027194,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 0.364916,
+            "wait_seconds": 0.167457,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 0.161825,
+            "wait_seconds": 0.316113,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 1.291782,
+            "wait_seconds": 1.785358,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "observed_max_concurrency": {
+        "download": 4,
+        "convert": 1,
+        "summary": 2
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "status": "ok",
+          "seconds": 0.181
+        },
+        {
+          "id": "A2",
+          "status": "ok",
+          "seconds": 0.307
+        },
+        {
+          "id": "A3",
+          "status": "ok",
+          "seconds": 0.158
+        },
+        {
+          "id": "A4",
+          "status": "ok",
+          "seconds": 0.34
+        },
+        {
+          "id": "A5",
+          "status": "ok",
+          "seconds": 0.464
+        },
+        {
+          "id": "O1",
+          "status": "ok",
+          "seconds": 0.555
+        },
+        {
+          "id": "O2",
+          "status": "ok",
+          "seconds": 0.415
+        },
+        {
+          "id": "O3",
+          "status": "ok",
+          "seconds": 0.619
+        },
+        {
+          "id": "O4",
+          "status": "ok",
+          "seconds": 0.524
+        },
+        {
+          "id": "O5",
+          "status": "ok",
+          "seconds": 0.581
+        }
+      ]
+    },
+    {
+      "sequence": 3,
+      "scenario": "api_dominated",
+      "repeat": 1,
+      "mode": "legacy",
+      "wall_seconds": 1.278387,
+      "metrics": {
+        "processing_seconds": 1.273,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 7.856845,
+        "successful_papers_per_second": 7.856845,
+        "concurrent": true,
+        "pipeline_mode": "legacy",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 4.295062,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 0.010055,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 0.166048,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 0.060151,
+            "wait_seconds": 0.004654,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 2.102913,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "observed_max_concurrency": {
+        "download": 2,
+        "convert": 1,
+        "summary": 2
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "status": "ok",
+          "seconds": 0.228
+        },
+        {
+          "id": "A2",
+          "status": "ok",
+          "seconds": 0.289
+        },
+        {
+          "id": "A3",
+          "status": "ok",
+          "seconds": 0.201
+        },
+        {
+          "id": "A4",
+          "status": "ok",
+          "seconds": 0.265
+        },
+        {
+          "id": "A5",
+          "status": "ok",
+          "seconds": 0.219
+        },
+        {
+          "id": "O1",
+          "status": "ok",
+          "seconds": 0.248
+        },
+        {
+          "id": "O2",
+          "status": "ok",
+          "seconds": 0.174
+        },
+        {
+          "id": "O3",
+          "status": "ok",
+          "seconds": 0.299
+        },
+        {
+          "id": "O4",
+          "status": "ok",
+          "seconds": 0.217
+        },
+        {
+          "id": "O5",
+          "status": "ok",
+          "seconds": 0.233
+        }
+      ]
+    },
+    {
+      "sequence": 4,
+      "scenario": "api_dominated",
+      "repeat": 1,
+      "mode": "staged",
+      "wall_seconds": 1.182445,
+      "metrics": {
+        "processing_seconds": 1.177,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 8.495072,
+        "successful_papers_per_second": 8.495072,
+        "concurrent": true,
+        "pipeline_mode": "staged",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 0.0,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 0.037384,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 0.061848,
+            "wait_seconds": 0.017546,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 0.064581,
+            "wait_seconds": 0.133575,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 2.107023,
+            "wait_seconds": 3.609255,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "observed_max_concurrency": {
+        "download": 4,
+        "convert": 1,
+        "summary": 2
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "status": "ok",
+          "seconds": 0.203
+        },
+        {
+          "id": "A2",
+          "status": "ok",
+          "seconds": 0.419
+        },
+        {
+          "id": "A3",
+          "status": "ok",
+          "seconds": 0.185
+        },
+        {
+          "id": "A4",
+          "status": "ok",
+          "seconds": 0.449
+        },
+        {
+          "id": "A5",
+          "status": "ok",
+          "seconds": 0.608
+        },
+        {
+          "id": "O1",
+          "status": "ok",
+          "seconds": 0.686
+        },
+        {
+          "id": "O2",
+          "status": "ok",
+          "seconds": 0.782
+        },
+        {
+          "id": "O3",
+          "status": "ok",
+          "seconds": 0.956
+        },
+        {
+          "id": "O4",
+          "status": "ok",
+          "seconds": 0.801
+        },
+        {
+          "id": "O5",
+          "status": "ok",
+          "seconds": 0.974
+        }
+      ]
+    },
+    {
+      "sequence": 5,
+      "scenario": "download_dominated",
+      "repeat": 1,
+      "mode": "legacy",
+      "wall_seconds": 1.032668,
+      "metrics": {
+        "processing_seconds": 1.024,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 9.764791,
+        "successful_papers_per_second": 9.764791,
+        "concurrent": true,
+        "pipeline_mode": "legacy",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 3.284332,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 0.013041,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 1.342737,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 0.113899,
+            "wait_seconds": 0.008992,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 0.375987,
+            "wait_seconds": 0.0,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "observed_max_concurrency": {
+        "download": 2,
+        "convert": 1,
+        "summary": 2
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "status": "ok",
+          "seconds": 0.159
+        },
+        {
+          "id": "A2",
+          "status": "ok",
+          "seconds": 0.211
+        },
+        {
+          "id": "A3",
+          "status": "ok",
+          "seconds": 0.145
+        },
+        {
+          "id": "A4",
+          "status": "ok",
+          "seconds": 0.22
+        },
+        {
+          "id": "A5",
+          "status": "ok",
+          "seconds": 0.172
+        },
+        {
+          "id": "O1",
+          "status": "ok",
+          "seconds": 0.202
+        },
+        {
+          "id": "O2",
+          "status": "ok",
+          "seconds": 0.156
+        },
+        {
+          "id": "O3",
+          "status": "ok",
+          "seconds": 0.233
+        },
+        {
+          "id": "O4",
+          "status": "ok",
+          "seconds": 0.175
+        },
+        {
+          "id": "O5",
+          "status": "ok",
+          "seconds": 0.216
+        }
+      ]
+    },
+    {
+      "sequence": 6,
+      "scenario": "download_dominated",
+      "repeat": 1,
+      "mode": "staged",
+      "wall_seconds": 0.434843,
+      "metrics": {
+        "processing_seconds": 0.431,
+        "selected_count": 10,
+        "attempted_count": 10,
+        "completed_count": 10,
+        "failed_count": 0,
+        "failure_rate": 0.0,
+        "paper_success_rate": 1.0,
+        "throughput_papers_per_second": 23.212202,
+        "successful_papers_per_second": 23.212202,
+        "concurrent": true,
+        "pipeline_mode": "staged",
+        "concurrency": {
+          "legacy_concurrency": 2,
+          "download_concurrency": 4,
+          "convert_concurrency": 1,
+          "summary_concurrency": 2,
+          "max_in_flight": 8
+        },
+        "scheduler_wait_seconds": 0.0,
+        "stage_metrics": {
+          "cache": {
+            "seconds": 0.024912,
+            "wait_seconds": 0.0,
+            "attempts": 20,
+            "failures": 0
+          },
+          "download": {
+            "seconds": 1.286921,
+            "wait_seconds": 0.671786,
+            "attempts": 10,
+            "failures": 0
+          },
+          "convert": {
+            "seconds": 0.111601,
+            "wait_seconds": 0.051321,
+            "attempts": 10,
+            "failures": 0
+          },
+          "summary": {
+            "seconds": 0.264728,
+            "wait_seconds": 8e-05,
+            "attempts": 10,
+            "failures": 0
+          }
+        },
+        "measured_scope": "PDF download + Markdown conversion + per-paper summaries"
+      },
+      "observed_max_concurrency": {
+        "download": 4,
+        "convert": 1,
+        "summary": 2
+      },
+      "papers": [
+        {
+          "id": "A1",
+          "status": "ok",
+          "seconds": 0.157
+        },
+        {
+          "id": "A2",
+          "status": "ok",
+          "seconds": 0.197
+        },
+        {
+          "id": "A3",
+          "status": "ok",
+          "seconds": 0.143
+        },
+        {
+          "id": "A4",
+          "status": "ok",
+          "seconds": 0.228
+        },
+        {
+          "id": "A5",
+          "status": "ok",
+          "seconds": 0.265
+        },
+        {
+          "id": "O1",
+          "status": "ok",
+          "seconds": 0.31
+        },
+        {
+          "id": "O2",
+          "status": "ok",
+          "seconds": 0.251
+        },
+        {
+          "id": "O3",
+          "status": "ok",
+          "seconds": 0.371
+        },
+        {
+          "id": "O4",
+          "status": "ok",
+          "seconds": 0.249
+        },
+        {
+          "id": "O5",
+          "status": "ok",
+          "seconds": 0.273
+        }
+      ]
+    }
+  ],
+  "comparison": {
+    "balanced": {
+      "modes": {
+        "legacy": {
+          "rounds": 1,
+          "median_seconds": 1.071775,
+          "min_seconds": 1.071775,
+          "max_seconds": 1.071775,
+          "median_throughput": 9.397387,
+          "attempted_count": 10,
+          "failed_count": 0,
+          "failure_rate": 0.0,
+          "median_scheduler_wait_seconds": 3.610846,
+          "observed_max_concurrency": {
+            "download": 2,
+            "convert": 1,
+            "summary": 2
+          },
+          "stage_medians": {
+            "cache": {
+              "seconds": 0.014435,
+              "wait_seconds": 0.0
+            },
+            "download": {
+              "seconds": 0.498808,
+              "wait_seconds": 0.0
+            },
+            "convert": {
+              "seconds": 0.16239,
+              "wait_seconds": 0.024795
+            },
+            "summary": {
+              "seconds": 1.246608,
+              "wait_seconds": 0.0
+            }
+          }
+        },
+        "staged": {
+          "rounds": 1,
+          "median_seconds": 0.764933,
+          "min_seconds": 0.764933,
+          "max_seconds": 0.764933,
+          "median_throughput": 13.133394,
+          "attempted_count": 10,
+          "failed_count": 0,
+          "failure_rate": 0.0,
+          "median_scheduler_wait_seconds": 0.0,
+          "observed_max_concurrency": {
+            "download": 4,
+            "convert": 1,
+            "summary": 2
+          },
+          "stage_medians": {
+            "cache": {
+              "seconds": 0.027194,
+              "wait_seconds": 0.0
+            },
+            "download": {
+              "seconds": 0.364916,
+              "wait_seconds": 0.167457
+            },
+            "convert": {
+              "seconds": 0.161825,
+              "wait_seconds": 0.316113
+            },
+            "summary": {
+              "seconds": 1.291782,
+              "wait_seconds": 1.785358
+            }
+          }
+        }
+      },
+      "improvement_rate": 0.2862932985001516
+    },
+    "api_dominated": {
+      "modes": {
+        "legacy": {
+          "rounds": 1,
+          "median_seconds": 1.278387,
+          "min_seconds": 1.278387,
+          "max_seconds": 1.278387,
+          "median_throughput": 7.856845,
+          "attempted_count": 10,
+          "failed_count": 0,
+          "failure_rate": 0.0,
+          "median_scheduler_wait_seconds": 4.295062,
+          "observed_max_concurrency": {
+            "download": 2,
+            "convert": 1,
+            "summary": 2
+          },
+          "stage_medians": {
+            "cache": {
+              "seconds": 0.010055,
+              "wait_seconds": 0.0
+            },
+            "download": {
+              "seconds": 0.166048,
+              "wait_seconds": 0.0
+            },
+            "convert": {
+              "seconds": 0.060151,
+              "wait_seconds": 0.004654
+            },
+            "summary": {
+              "seconds": 2.102913,
+              "wait_seconds": 0.0
+            }
+          }
+        },
+        "staged": {
+          "rounds": 1,
+          "median_seconds": 1.182445,
+          "min_seconds": 1.182445,
+          "max_seconds": 1.182445,
+          "median_throughput": 8.495072,
+          "attempted_count": 10,
+          "failed_count": 0,
+          "failure_rate": 0.0,
+          "median_scheduler_wait_seconds": 0.0,
+          "observed_max_concurrency": {
+            "download": 4,
+            "convert": 1,
+            "summary": 2
+          },
+          "stage_medians": {
+            "cache": {
+              "seconds": 0.037384,
+              "wait_seconds": 0.0
+            },
+            "download": {
+              "seconds": 0.061848,
+              "wait_seconds": 0.017546
+            },
+            "convert": {
+              "seconds": 0.064581,
+              "wait_seconds": 0.133575
+            },
+            "summary": {
+              "seconds": 2.107023,
+              "wait_seconds": 3.609255
+            }
+          }
+        }
+      },
+      "improvement_rate": 0.07504926129567961
+    },
+    "download_dominated": {
+      "modes": {
+        "legacy": {
+          "rounds": 1,
+          "median_seconds": 1.032668,
+          "min_seconds": 1.032668,
+          "max_seconds": 1.032668,
+          "median_throughput": 9.764791,
+          "attempted_count": 10,
+          "failed_count": 0,
+          "failure_rate": 0.0,
+          "median_scheduler_wait_seconds": 3.284332,
+          "observed_max_concurrency": {
+            "download": 2,
+            "convert": 1,
+            "summary": 2
+          },
+          "stage_medians": {
+            "cache": {
+              "seconds": 0.013041,
+              "wait_seconds": 0.0
+            },
+            "download": {
+              "seconds": 1.342737,
+              "wait_seconds": 0.0
+            },
+            "convert": {
+              "seconds": 0.113899,
+              "wait_seconds": 0.008992
+            },
+            "summary": {
+              "seconds": 0.375987,
+              "wait_seconds": 0.0
+            }
+          }
+        },
+        "staged": {
+          "rounds": 1,
+          "median_seconds": 0.434843,
+          "min_seconds": 0.434843,
+          "max_seconds": 0.434843,
+          "median_throughput": 23.212202,
+          "attempted_count": 10,
+          "failed_count": 0,
+          "failure_rate": 0.0,
+          "median_scheduler_wait_seconds": 0.0,
+          "observed_max_concurrency": {
+            "download": 4,
+            "convert": 1,
+            "summary": 2
+          },
+          "stage_medians": {
+            "cache": {
+              "seconds": 0.024912,
+              "wait_seconds": 0.0
+            },
+            "download": {
+              "seconds": 1.286921,
+              "wait_seconds": 0.671786
+            },
+            "convert": {
+              "seconds": 0.111601,
+              "wait_seconds": 0.051321
+            },
+            "summary": {
+              "seconds": 0.264728,
+              "wait_seconds": 8e-05
+            }
+          }
+        }
+      },
+      "improvement_rate": 0.5789130678979111
+    }
+  }
+}
