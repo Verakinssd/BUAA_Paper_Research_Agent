@@ -122,7 +122,7 @@ step_check() {
   log "Preflight"
   (cd "$REPO_ROOT" && "$PY" - <<'PYEOF'
 from dotenv import load_dotenv
-load_dotenv()
+load_dotenv(".env")
 from benchmarks import preflight
 report = preflight.check(full=True)
 print(preflight.render(report))
