@@ -31,7 +31,9 @@ stage_var = contextvars.ContextVar("bench_stage", default="other")
 collector_var = contextvars.ContextVar("bench_collector", default=None)
 ENV_KEYS = ("PAPER_MODEL_ID", "PAPER_MODEL_LABEL", "PDF_LAYOUT_MODE", "SELECTION_MAX_TOKENS",
             "SUMMARY_CHUNK_CHARS", "SUMMARY_NOTE_MAX_TOKENS", "SUMMARY_FINAL_MAX_TOKENS",
-            "REPORT_MAX_TOKENS", "PAPER_RANKING_METHOD")
+            "REPORT_MAX_TOKENS", "PAPER_RANKING_METHOD", "PAPER_RERANKING_METHOD", "RERANKER_TOP_N",
+            "RERANKER_AGENT_TOP_M", "RERANKER_MODEL", "RERANKER_DEVICE", "PIPELINE_MODE",
+            "DOWNLOAD_CONCURRENCY", "CONVERT_CONCURRENCY", "SUMMARY_CONCURRENCY", "PIPELINE_MAX_IN_FLIGHT")
 
 
 class StubAgent:
@@ -161,19 +163,25 @@ async def run_query(query, agent, corpus, collector, concurrent, work_dir):
     return row
 
 
-async def run_query_e2e(query, out_dir, concurrent, timeout):
-    """Spawn the real main_agent.py; the whole wall time includes network."""
-    root = Path(out_dir) / "e2e" / query["qid"]
+async def run_query_e2e(query, out_dir, concurrent, timeout, *, repo=None, env=None, args=(), name=None):
+    """Spawn the real main_agent.py; the whole wall time includes network.
+
+    Each run gets its own empty PDF cache, otherwise whichever run comes second would find the
+    papers already downloaded and converted and look faster for the wrong reason.
+    `repo`, `env` and `args` let one runner drive several code versions / settings (see ab_e2e).
+    """
+    root = Path(out_dir) / "e2e" / (name or query["qid"])
     root.mkdir(parents=True, exist_ok=True)
-    env = dict(os.environ, PAPER_OUTPUT_ROOT=str(root), PYTHONIOENCODING="utf-8")
-    cmd = [sys.executable, "main_agent.py", "--idea", query["idea"], "--top-k", str(query["top_k"])]
+    env = dict(os.environ, PAPER_OUTPUT_ROOT=str(root), PYTHONIOENCODING="utf-8",
+               PAPER_CACHE_DIR=str(root / "cache"), **(env or {}))
+    cmd = [sys.executable, "main_agent.py", "--idea", query["idea"], "--top-k", str(query["top_k"]), *args]
     if concurrent:
         cmd.append("--concurrent")
     row = {"qid": query["qid"], "topic": query["topic"], "lang": query["lang"],
            "top_k": query["top_k"]}
     started = time.perf_counter()
     proc = await asyncio.create_subprocess_exec(
-        *cmd, cwd=str(REPO), env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
+        *cmd, cwd=str(repo or REPO), env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.STDOUT)
     try:
         output, _ = await asyncio.wait_for(proc.communicate(), timeout)
     except asyncio.TimeoutError:
@@ -189,6 +197,8 @@ async def run_query_e2e(query, out_dir, concurrent, timeout):
     search = metrics.get("search_seconds", 0.0)
     processing = metrics.get("processing_seconds", 0.0)
     row.update(exit_code=proc.returncode, query_seconds=round(wall, 3),
+               metrics={k: metrics[k] for k in ("server_total_seconds", "completed_count", "requested_top_k",
+                                                 "report_success") if k in metrics},
                stages={"search": search, "processing": processing,
                        "other": round(max(0.0, wall - search - processing), 3)},
                task_success=bool(metrics.get("task_success")) and proc.returncode == 0)
