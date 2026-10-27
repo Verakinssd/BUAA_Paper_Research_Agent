@@ -1,6 +1,9 @@
 # 实验结果（2026-10-27，RTX 5090）
 
-按 `EXPERIMENTS.md` 的方案跑完的第一轮结果。原始数据在 `benchmarks/baselines/` 和 `benchmarks/results/`，相关性标签在 `benchmarks/rank_labels.jsonl`。
+按 `EXPERIMENTS.md` 的方案跑完的第一轮结果。
+
+> **更新（2026-10-27 晚）：** 实验期间 PR #2 和 PR #3 还未合并，所以下面是它们各自的分支相对 `baseline` 标签（`095efbd`，合并前）的对比。之后管理员在集成 PR #5 中解决了二者的冲突并一并合入 main（默认均关闭），**本报告没有测试合并后的 main**。结论对 main 的含义见各节末尾。
+原始数据在 `benchmarks/baselines/` 和 `benchmarks/results/`，相关性标签在 `benchmarks/rank_labels.jsonl`。
 
 **一句话结论**
 
@@ -101,5 +104,6 @@
 - **标签未经人工抽查。** 打标签的模型和被评测的任务 Agent 是同一个模型，可能偏向自己的选择。已导出 60 条抽查表（`rank_sample.csv`，不在仓库里），人工填完后标签哈希会变，排序评测需要重跑（几秒钟；Top-k 选择评测约 10 分钟一组）。
 - 只有 20 个想法，置信区间较宽。
 - 一块 GPU、一台机器的结果；E0 只代表该硬件。
-- PR #2 与 PR #3 在 `research/pipeline.py` 冲突，没有做两者叠加的实验。
+- 实验时 PR #2 与 PR #3 在 `research/pipeline.py` 冲突，所以没有做两者叠加的实验；二者之后已在 PR #5 合入 main，叠加后的行为没有测过。
+- 精排（`PAPER_RERANKING_METHOD`）和分阶段并发（`PIPELINE_MODE`）在 main 上默认关闭，所以眼下不影响线上；但谁开启精排，就会遇到上面的“只给任务 Agent 看前 8 篇”问题（`RERANKER_AGENT_TOP_M` 默认 8）。
 - 数据源优化（E3）没有实现。

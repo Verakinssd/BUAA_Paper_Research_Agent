@@ -83,7 +83,7 @@ python -m benchmarks.rank_eval compare outputs/rankeval-base-*/results.json outp
 | base | 基准分支（main + 基准工具，行为不变） | 可用 |
 | pr2 | base + PR #2 | 合并无冲突；全量测试仅有 main 上已有的 14 个失败 |
 | pr3 | base + PR #3 | 合并无冲突；同上 |
-| both | base + PR #2 + PR #3 | **冲突**，`make_variants` 会报告并移除，不会留下半合并的目录 |
+| both | base + PR #2 + PR #3 | 直接合并**冲突**，`make_variants` 会报告并移除，不会留下半合并的目录；管理员已在 PR #5 中手工解决并合入 main，要测叠加效果请直接用 main |
 
 冲突在 `research/pipeline.py`：PR #3 在结果字典里加了 5 个排名字段（`base_rank` 等），PR #2 重写了同一个函数（`process_one`）。需要其中一个 PR 先 rebase，改动只是把这 5 个字段加进 PR #2 的新写法。在此之前不做“两个优化叠加”的实验；任务书只要求选做一项，各自对基线比较即可。
 
