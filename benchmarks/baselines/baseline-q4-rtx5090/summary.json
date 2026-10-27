@@ -1,0 +1,191 @@
+{
+  "meta": {
+    "label": "baseline-q4",
+    "mode": "stage",
+    "workload": "frozen",
+    "concurrent": false,
+    "dataset_hash": "d7cd9ea8509be3e4",
+    "full_dataset": true,
+    "repeats": 1,
+    "warmup": 3,
+    "seed": 0,
+    "filters": {
+      "limit": null,
+      "top_k": null,
+      "lang": null
+    },
+    "workers": 1
+  },
+  "n_queries": 100,
+  "success_rate": 1.0,
+  "overall": {
+    "n": 100,
+    "mean": 110.966,
+    "median": 103.059,
+    "p95": 204.559,
+    "min": 24.74,
+    "max": 259.706
+  },
+  "overall_success_only": {
+    "n": 100,
+    "mean": 110.966,
+    "median": 103.059,
+    "p95": 204.559,
+    "min": 24.74,
+    "max": 259.706
+  },
+  "by_top_k": {
+    "1": {
+      "n": 20,
+      "mean": 46.669,
+      "median": 39.843,
+      "p95": 83.57,
+      "min": 24.74,
+      "max": 107.488
+    },
+    "2": {
+      "n": 20,
+      "mean": 78.908,
+      "median": 68.23,
+      "p95": 124.454,
+      "min": 52.672,
+      "max": 142.977
+    },
+    "3": {
+      "n": 20,
+      "mean": 110.441,
+      "median": 99.99,
+      "p95": 165.704,
+      "min": 79.507,
+      "max": 192.199
+    },
+    "4": {
+      "n": 20,
+      "mean": 144.61,
+      "median": 136.752,
+      "p95": 205.342,
+      "min": 94.001,
+      "max": 235.786
+    },
+    "5": {
+      "n": 20,
+      "mean": 174.204,
+      "median": 166.449,
+      "p95": 241.078,
+      "min": 128.427,
+      "max": 259.706
+    }
+  },
+  "by_lang": {
+    "en": {
+      "n": 25,
+      "mean": 87.194,
+      "median": 81.872,
+      "p95": 147.983,
+      "min": 24.74,
+      "max": 163.831
+    },
+    "zh": {
+      "n": 75,
+      "mean": 118.891,
+      "median": 115.005,
+      "p95": 220.017,
+      "min": 24.852,
+      "max": 259.706
+    }
+  },
+  "by_repeat_mean": [
+    110.966
+  ],
+  "repeat_mean_stdev": null,
+  "stages": {
+    "report": {
+      "mean_seconds": 13.188,
+      "share": 0.1188
+    },
+    "select": {
+      "mean_seconds": 5.539,
+      "share": 0.0499
+    },
+    "summarize": {
+      "mean_seconds": 92.239,
+      "share": 0.8312
+    }
+  },
+  "fit_time_vs_top_k": {
+    "slope_seconds_per_paper": 32.077,
+    "intercept_seconds": 14.735,
+    "r2": 0.6743
+  },
+  "select_overlap_mean": 0.8067,
+  "llm": {
+    "total": {
+      "calls": 2092,
+      "seconds": 10852.513,
+      "prompt_tokens": 9427345,
+      "completion_tokens": 390932,
+      "truncated": 0,
+      "prompt_n": 9264736,
+      "prompt_ms": 4035043.207,
+      "predicted_n": 390932,
+      "predicted_ms": 5413807.844,
+      "prefill_tps_server": 2296.07,
+      "decode_tps_server": 72.21,
+      "completion_tps_overall": 36.02
+    },
+    "by_stage": {
+      "report": {
+        "calls": 100,
+        "seconds": 1311.11,
+        "prompt_tokens": 143355,
+        "completion_tokens": 85232,
+        "truncated": 0,
+        "prompt_n": 143355,
+        "prompt_ms": 79356.197,
+        "predicted_n": 85232,
+        "predicted_ms": 1181789.66,
+        "prefill_tps_server": 1806.48,
+        "decode_tps_server": 72.12,
+        "completion_tps_overall": 65.01
+      },
+      "select": {
+        "calls": 101,
+        "seconds": 547.728,
+        "prompt_tokens": 388274,
+        "completion_tokens": 22960,
+        "truncated": 0,
+        "prompt_n": 384265,
+        "prompt_ms": 169183.887,
+        "predicted_n": 22960,
+        "predicted_ms": 319145.309,
+        "prefill_tps_server": 2271.29,
+        "decode_tps_server": 71.94,
+        "completion_tps_overall": 41.92
+      },
+      "summarize": {
+        "calls": 1891,
+        "seconds": 8993.675,
+        "prompt_tokens": 8895716,
+        "completion_tokens": 282740,
+        "truncated": 0,
+        "prompt_n": 8737116,
+        "prompt_ms": 3786503.123,
+        "predicted_n": 282740,
+        "predicted_ms": 3912872.875,
+        "prefill_tps_server": 2307.44,
+        "decode_tps_server": 72.26,
+        "completion_tps_overall": 31.44
+      }
+    }
+  },
+  "throughput": {
+    "busy_seconds": 11097.2,
+    "queries_per_hour": 32.44,
+    "completion_tps_aggregate": 35.23
+  },
+  "validity": {
+    "ok": true,
+    "reasons": [],
+    "warnings": []
+  }
+}

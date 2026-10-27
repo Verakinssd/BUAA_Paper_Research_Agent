@@ -1,0 +1,1689 @@
+{
+  "meta": {
+    "label": "base-basic-L8-select",
+    "mode": "rank+select",
+    "pool_limit": 8,
+    "recall_m": 8,
+    "pools_hash": "10e562ee5d291086",
+    "labels_hash": "064bb22c08b2bc14",
+    "ranking_method": "basic",
+    "rerank": "none",
+    "created": "2026-10-27 11:17:39",
+    "judges": [
+      "qwen-local"
+    ],
+    "human_labels": 0,
+    "environment": {
+      "env": {
+        "LLM_BACKEND": "llamacpp",
+        "LLM_BASE_URL": "http://127.0.0.1:8000/v1",
+        "LLM_MODEL": "qwen-local",
+        "LLM_ALLOW_NO_KEY": "1",
+        "LLM_TRUST_ENV": "0",
+        "LLM_ENABLE_THINKING": "0",
+        "LLM_MAX_TOKENS": "2048",
+        "LLM_TEMPERATURE": "0",
+        "LLM_TOP_P": "0.8",
+        "LLM_TOP_K": "20",
+        "LLM_TOKENIZE": "1",
+        "LLM_CONTEXT_TOKENS": "8192",
+        "PDF_LAYOUT_MODE": "legacy",
+        "SUMMARY_CHUNK_CHARS": "24000",
+        "SUMMARY_NOTE_MAX_TOKENS": "384",
+        "SUMMARY_FINAL_MAX_TOKENS": "1024",
+        "REPORT_MAX_TOKENS": "1536",
+        "PAPER_RANKING_METHOD": "bm25",
+        "RERANKER_DEVICE": "cuda"
+      },
+      "python": "3.12.3",
+      "git_sha": "095efbd",
+      "git_dirty": false,
+      "gpu": [
+        "NVIDIA GeForce RTX 5090, 32607 MiB"
+      ],
+      "server": {
+        "n_ctx": 8192,
+        "total_slots": 4,
+        "model": "Qwen3.8-27B-Q4_K_M.gguf",
+        "build_info": "b1-30f7df1"
+      }
+    }
+  },
+  "ideas": [
+    {
+      "qkey": "1102408acd23",
+      "topic": "ssl",
+      "lang": "en",
+      "search_query": "contrastive learning",
+      "n_pool": 16,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 0.4636814559739926,
+        "ndcg@5": 0.37472539909725444,
+        "ndcg@10": 0.5024804011078826,
+        "p@1": 0.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.4,
+        "mrr": 0.5,
+        "recall@M": 0.3333333333333333
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P11"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P11",
+            "P13"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.6666666666666665,
+          "precision": 1.0,
+          "ndcg": 0.8659203639934981,
+          "shown": 16,
+          "picked": [
+            "P11",
+            "P13",
+            "P12"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.75,
+          "precision": 1.0,
+          "ndcg": 0.9039271221307901,
+          "shown": 16,
+          "picked": [
+            "P13",
+            "P11",
+            "P10",
+            "P12"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.8,
+          "precision": 1.0,
+          "ndcg": 0.9165323715184533,
+          "shown": 16,
+          "picked": [
+            "P13",
+            "P11",
+            "P10",
+            "P12",
+            "P6"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "13acfddc3707",
+      "topic": "kvcache",
+      "lang": "zh",
+      "search_query": "KV cache compression",
+      "n_pool": 12,
+      "n_relevant": 12,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6666666666666666
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 12,
+          "picked": [
+            "P3"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 12,
+          "picked": [
+            "P3",
+            "P1"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 12,
+          "picked": [
+            "P3",
+            "P1",
+            "P9"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 12,
+          "picked": [
+            "P1",
+            "P3",
+            "P4",
+            "P5"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 12,
+          "picked": [
+            "P1",
+            "P3",
+            "P4",
+            "P5",
+            "P9"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "17ab463e7fa0",
+      "topic": "recsys",
+      "lang": "zh",
+      "search_query": "sequential recommendation",
+      "n_pool": 15,
+      "n_relevant": 3,
+      "metrics": {
+        "ndcg@3": 0.2050392536704803,
+        "ndcg@5": 0.2630129630780688,
+        "ndcg@10": 0.5687328575571411,
+        "p@1": 0.0,
+        "p@3": 0.0,
+        "p@5": 0.0,
+        "mrr": 0.16666666666666666,
+        "recall@M": 0.3333333333333333
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P6"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.0,
+          "precision": 0.5,
+          "ndcg": 0.8581030686606479,
+          "shown": 15,
+          "picked": [
+            "P6",
+            "P15"
+          ]
+        },
+        "3": {
+          "mean_rel": 1.6666666666666667,
+          "precision": 0.3333333333333333,
+          "ndcg": 0.7823626121533189,
+          "shown": 15,
+          "picked": [
+            "P6",
+            "P15",
+            "P3"
+          ]
+        },
+        "4": {
+          "mean_rel": 1.5,
+          "precision": 0.25,
+          "ndcg": 0.7910226220498893,
+          "shown": 15,
+          "picked": [
+            "P6",
+            "P15",
+            "P8",
+            "P1"
+          ]
+        },
+        "5": {
+          "mean_rel": 1.4,
+          "precision": 0.2,
+          "ndcg": 0.7982341463611478,
+          "shown": 15,
+          "picked": [
+            "P6",
+            "P15",
+            "P3",
+            "P8",
+            "P13"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "1917e406080c",
+      "topic": "rag",
+      "lang": "zh",
+      "search_query": "retrieval-augmented generation",
+      "n_pool": 16,
+      "n_relevant": 13,
+      "metrics": {
+        "ndcg@3": 0.2098969608603938,
+        "ndcg@5": 0.3539972084792197,
+        "ndcg@10": 0.4699129576159691,
+        "p@1": 0.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 0.3333333333333333,
+        "recall@M": 0.38461538461538464
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P10"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P4",
+            "P10"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.6666666666666665,
+          "precision": 1.0,
+          "ndcg": 0.8659203639934981,
+          "shown": 16,
+          "picked": [
+            "P4",
+            "P10",
+            "P9"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.75,
+          "precision": 1.0,
+          "ndcg": 0.8884628428593995,
+          "shown": 16,
+          "picked": [
+            "P10",
+            "P4",
+            "P9",
+            "P11"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.6,
+          "precision": 1.0,
+          "ndcg": 0.8281227542004858,
+          "shown": 16,
+          "picked": [
+            "P10",
+            "P4",
+            "P9",
+            "P11",
+            "P5"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "225a6ceaa35c",
+      "topic": "multimodal",
+      "lang": "zh",
+      "search_query": "vision-language models",
+      "n_pool": 16,
+      "n_relevant": 7,
+      "metrics": {
+        "ndcg@3": 0.3012598134176201,
+        "ndcg@5": 0.568782362630488,
+        "ndcg@10": 0.645770145302168,
+        "p@1": 0.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 0.3333333333333333,
+        "recall@M": 0.5714285714285714
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P4"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.5,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P4",
+            "P5"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.3333333333333335,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P4",
+            "P13",
+            "P5"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.0,
+          "precision": 0.75,
+          "ndcg": 0.9144188707100748,
+          "shown": 16,
+          "picked": [
+            "P4",
+            "P5",
+            "P2",
+            "P13"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.0,
+          "precision": 0.8,
+          "ndcg": 0.9329445066320563,
+          "shown": 16,
+          "picked": [
+            "P4",
+            "P5",
+            "P6",
+            "P2",
+            "P13"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "49b907abe37c",
+      "topic": "moe",
+      "lang": "en",
+      "search_query": "mixture of experts",
+      "n_pool": 16,
+      "n_relevant": 8,
+      "metrics": {
+        "ndcg@3": 0.42857142857142855,
+        "ndcg@5": 0.45966837134122335,
+        "ndcg@10": 0.641299873393074,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.625
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P11"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P11",
+            "P10"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.6666666666666665,
+          "precision": 1.0,
+          "ndcg": 0.8659203639934981,
+          "shown": 16,
+          "picked": [
+            "P11",
+            "P10",
+            "P1"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.75,
+          "precision": 1.0,
+          "ndcg": 0.9828921171931015,
+          "shown": 16,
+          "picked": [
+            "P11",
+            "P10",
+            "P1",
+            "P6"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.6,
+          "precision": 1.0,
+          "ndcg": 0.9840352219951628,
+          "shown": 16,
+          "picked": [
+            "P11",
+            "P10",
+            "P1",
+            "P6",
+            "P2"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "5225dee04332",
+      "topic": "cot",
+      "lang": "en",
+      "search_query": "chain-of-thought reasoning",
+      "n_pool": 16,
+      "n_relevant": 16,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.9250256699929476,
+        "ndcg@10": 0.8668727951102436,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.5
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P13"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P2",
+            "P13"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P2",
+            "P10",
+            "P13"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P2",
+            "P3",
+            "P4",
+            "P10"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "5393757b21cc",
+      "topic": "diffusion",
+      "lang": "zh",
+      "search_query": "diffusion model sampling",
+      "n_pool": 10,
+      "n_relevant": 8,
+      "metrics": {
+        "ndcg@3": 0.42857142857142855,
+        "ndcg@5": 0.5443586863728009,
+        "ndcg@10": 0.7433522526126947,
+        "p@1": 0.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.8,
+        "mrr": 0.5,
+        "recall@M": 0.75
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P3"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P3",
+            "P5"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P3",
+            "P5",
+            "P9"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P3",
+            "P5",
+            "P9",
+            "P10"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.8,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P3",
+            "P5",
+            "P9",
+            "P10",
+            "P2"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "5b08c1d1d6f1",
+      "topic": "timeseries",
+      "lang": "zh",
+      "search_query": "time series forecasting",
+      "n_pool": 15,
+      "n_relevant": 8,
+      "metrics": {
+        "ndcg@3": 0.5188972012643011,
+        "ndcg@5": 0.6107549150810956,
+        "ndcg@10": 0.6456140985446225,
+        "p@1": 1.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.5
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P12"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.5,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P12",
+            "P1"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.3333333333333335,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P12",
+            "P1",
+            "P5"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.25,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P12",
+            "P1",
+            "P5",
+            "P9"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.2,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P12",
+            "P1",
+            "P2",
+            "P5",
+            "P9"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "5beeacf0e2da",
+      "topic": "agent",
+      "lang": "zh",
+      "search_query": "LLM agents",
+      "n_pool": 16,
+      "n_relevant": 11,
+      "metrics": {
+        "ndcg@3": 0.6151177610114408,
+        "ndcg@5": 0.6283717105436261,
+        "ndcg@10": 0.7975355440712493,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.6363636363636364
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P9"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.5,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P9",
+            "P1"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.3333333333333335,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P9",
+            "P1",
+            "P3"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.25,
+          "precision": 1.0,
+          "ndcg": 0.8736582060933374,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P9",
+            "P3",
+            "P6"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.2,
+          "precision": 1.0,
+          "ndcg": 0.8850729764703048,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P9",
+            "P3",
+            "P6",
+            "P8"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "5cacfe0b2690",
+      "topic": "codegen",
+      "lang": "zh",
+      "search_query": "code generation",
+      "n_pool": 15,
+      "n_relevant": 10,
+      "metrics": {
+        "ndcg@3": 0.49493168932408493,
+        "ndcg@5": 0.575530086035005,
+        "ndcg@10": 0.608839153964165,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 0.42857142857142855,
+          "shown": 15,
+          "picked": [
+            "P2"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 0.42857142857142855,
+          "shown": 15,
+          "picked": [
+            "P2",
+            "P11"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 0.49493168932408493,
+          "shown": 15,
+          "picked": [
+            "P2",
+            "P1",
+            "P11"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.25,
+          "precision": 1.0,
+          "ndcg": 0.6816196690712962,
+          "shown": 15,
+          "picked": [
+            "P2",
+            "P11",
+            "P10",
+            "P1"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.2,
+          "precision": 1.0,
+          "ndcg": 0.8357926221960372,
+          "shown": 15,
+          "picked": [
+            "P10",
+            "P2",
+            "P11",
+            "P4",
+            "P5"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "5e664941de24",
+      "topic": "quant",
+      "lang": "zh",
+      "search_query": "language model quantization",
+      "n_pool": 10,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 0.8308103365909342,
+        "ndcg@5": 0.8777221344374128,
+        "ndcg@10": 0.9450846062954429,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.7777777777777778
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P1"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P1",
+            "P3"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P1",
+            "P3",
+            "P10"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P1",
+            "P3",
+            "P10",
+            "P6"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 10,
+          "picked": [
+            "P1",
+            "P3",
+            "P5",
+            "P10",
+            "P6"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "6f862edbfe24",
+      "topic": "safety",
+      "lang": "zh",
+      "search_query": "jailbreak attacks",
+      "n_pool": 12,
+      "n_relevant": 12,
+      "metrics": {
+        "ndcg@3": 0.7318407279869963,
+        "ndcg@5": 0.8061941684150765,
+        "ndcg@10": 0.874233276401097,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6666666666666666
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 12,
+          "picked": [
+            "P5"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.5,
+          "precision": 1.0,
+          "ndcg": 0.6496301755625952,
+          "shown": 12,
+          "picked": [
+            "P1",
+            "P2"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.6666666666666665,
+          "precision": 1.0,
+          "ndcg": 0.7318407279869963,
+          "shown": 12,
+          "picked": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.75,
+          "precision": 1.0,
+          "ndcg": 0.776925685718799,
+          "shown": 12,
+          "picked": [
+            "P1",
+            "P2",
+            "P3",
+            "P4"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.8,
+          "precision": 1.0,
+          "ndcg": 0.8061941684150765,
+          "shown": 12,
+          "picked": [
+            "P1",
+            "P2",
+            "P3",
+            "P4",
+            "P5"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "79eaa52f46f6",
+      "topic": "speculative",
+      "lang": "zh",
+      "search_query": "speculative decoding",
+      "n_pool": 9,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.8888888888888888
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 9,
+          "picked": [
+            "P1"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 9,
+          "picked": [
+            "P1",
+            "P6"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 9,
+          "picked": [
+            "P1",
+            "P2",
+            "P6"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 9,
+          "picked": [
+            "P1",
+            "P2",
+            "P6",
+            "P8"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 9,
+          "picked": [
+            "P1",
+            "P2",
+            "P6",
+            "P8",
+            "P7"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "9b856653d145",
+      "topic": "medical",
+      "lang": "zh",
+      "search_query": "medical image segmentation",
+      "n_pool": 16,
+      "n_relevant": 4,
+      "metrics": {
+        "ndcg@3": 0.6461858173485043,
+        "ndcg@5": 0.8156325058538716,
+        "ndcg@10": 0.8460547224430763,
+        "p@1": 1.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 1.0,
+        "recall@M": 0.75
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P4"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P4",
+            "P5"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P4",
+            "P5"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P4",
+            "P5",
+            "P13"
+          ]
+        },
+        "5": {
+          "mean_rel": 1.8,
+          "precision": 0.8,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P1",
+            "P4",
+            "P5",
+            "P13",
+            "P2"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "a9cb83e3c604",
+      "topic": "gnn",
+      "lang": "zh",
+      "search_query": "over-smoothing",
+      "n_pool": 14,
+      "n_relevant": 13,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.9250256699929476,
+        "ndcg@10": 0.9513467899190737,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6153846153846154
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P10"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P10",
+            "P8"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P1",
+            "P2",
+            "P3"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P1",
+            "P2",
+            "P3",
+            "P4"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P1",
+            "P2",
+            "P3",
+            "P4",
+            "P6"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "f27ee03db5ca",
+      "topic": "federated",
+      "lang": "en",
+      "search_query": "federated learning",
+      "n_pool": 16,
+      "n_relevant": 9,
+      "metrics": {
+        "ndcg@3": 0.6461858173485043,
+        "ndcg@5": 0.7442890884191097,
+        "ndcg@10": 0.8199281507293016,
+        "p@1": 1.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.6,
+        "mrr": 1.0,
+        "recall@M": 0.5555555555555556
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P6"
+          ]
+        },
+        "2": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P6",
+            "P5"
+          ]
+        },
+        "3": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P6",
+            "P5",
+            "P1"
+          ]
+        },
+        "4": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P6",
+            "P5",
+            "P1",
+            "P13"
+          ]
+        },
+        "5": {
+          "mean_rel": 2.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 16,
+          "picked": [
+            "P6",
+            "P5",
+            "P1",
+            "P8",
+            "P13"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "f3ca88af0102",
+      "topic": "peft",
+      "lang": "zh",
+      "search_query": "parameter-efficient fine-tuning",
+      "n_pool": 15,
+      "n_relevant": 14,
+      "metrics": {
+        "ndcg@3": 0.5977610919804944,
+        "ndcg@5": 0.7092912526226147,
+        "ndcg@10": 0.7484665528021941,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.5
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P2"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P2",
+            "P4"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P2",
+            "P4",
+            "P10"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P2",
+            "P4",
+            "P14",
+            "P10"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P2",
+            "P4",
+            "P9",
+            "P10",
+            "P14"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "f8602975ad85",
+      "topic": "continual",
+      "lang": "en",
+      "search_query": "catastrophic forgetting",
+      "n_pool": 15,
+      "n_relevant": 15,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.9165323715184533,
+        "ndcg@10": 0.9010362095152994,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.5333333333333333
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P11"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P11",
+            "P10"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P11",
+            "P10",
+            "P5"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P11",
+            "P10",
+            "P5",
+            "P1"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 15,
+          "picked": [
+            "P11",
+            "P10",
+            "P5",
+            "P1",
+            "P9"
+          ]
+        }
+      }
+    },
+    {
+      "qkey": "fdfda4c8974f",
+      "topic": "rlhf",
+      "lang": "zh",
+      "search_query": "reinforcement learning from human feedback",
+      "n_pool": 14,
+      "n_relevant": 13,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.6153846153846154
+      },
+      "reranking": null,
+      "select": {
+        "1": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P11"
+          ]
+        },
+        "2": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P11",
+            "P8"
+          ]
+        },
+        "3": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P8",
+            "P11",
+            "P9"
+          ]
+        },
+        "4": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P8",
+            "P11",
+            "P2",
+            "P9"
+          ]
+        },
+        "5": {
+          "mean_rel": 3.0,
+          "precision": 1.0,
+          "ndcg": 1.0,
+          "shown": 14,
+          "picked": [
+            "P8",
+            "P11",
+            "P2",
+            "P4",
+            "P9"
+          ]
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "rank": {
+      "ndcg@3": {
+        "mean": 0.6559375391960302,
+        "n": 20
+      },
+      "ndcg@5": {
+        "mean": 0.7049457281955608,
+        "n": 20
+      },
+      "ndcg@10": {
+        "mean": 0.7788280193692347,
+        "n": 20
+      },
+      "p@1": {
+        "mean": 0.75,
+        "n": 20
+      },
+      "p@3": {
+        "mean": 0.7666666666666667,
+        "n": 20
+      },
+      "p@5": {
+        "mean": 0.8,
+        "n": 20
+      },
+      "mrr": {
+        "mean": 0.8416666666666666,
+        "n": 20
+      },
+      "recall@M": {
+        "mean": 0.590186618936619,
+        "n": 20
+      }
+    },
+    "select": {
+      "mean_rel": {
+        "mean": 2.6698333333333335,
+        "n": 20
+      },
+      "mean_rel@k=1": {
+        "mean": 2.85,
+        "n": 20
+      },
+      "mean_rel@k=2": {
+        "mean": 2.7,
+        "n": 20
+      },
+      "mean_rel@k=3": {
+        "mean": 2.6166666666666667,
+        "n": 20
+      },
+      "mean_rel@k=4": {
+        "mean": 2.6125,
+        "n": 20
+      },
+      "mean_rel@k=5": {
+        "mean": 2.57,
+        "n": 20
+      },
+      "precision": {
+        "mean": 0.9663333333333334,
+        "n": 20
+      },
+      "precision@k=1": {
+        "mean": 1.0,
+        "n": 20
+      },
+      "precision@k=2": {
+        "mean": 0.975,
+        "n": 20
+      },
+      "precision@k=3": {
+        "mean": 0.9666666666666666,
+        "n": 20
+      },
+      "precision@k=4": {
+        "mean": 0.95,
+        "n": 20
+      },
+      "precision@k=5": {
+        "mean": 0.9400000000000001,
+        "n": 20
+      },
+      "ndcg": {
+        "mean": 0.9477162812642641,
+        "n": 20
+      },
+      "ndcg@k=1": {
+        "mean": 0.9714285714285713,
+        "n": 20
+      },
+      "ndcg@k=2": {
+        "mean": 0.9468152336397336,
+        "n": 20
+      },
+      "ndcg@k=3": {
+        "mean": 0.9303448060722447,
+        "n": 20
+      },
+      "ndcg@k=4": {
+        "mean": 0.9406463567913343,
+        "n": 20
+      },
+      "ndcg@k=5": {
+        "mean": 0.9493464383894363,
+        "n": 20
+      }
+    }
+  },
+  "validity": {
+    "ok": true,
+    "reasons": [],
+    "warnings": []
+  }
+}

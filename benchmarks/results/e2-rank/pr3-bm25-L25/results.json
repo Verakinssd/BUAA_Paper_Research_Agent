@@ -1,0 +1,1256 @@
+{
+  "meta": {
+    "label": "pr3-bm25-L25",
+    "mode": "rank",
+    "pool_limit": 25,
+    "recall_m": 8,
+    "pools_hash": "10e562ee5d291086",
+    "labels_hash": "064bb22c08b2bc14",
+    "ranking_method": "bm25",
+    "rerank": "local",
+    "created": "2026-10-27 11:16:51",
+    "judges": [
+      "qwen-local"
+    ],
+    "human_labels": 0,
+    "environment": {
+      "env": {
+        "LLM_BACKEND": "llamacpp",
+        "LLM_BASE_URL": "http://127.0.0.1:8000/v1",
+        "LLM_MODEL": "qwen-local",
+        "LLM_ALLOW_NO_KEY": "1",
+        "LLM_TRUST_ENV": "0",
+        "LLM_ENABLE_THINKING": "0",
+        "LLM_MAX_TOKENS": "2048",
+        "LLM_TEMPERATURE": "0",
+        "LLM_TOP_P": "0.8",
+        "LLM_TOP_K": "20",
+        "LLM_TOKENIZE": "1",
+        "LLM_CONTEXT_TOKENS": "8192",
+        "PDF_LAYOUT_MODE": "legacy",
+        "SUMMARY_CHUNK_CHARS": "24000",
+        "SUMMARY_NOTE_MAX_TOKENS": "384",
+        "SUMMARY_FINAL_MAX_TOKENS": "1024",
+        "REPORT_MAX_TOKENS": "1536",
+        "PAPER_RANKING_METHOD": "bm25",
+        "PAPER_RERANKING_METHOD": "local",
+        "RERANKER_DEVICE": "cuda"
+      },
+      "python": "3.12.3",
+      "git_sha": "82ca80c",
+      "git_dirty": false,
+      "gpu": [
+        "NVIDIA GeForce RTX 5090, 32607 MiB"
+      ],
+      "server": {
+        "n_ctx": 8192,
+        "total_slots": 4,
+        "model": "Qwen3.8-27B-Q4_K_M.gguf",
+        "build_info": "b1-30f7df1"
+      }
+    }
+  },
+  "ideas": [
+    {
+      "qkey": "1102408acd23",
+      "topic": "ssl",
+      "lang": "en",
+      "search_query": "contrastive learning",
+      "n_pool": 48,
+      "n_relevant": 19,
+      "metrics": {
+        "ndcg@3": 0.34397659686689563,
+        "ndcg@5": 0.41341295926815524,
+        "ndcg@10": 0.41579556288473335,
+        "p@1": 1.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.6,
+        "mrr": 1.0,
+        "recall@M": 0.21052631578947367
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 48,
+        "processed_count": 16,
+        "seconds": 9.383,
+        "top_changes": [
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 1,
+            "rerank_score": 0.998724
+          },
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 2,
+            "rerank_score": 0.997777
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 3,
+            "rerank_score": 0.997163
+          },
+          {
+            "id": "P11",
+            "base_rank": 11,
+            "final_rank": 4,
+            "rerank_score": 0.994929
+          },
+          {
+            "id": "P14",
+            "base_rank": 14,
+            "final_rank": 5,
+            "rerank_score": 0.992916
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "13acfddc3707",
+      "topic": "kvcache",
+      "lang": "zh",
+      "search_query": "KV cache compression",
+      "n_pool": 37,
+      "n_relevant": 37,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.21621621621621623
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 37,
+        "processed_count": 16,
+        "seconds": 0.091,
+        "top_changes": [
+          {
+            "id": "P16",
+            "base_rank": 16,
+            "final_rank": 1,
+            "rerank_score": 0.998965
+          },
+          {
+            "id": "P6",
+            "base_rank": 6,
+            "final_rank": 2,
+            "rerank_score": 0.998227
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 3,
+            "rerank_score": 0.998217
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 4,
+            "rerank_score": 0.997603
+          },
+          {
+            "id": "P10",
+            "base_rank": 10,
+            "final_rank": 5,
+            "rerank_score": 0.997315
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "17ab463e7fa0",
+      "topic": "recsys",
+      "lang": "zh",
+      "search_query": "sequential recommendation",
+      "n_pool": 47,
+      "n_relevant": 15,
+      "metrics": {
+        "ndcg@3": 0.5450960508766485,
+        "ndcg@5": 0.5460273852451067,
+        "ndcg@10": 0.5059949595759456,
+        "p@1": 1.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.4,
+        "mrr": 1.0,
+        "recall@M": 0.13333333333333333
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 47,
+        "processed_count": 16,
+        "seconds": 0.091,
+        "top_changes": [
+          {
+            "id": "P16",
+            "base_rank": 16,
+            "final_rank": 1,
+            "rerank_score": 0.999498
+          },
+          {
+            "id": "P3",
+            "base_rank": 3,
+            "final_rank": 2,
+            "rerank_score": 0.997642
+          },
+          {
+            "id": "P10",
+            "base_rank": 10,
+            "final_rank": 3,
+            "rerank_score": 0.997147
+          },
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 4,
+            "rerank_score": 0.996222
+          },
+          {
+            "id": "P11",
+            "base_rank": 11,
+            "final_rank": 5,
+            "rerank_score": 0.9948
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "1917e406080c",
+      "topic": "rag",
+      "lang": "zh",
+      "search_query": "retrieval-augmented generation",
+      "n_pool": 46,
+      "n_relevant": 35,
+      "metrics": {
+        "ndcg@3": 0.6296908825811814,
+        "ndcg@5": 0.5739258022601211,
+        "ndcg@10": 0.5436416771046532,
+        "p@1": 1.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.2
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 46,
+        "processed_count": 16,
+        "seconds": 0.09,
+        "top_changes": [
+          {
+            "id": "P12",
+            "base_rank": 12,
+            "final_rank": 1,
+            "rerank_score": 0.999899
+          },
+          {
+            "id": "P11",
+            "base_rank": 11,
+            "final_rank": 2,
+            "rerank_score": 0.998919
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 3,
+            "rerank_score": 0.998846
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 4,
+            "rerank_score": 0.998758
+          },
+          {
+            "id": "P9",
+            "base_rank": 9,
+            "final_rank": 5,
+            "rerank_score": 0.998443
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "225a6ceaa35c",
+      "topic": "multimodal",
+      "lang": "zh",
+      "search_query": "vision-language models",
+      "n_pool": 49,
+      "n_relevant": 22,
+      "metrics": {
+        "ndcg@3": 0.4226766415171612,
+        "ndcg@5": 0.40561818320812054,
+        "ndcg@10": 0.5265370340222907,
+        "p@1": 0.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.4,
+        "mrr": 0.5,
+        "recall@M": 0.18181818181818182
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 49,
+        "processed_count": 16,
+        "seconds": 0.09,
+        "top_changes": [
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 1,
+            "rerank_score": 0.99917
+          },
+          {
+            "id": "P10",
+            "base_rank": 10,
+            "final_rank": 2,
+            "rerank_score": 0.996669
+          },
+          {
+            "id": "P7",
+            "base_rank": 7,
+            "final_rank": 3,
+            "rerank_score": 0.995443
+          },
+          {
+            "id": "P6",
+            "base_rank": 6,
+            "final_rank": 4,
+            "rerank_score": 0.993543
+          },
+          {
+            "id": "P14",
+            "base_rank": 14,
+            "final_rank": 5,
+            "rerank_score": 0.992996
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "49b907abe37c",
+      "topic": "moe",
+      "lang": "en",
+      "search_query": "mixture of experts",
+      "n_pool": 49,
+      "n_relevant": 18,
+      "metrics": {
+        "ndcg@3": 0.2098969608603938,
+        "ndcg@5": 0.3165100434756935,
+        "ndcg@10": 0.3097533570203818,
+        "p@1": 0.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.4,
+        "mrr": 0.3333333333333333,
+        "recall@M": 0.1111111111111111
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 49,
+        "processed_count": 16,
+        "seconds": 0.089,
+        "top_changes": [
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 1,
+            "rerank_score": 0.999661
+          },
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 2,
+            "rerank_score": 0.997775
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 3,
+            "rerank_score": 0.996257
+          },
+          {
+            "id": "P6",
+            "base_rank": 6,
+            "final_rank": 4,
+            "rerank_score": 0.995334
+          },
+          {
+            "id": "P5",
+            "base_rank": 5,
+            "final_rank": 5,
+            "rerank_score": 0.994683
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "5225dee04332",
+      "topic": "cot",
+      "lang": "en",
+      "search_query": "chain-of-thought reasoning",
+      "n_pool": 44,
+      "n_relevant": 41,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.8415580415114009,
+        "ndcg@10": 0.8575070263154577,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.1951219512195122
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 44,
+        "processed_count": 16,
+        "seconds": 0.093,
+        "top_changes": [
+          {
+            "id": "P3",
+            "base_rank": 3,
+            "final_rank": 1,
+            "rerank_score": 0.994866
+          },
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 2,
+            "rerank_score": 0.994154
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 3,
+            "rerank_score": 0.993093
+          },
+          {
+            "id": "P7",
+            "base_rank": 7,
+            "final_rank": 4,
+            "rerank_score": 0.991622
+          },
+          {
+            "id": "P10",
+            "base_rank": 10,
+            "final_rank": 5,
+            "rerank_score": 0.991481
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "5393757b21cc",
+      "topic": "diffusion",
+      "lang": "zh",
+      "search_query": "diffusion model sampling",
+      "n_pool": 36,
+      "n_relevant": 25,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.8747985572776802,
+        "ndcg@10": 0.7599092395790886,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.24
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 36,
+        "processed_count": 16,
+        "seconds": 0.121,
+        "top_changes": [
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 1,
+            "rerank_score": 0.998787
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 2,
+            "rerank_score": 0.997328
+          },
+          {
+            "id": "P5",
+            "base_rank": 5,
+            "final_rank": 3,
+            "rerank_score": 0.996648
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 4,
+            "rerank_score": 0.995905
+          },
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 5,
+            "rerank_score": 0.995002
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "5b08c1d1d6f1",
+      "topic": "timeseries",
+      "lang": "zh",
+      "search_query": "time series forecasting",
+      "n_pool": 46,
+      "n_relevant": 19,
+      "metrics": {
+        "ndcg@3": 0.2274519745616758,
+        "ndcg@5": 0.26105571820920787,
+        "ndcg@10": 0.46882377331371666,
+        "p@1": 0.0,
+        "p@3": 0.3333333333333333,
+        "p@5": 0.4,
+        "mrr": 0.5,
+        "recall@M": 0.2631578947368421
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 46,
+        "processed_count": 16,
+        "seconds": 0.088,
+        "top_changes": [
+          {
+            "id": "P14",
+            "base_rank": 14,
+            "final_rank": 1,
+            "rerank_score": 0.997479
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 2,
+            "rerank_score": 0.996123
+          },
+          {
+            "id": "P5",
+            "base_rank": 5,
+            "final_rank": 3,
+            "rerank_score": 0.996041
+          },
+          {
+            "id": "P10",
+            "base_rank": 10,
+            "final_rank": 4,
+            "rerank_score": 0.996012
+          },
+          {
+            "id": "P3",
+            "base_rank": 3,
+            "final_rank": 5,
+            "rerank_score": 0.995633
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "5beeacf0e2da",
+      "topic": "agent",
+      "lang": "zh",
+      "search_query": "LLM agents",
+      "n_pool": 47,
+      "n_relevant": 27,
+      "metrics": {
+        "ndcg@3": 0.14285714285714288,
+        "ndcg@5": 0.19496140886776042,
+        "ndcg@10": 0.2758287527010149,
+        "p@1": 0.0,
+        "p@3": 0.0,
+        "p@5": 0.2,
+        "mrr": 0.2,
+        "recall@M": 0.07407407407407407
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 47,
+        "processed_count": 16,
+        "seconds": 0.09,
+        "top_changes": [
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 1,
+            "rerank_score": 0.99867
+          },
+          {
+            "id": "P11",
+            "base_rank": 11,
+            "final_rank": 2,
+            "rerank_score": 0.995945
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 3,
+            "rerank_score": 0.994902
+          },
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 4,
+            "rerank_score": 0.994546
+          },
+          {
+            "id": "P10",
+            "base_rank": 10,
+            "final_rank": 5,
+            "rerank_score": 0.992192
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "5cacfe0b2690",
+      "topic": "codegen",
+      "lang": "zh",
+      "search_query": "code generation",
+      "n_pool": 47,
+      "n_relevant": 32,
+      "metrics": {
+        "ndcg@3": 0.6967307005844323,
+        "ndcg@5": 0.622377260156352,
+        "ndcg@10": 0.6934519052999147,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.25
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 47,
+        "processed_count": 16,
+        "seconds": 0.095,
+        "top_changes": [
+          {
+            "id": "P16",
+            "base_rank": 16,
+            "final_rank": 1,
+            "rerank_score": 0.998423
+          },
+          {
+            "id": "P15",
+            "base_rank": 15,
+            "final_rank": 2,
+            "rerank_score": 0.995395
+          },
+          {
+            "id": "P5",
+            "base_rank": 5,
+            "final_rank": 3,
+            "rerank_score": 0.987624
+          },
+          {
+            "id": "P10",
+            "base_rank": 10,
+            "final_rank": 4,
+            "rerank_score": 0.983622
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 5,
+            "rerank_score": 0.981655
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "5e664941de24",
+      "topic": "quant",
+      "lang": "zh",
+      "search_query": "language model quantization",
+      "n_pool": 28,
+      "n_relevant": 26,
+      "metrics": {
+        "ndcg@3": 0.42857142857142855,
+        "ndcg@5": 0.5870133870600276,
+        "ndcg@10": 0.6900777054742657,
+        "p@1": 0.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.8,
+        "mrr": 0.5,
+        "recall@M": 0.2692307692307692
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 28,
+        "processed_count": 16,
+        "seconds": 0.095,
+        "top_changes": [
+          {
+            "id": "P9",
+            "base_rank": 9,
+            "final_rank": 1,
+            "rerank_score": 0.996792
+          },
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 2,
+            "rerank_score": 0.995089
+          },
+          {
+            "id": "P6",
+            "base_rank": 6,
+            "final_rank": 3,
+            "rerank_score": 0.994653
+          },
+          {
+            "id": "P13",
+            "base_rank": 13,
+            "final_rank": 4,
+            "rerank_score": 0.994116
+          },
+          {
+            "id": "P7",
+            "base_rank": 7,
+            "final_rank": 5,
+            "rerank_score": 0.991564
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "6f862edbfe24",
+      "topic": "safety",
+      "lang": "zh",
+      "search_query": "jailbreak attacks",
+      "n_pool": 41,
+      "n_relevant": 40,
+      "metrics": {
+        "ndcg@3": 0.8659203639934981,
+        "ndcg@5": 0.9030970842075382,
+        "ndcg@10": 0.9371166382005485,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.2
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 41,
+        "processed_count": 16,
+        "seconds": 0.115,
+        "top_changes": [
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 1,
+            "rerank_score": 0.994453
+          },
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 2,
+            "rerank_score": 0.994408
+          },
+          {
+            "id": "P14",
+            "base_rank": 14,
+            "final_rank": 3,
+            "rerank_score": 0.990753
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 4,
+            "rerank_score": 0.990519
+          },
+          {
+            "id": "P7",
+            "base_rank": 7,
+            "final_rank": 5,
+            "rerank_score": 0.984851
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "79eaa52f46f6",
+      "topic": "speculative",
+      "lang": "zh",
+      "search_query": "speculative decoding",
+      "n_pool": 36,
+      "n_relevant": 36,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 0.9250256699929476,
+        "ndcg@10": 0.9149920538053871,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.2222222222222222
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 36,
+        "processed_count": 16,
+        "seconds": 0.095,
+        "top_changes": [
+          {
+            "id": "P15",
+            "base_rank": 15,
+            "final_rank": 1,
+            "rerank_score": 0.999431
+          },
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 2,
+            "rerank_score": 0.999349
+          },
+          {
+            "id": "P7",
+            "base_rank": 7,
+            "final_rank": 3,
+            "rerank_score": 0.997568
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 4,
+            "rerank_score": 0.997435
+          },
+          {
+            "id": "P14",
+            "base_rank": 14,
+            "final_rank": 5,
+            "rerank_score": 0.997373
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "9b856653d145",
+      "topic": "medical",
+      "lang": "zh",
+      "search_query": "medical image segmentation",
+      "n_pool": 47,
+      "n_relevant": 8,
+      "metrics": {
+        "ndcg@3": 0.2050392536704803,
+        "ndcg@5": 0.2295346440216255,
+        "ndcg@10": 0.2761960153287005,
+        "p@1": 0.0,
+        "p@3": 0.0,
+        "p@5": 0.0,
+        "mrr": 0.09090909090909091,
+        "recall@M": 0.0
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 47,
+        "processed_count": 16,
+        "seconds": 0.092,
+        "top_changes": [
+          {
+            "id": "P3",
+            "base_rank": 3,
+            "final_rank": 1,
+            "rerank_score": 0.999628
+          },
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 2,
+            "rerank_score": 0.999573
+          },
+          {
+            "id": "P5",
+            "base_rank": 5,
+            "final_rank": 3,
+            "rerank_score": 0.999278
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 4,
+            "rerank_score": 0.998809
+          },
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 5,
+            "rerank_score": 0.998686
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "a9cb83e3c604",
+      "topic": "gnn",
+      "lang": "zh",
+      "search_query": "over-smoothing",
+      "n_pool": 39,
+      "n_relevant": 32,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 0.9621404437403492,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.25
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 39,
+        "processed_count": 16,
+        "seconds": 0.096,
+        "top_changes": [
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 1,
+            "rerank_score": 0.991924
+          },
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 2,
+            "rerank_score": 0.991614
+          },
+          {
+            "id": "P16",
+            "base_rank": 16,
+            "final_rank": 3,
+            "rerank_score": 0.986756
+          },
+          {
+            "id": "P11",
+            "base_rank": 11,
+            "final_rank": 4,
+            "rerank_score": 0.983916
+          },
+          {
+            "id": "P7",
+            "base_rank": 7,
+            "final_rank": 5,
+            "rerank_score": 0.982393
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "f27ee03db5ca",
+      "topic": "federated",
+      "lang": "en",
+      "search_query": "federated learning",
+      "n_pool": 50,
+      "n_relevant": 26,
+      "metrics": {
+        "ndcg@3": 0.3615316105681776,
+        "ndcg@5": 0.4109291050032111,
+        "ndcg@10": 0.45313531120303896,
+        "p@1": 1.0,
+        "p@3": 0.6666666666666666,
+        "p@5": 0.8,
+        "mrr": 1.0,
+        "recall@M": 0.23076923076923078
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 50,
+        "processed_count": 16,
+        "seconds": 0.073,
+        "top_changes": [
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 1,
+            "rerank_score": 0.996072
+          },
+          {
+            "id": "P14",
+            "base_rank": 14,
+            "final_rank": 2,
+            "rerank_score": 0.995914
+          },
+          {
+            "id": "P6",
+            "base_rank": 6,
+            "final_rank": 3,
+            "rerank_score": 0.995731
+          },
+          {
+            "id": "P12",
+            "base_rank": 12,
+            "final_rank": 4,
+            "rerank_score": 0.995478
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 5,
+            "rerank_score": 0.995137
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "f3ca88af0102",
+      "topic": "peft",
+      "lang": "zh",
+      "search_query": "parameter-efficient fine-tuning",
+      "n_pool": 45,
+      "n_relevant": 43,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 0.9621404437403492,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.18604651162790697
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 45,
+        "processed_count": 16,
+        "seconds": 0.111,
+        "top_changes": [
+          {
+            "id": "P4",
+            "base_rank": 4,
+            "final_rank": 1,
+            "rerank_score": 0.999459
+          },
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 2,
+            "rerank_score": 0.999441
+          },
+          {
+            "id": "P12",
+            "base_rank": 12,
+            "final_rank": 3,
+            "rerank_score": 0.99891
+          },
+          {
+            "id": "P7",
+            "base_rank": 7,
+            "final_rank": 4,
+            "rerank_score": 0.998324
+          },
+          {
+            "id": "P16",
+            "base_rank": 16,
+            "final_rank": 5,
+            "rerank_score": 0.998058
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "f8602975ad85",
+      "topic": "continual",
+      "lang": "en",
+      "search_query": "catastrophic forgetting",
+      "n_pool": 45,
+      "n_relevant": 45,
+      "metrics": {
+        "ndcg@3": 0.7318407279869963,
+        "ndcg@5": 0.8061941684150765,
+        "ndcg@10": 0.874233276401097,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.17777777777777778
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 45,
+        "processed_count": 16,
+        "seconds": 0.089,
+        "top_changes": [
+          {
+            "id": "P16",
+            "base_rank": 16,
+            "final_rank": 1,
+            "rerank_score": 0.998494
+          },
+          {
+            "id": "P15",
+            "base_rank": 15,
+            "final_rank": 2,
+            "rerank_score": 0.996993
+          },
+          {
+            "id": "P12",
+            "base_rank": 12,
+            "final_rank": 3,
+            "rerank_score": 0.996813
+          },
+          {
+            "id": "P14",
+            "base_rank": 14,
+            "final_rank": 4,
+            "rerank_score": 0.995636
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 5,
+            "rerank_score": 0.995486
+          }
+        ]
+      }
+    },
+    {
+      "qkey": "fdfda4c8974f",
+      "topic": "rlhf",
+      "lang": "zh",
+      "search_query": "reinforcement learning from human feedback",
+      "n_pool": 36,
+      "n_relevant": 35,
+      "metrics": {
+        "ndcg@3": 1.0,
+        "ndcg@5": 1.0,
+        "ndcg@10": 1.0,
+        "p@1": 1.0,
+        "p@3": 1.0,
+        "p@5": 1.0,
+        "mrr": 1.0,
+        "recall@M": 0.22857142857142856
+      },
+      "reranking": {
+        "method": "local",
+        "status": "ok",
+        "fallback": false,
+        "candidate_count": 36,
+        "processed_count": 16,
+        "seconds": 0.087,
+        "top_changes": [
+          {
+            "id": "P1",
+            "base_rank": 1,
+            "final_rank": 1,
+            "rerank_score": 0.9999
+          },
+          {
+            "id": "P2",
+            "base_rank": 2,
+            "final_rank": 2,
+            "rerank_score": 0.999864
+          },
+          {
+            "id": "P3",
+            "base_rank": 3,
+            "final_rank": 3,
+            "rerank_score": 0.998922
+          },
+          {
+            "id": "P12",
+            "base_rank": 12,
+            "final_rank": 4,
+            "rerank_score": 0.998698
+          },
+          {
+            "id": "P8",
+            "base_rank": 8,
+            "final_rank": 5,
+            "rerank_score": 0.998483
+          }
+        ]
+      }
+    }
+  ],
+  "aggregate": {
+    "rank": {
+      "ndcg@3": {
+        "mean": 0.6405640167748057,
+        "n": 20
+      },
+      "ndcg@5": {
+        "mean": 0.6456019709090013,
+        "n": 20
+      },
+      "ndcg@10": {
+        "mean": 0.6713637587855467,
+        "n": 20
+      },
+      "p@1": {
+        "mean": 0.7,
+        "n": 20
+      },
+      "p@3": {
+        "mean": 0.7166666666666667,
+        "n": 20
+      },
+      "p@5": {
+        "mean": 0.73,
+        "n": 20
+      },
+      "mrr": {
+        "mean": 0.8062121212121213,
+        "n": 20
+      },
+      "recall@M": {
+        "mean": 0.191998850924904,
+        "n": 20
+      }
+    }
+  },
+  "validity": {
+    "ok": true,
+    "reasons": [],
+    "warnings": []
+  }
+}
