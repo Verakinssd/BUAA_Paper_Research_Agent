@@ -1,0 +1,56 @@
+[
+  {
+    "id": "q01",
+    "idea": "研究低资源条件下大语言模型的参数高效微调方法",
+    "baseline_query": "parameter efficient fine tuning large language models",
+    "concept_groups": [
+      [
+        "parameter efficient",
+        "low rank adaptation",
+        "LoRA"
+      ],
+      [
+        "large language model",
+        "large language models",
+        "LLM"
+      ]
+    ]
+  },
+  {
+    "id": "q02",
+    "idea": "研究检索增强生成中降低幻觉的方法",
+    "baseline_query": "retrieval augmented generation hallucination",
+    "concept_groups": [
+      [
+        "retrieval augmented generation",
+        "RAG"
+      ],
+      [
+        "hallucination",
+        "hallucinations",
+        "factuality"
+      ]
+    ]
+  },
+  {
+    "id": "q03",
+    "idea": "研究大语言模型多智能体协作完成复杂任务的方法",
+    "baseline_query": "large language model multi agent collaboration",
+    "concept_groups": [
+      [
+        "large language model",
+        "large language models",
+        "LLM"
+      ],
+      [
+        "multi agent",
+        "multi-agent"
+      ],
+      [
+        "collaboration",
+        "cooperation",
+        "coordination"
+      ]
+    ]
+  }
+]

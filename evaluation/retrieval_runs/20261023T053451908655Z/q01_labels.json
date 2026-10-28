@@ -1,0 +1,91 @@
+{
+  "query_id": "q01",
+  "idea": "研究低资源条件下大语言模型的参数高效微调方法",
+  "rubric": {
+    "0": "无关",
+    "1": "部分相关",
+    "2": "高度相关"
+  },
+  "papers": [
+    {
+      "stable_id": "arxiv:2309.14717",
+      "title": "QA-LoRA: Quantization-Aware Low-Rank Adaptation of Large Language Models",
+      "abstract": "Recently years have witnessed a rapid development of large language models (LLMs). Despite the strong ability in many language-understanding tasks, the heavy computational burden largely restricts the application of LLMs especially when one needs to deploy them onto edge devices. In this paper, we propose a quantization-aware low-rank adaptation (QA-LoRA) algorithm. The motivation lies in the imbalanced degrees of freedom of quantization and adaptation, and the solution is to use group-wise operators which increase the degree of freedom of quantization meanwhile decreasing that of adaptation. QA-LoRA is easily implemented with a few lines of code, and it equips the original LoRA with two-fold abilities: (i) during fine-tuning, the LLM's weights are quantized (e.g., into INT4) to reduce time and memory usage; (ii) after fine-tuning, the LLM and auxiliary weights are naturally integrated into a quantized model without loss of accuracy. We apply QA-LoRA to the LLaMA and LLaMA2 model families and validate its effectiveness in different fine-tuning datasets and downstream scenarios. Code will be made available at https://github.com/yuhuixu1993/qa-lora.",
+      "url": "https://arxiv.org/abs/2309.14717v2",
+      "label": 2,
+      "reason": "将量化与低秩适配结合，明确针对大语言模型微调的时间和内存开销进行优化"
+    },
+    {
+      "stable_id": "arxiv:2403.16187",
+      "title": "ALoRA: Allocating Low-Rank Adaptation for Fine-tuning Large Language Models",
+      "abstract": "Parameter-efficient fine-tuning (PEFT) is widely studied for its effectiveness and efficiency in the era of large language models. Low-rank adaptation (LoRA) has demonstrated commendable performance as a popular and representative method. However, it is implemented with a fixed intrinsic rank that might not be the ideal setting for the downstream tasks. Recognizing the need for more flexible downstream task adaptation, we extend the methodology of LoRA to an innovative approach we call allocating low-rank adaptation (ALoRA) that enables dynamic adjustments to the intrinsic rank during the adaptation process. First, we propose a novel method, AB-LoRA, that can effectively estimate the importance score of each LoRA rank. Second, guided by AB-LoRA, we gradually prune abundant and negatively impacting LoRA ranks and allocate the pruned LoRA budgets to important Transformer modules needing higher ranks. We have conducted experiments on various tasks, and the experimental results demonstrate that our ALoRA method can outperform the recent baselines with comparable tunable parameters.",
+      "url": "https://arxiv.org/abs/2403.16187v2",
+      "label":2,
+      "reason": "通过动态调整低秩参数并分配参数预算，直接研究大语言模型的参数高效微调"
+    },
+    {
+      "stable_id": "arxiv:2406.01775",
+      "title": "OLoRA: Orthonormal Low-Rank Adaptation of Large Language Models",
+      "abstract": "The advent of large language models (LLMs) has revolutionized natural language processing, enabling unprecedented capabilities in understanding and generating human-like text. However, the computational cost and convergence times associated with fine-tuning these models remain significant challenges. Low-Rank Adaptation (LoRA) has emerged as a promising method to mitigate these issues by introducing efficient fine-tuning techniques with a reduced number of trainable parameters. In this paper, we present OLoRA, an enhancement to the LoRA method that leverages orthonormal matrix initialization through QR decomposition. OLoRA significantly accelerates the convergence of LLM training while preserving the efficiency benefits of LoRA, such as the number of trainable parameters and GPU memory footprint. Our empirical evaluations demonstrate that OLoRA not only converges faster but also exhibits improved performance compared to standard LoRA across a variety of language modeling tasks. This advancement opens new avenues for more efficient and accessible fine-tuning of LLMs, potentially enabling broader adoption and innovation in natural language applications.",
+      "url": "https://arxiv.org/abs/2406.01775v2",
+      "label": 2,
+      "reason": "通过改进LoRA初始化加快微调收敛，并保留参数量和显存方面的效率优势"
+    },
+    {
+      "stable_id": "arxiv:2407.12036",
+      "title": "Exploring Advanced Large Language Models with LLMsuite",
+      "abstract": "This tutorial explores the advancements and challenges in the development of Large Language Models (LLMs) such as ChatGPT and Gemini. It addresses inherent limitations like temporal knowledge cutoffs, mathematical inaccuracies, and the generation of incorrect information, proposing solutions like Retrieval Augmented Generation (RAG), Program-Aided Language Models (PAL), and frameworks such as ReAct and LangChain. The integration of these techniques enhances LLM performance and reliability, especially in multi-step reasoning and complex task execution. The paper also covers fine-tuning strategies, including instruction fine-tuning, parameter-efficient methods like LoRA, and Reinforcement Learning from Human Feedback (RLHF) as well as Reinforced Self-Training (ReST). Additionally, it provides a comprehensive survey of transformer architectures and training techniques for LLMs. The source code can be accessed by contacting the author via email for a request.",
+      "url": "https://arxiv.org/abs/2407.12036v2",
+      "label": 1,
+      "reason": "探讨了大型语言模型的技术进展、固有局限性的缓解方案，并总结了包括参数高效微调在内的多种模型训练与优化策略"
+    },
+    {
+      "stable_id": "arxiv:2408.04556",
+      "title": "BA-LoRA: Bias-Alleviating Low-Rank Adaptation to Mitigate Catastrophic Inheritance in Large Language Models",
+      "abstract": "Parameter-efficient fine-tuning (PEFT) has become a de facto standard for adapting large language models (LLMs). However, we identify a critical vulnerability within popular low-rank adaptation methods such as LoRA: they can exacerbate \"Catastrophic Inheritance\" - the unchecked propagation of biases, noise, and data imbalances from pre-training. This phenomenon can degrade model robustness and fairness, undermining the benefits of efficient adaptation. To address this, we introduce Bias-Alleviating Low-Rank Adaptation (BA-LoRA). Our approach is founded on a principled decomposition of Catastrophic Inheritance into three core challenges: Knowledge Drift, Representation Collapse, and Overfitting to Noise. BA-LoRA systematically mitigates these issues by incorporating a trio of targeted regularizers: consistency, diversity, and an SVD-based term, designed to preserve core knowledge, promote representational richness, and encourage robust, low-rank output representations, respectively. We conduct comprehensive evaluations on a suite of Natural Language Generation (NLG) and Natural Language Understanding (NLU) tasks using diverse, prominent open-source language models (e.g., LLaMA-2-7B and DeBERTa-v3-base). Our results show that BA-LoRA not only outperforms state-of-the-art LoRA variants in terms of performance and stability, but also demonstrates superior robustness and bias mitigation on targeted evaluations. These results provide evidence that BA-LoRA can counteract the adverse effects of Catastrophic Inheritance.",
+      "url": "https://arxiv.org/abs/2408.04556v8",
+      "label": 1,
+      "reason": "使用了LoRA，但主要研究具体应用，没有讨论资源效率或微调方法改进"
+    },
+    {
+      "stable_id": "arxiv:2408.10774",
+      "title": "Flexora: Flexible Low Rank Adaptation for Large Language Models",
+      "abstract": "Large Language Models (LLMs) are driving advancements in artificial intelligence by increasing the scale of model parameters, which has significantly enhanced generalization ability and unlocked new capabilities in practice. However, their performance in specific downstream tasks is usually hindered by their knowledge boundaries on these tasks. Thus, fine-tuning techniques, especially the widely used Low-Rank Adaptation (LoRA) method, have been introduced to expand the boundaries on these tasks, whereas LoRA would underperform on certain tasks owing to its potential overfitting on these tasks. To overcome this overfitting and improve the performance of LoRA, we propose the flexible low rank adaptation (Flexora) method to automatically and flexibly select the most important layers needing to be fine-tuned to achieve the best performance on different downstream tasks. Specifically, Flexora firstly frames this layer selection problem as a well-defined hyperparameter optimization (HPO) problem, then addresses it using the unrolled differentiation (UD) method, and finally selects the most useful layers based on the optimized hyperparameters. Our extensive experiments on many pretrained models and natural language tasks show that Flexora is able to consistently improve over the existing baselines, indicating the effectiveness of our Flexora in practice. We additionally provide insightful theoretical results and many ablation studies to deliver a comprehensive understanding of our Flexora.",
+      "url": "https://arxiv.org/abs/2408.10774v5",
+      "label": 1,
+      "reason": "使用了LoRA，但主要研究具体应用，没有讨论资源效率或微调方法改进"
+    },
+    {
+      "stable_id": "arxiv:2411.06839",
+      "title": "LLM-NEO: Parameter Efficient Knowledge Distillation for Large Language Models",
+      "abstract": "Knowledge distillation (KD) has been a predominant method for compressing Large Language Models (LLMs). In this paper, we first revisit KD and Low-Rank Adaption (LoRA) and demonstrate that they follow the same paradigm. Inspired by this observation, we propose a parameter-efficient knowledge distillation method, LLM-NEO, which integrates LoRA into KD to improve the efficiency of knowledge transfer. After that, we summarize some valuable guidelines for the hyperparameters in LLM-NEO. Experimental results on compressing Llama 2 and Llama 3.2 show that LLM-NEO outperforms various baselines. Further analysis demonstrates the robustness of the proposed LLM-NEO on variants of LoRA. The code and trained models are available at [Github](https://github.com/yang3121099/LLM-Neo).",
+      "url": "https://arxiv.org/abs/2411.06839v2",
+      "label": 2,
+      "reason": "将模型压缩与参数高效微调结合，旨在解决大语言模型的轻量化和低成本转移问题。"
+    },
+    {
+      "stable_id": "arxiv:2505.15424",
+      "title": "Gated Integration of Low-Rank Adaptation for Continual Learning of Large Language Models",
+      "abstract": "Continual learning (CL), which requires the model to learn multiple tasks sequentially, is crucial for large language models (LLMs). Recently, low-rank adaptation~(LoRA), one of the most representative parameter-efficient fine-tuning (PEFT) methods, has gained increasing attention in CL of LLMs. However, most existing CL methods based on LoRA typically expand a new LoRA branch to learn each new task and force the new and old LoRA branches to influence old tasks equally, potentially leading to forgetting. In this work, we propose a new method, called gated integration of low-rank adaptation (GainLoRA), for CL of LLMs. GainLoRA expands a new LoRA branch for each new task and introduces gating modules to integrate the new and old LoRA branches. Furthermore, GainLoRA leverages the new gating module to minimize the influence from the new LoRA branch to old tasks, effectively mitigating forgetting and improving the model's overall performance. Experimental results on CL benchmarks demonstrate that GainLoRA outperforms existing state-of-the-art methods.",
+      "url": "https://arxiv.org/abs/2505.15424v2",
+      "label": 1,
+      "reason": "使用LoRA但是目标不同，增加了学习工作量，与提升资源效率矛盾"
+    },
+    {
+      "stable_id": "arxiv:2505.17773",
+      "title": "C-LoRA: Contextual Low-Rank Adaptation for Uncertainty Estimation in Large Language Models",
+      "abstract": "Low-Rank Adaptation (LoRA) offers a cost-effective solution for fine-tuning large language models (LLMs), but it often produces overconfident predictions in data-scarce few-shot settings. To address this issue, several classical statistical learning approaches have been repurposed for scalable uncertainty-aware LoRA fine-tuning. However, these approaches neglect how input characteristics affect the predictive uncertainty estimates. To address this limitation, we propose Contextual Low-Rank Adaptation (C-LoRA) as a novel uncertainty-aware and parameter efficient fine-tuning approach, by developing new lightweight LoRA modules contextualized to each input data sample to dynamically adapt uncertainty estimates. Incorporating data-driven contexts into the parameter posteriors, C-LoRA mitigates overfitting, achieves well-calibrated uncertainties, and yields robust predictions. Extensive experiments on LLaMA2-7B models demonstrate that C-LoRA consistently outperforms the state-of-the-art uncertainty-aware LoRA methods in both uncertainty quantification and model generalization. Ablation studies further confirm the critical role of our contextual modules in capturing sample-specific uncertainties. C-LoRA sets a new standard for robust, uncertainty-aware LLM fine-tuning in few-shot regimes. Although our experiments are limited to 7B models, our method is architecture-agnostic and, in principle, applies beyond this scale; studying its scaling to larger models remains an open problem. Our code is available at https://github.com/ahra99/c_lora.",
+      "url": "https://arxiv.org/abs/2505.17773v3",
+      "label": 2,
+      "reason": "通过引入“针对每个样本的上下文 LoRA 模块”来动态调整不确定性，解决数据稀缺的少样本时过度自信预测问题"
+    },
+    {
+      "stable_id": "arxiv:2604.18124",
+      "title": "TLoRA: Task-aware Low Rank Adaptation of Large Language Models",
+      "abstract": "Low-Rank Adaptation (LoRA) has become a widely adopted parameter-efficient fine-tuning method for large language models, with its effectiveness largely influenced by the allocation of ranks and scaling factors, as well as initialization. Existing LoRA variants typically address only one of these factors, often at the cost of increased training complexity or reduced practical efficiency. In this work, we present Task-aware Low-Rank Adaptation (TLoRA), a unified framework that jointly optimizes initialization and resource allocation at the outset of training. TLoRA introduces a data-driven initialization strategy that aligns the LoRA $A$ matrix with task-relevant subspaces by performing singular value decomposition on the product of pre-trained weights and input activation covariance. After this, the $A$ matrix is frozen, and only the $B$ matrix is trained. Furthermore, TLoRA employs a sensitivity-based importance metric to adaptively allocate ranks and scaling factors across layers under a fixed parameter budget. We conduct extensive experiments that demonstrate TLoRA consistently performs excellently across various tasks, including natural language understanding, commonsense reasoning, math reasoning, code generation, and chat generation, while significantly reducing the number of trainable parameters.",
+      "url": "https://arxiv.org/abs/2604.18124v1",
+      "label": 2,
+      "reason": "明确指出现有的 LoRA 变体往往会“增加训练复杂度或降低实际效率”，而 TLoRA 则是为了解决这一痛点。"
+    }
+  ]
+}
