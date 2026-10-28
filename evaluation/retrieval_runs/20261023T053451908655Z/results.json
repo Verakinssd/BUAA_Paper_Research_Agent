@@ -1,0 +1,608 @@
+{
+  "limit": 10,
+  "automatic_retries": 0,
+  "timing_scope": "HTTP request plus response parsing; excludes inter-request wait",
+  "rows": [
+    {
+      "query_id": "q01",
+      "idea": "研究低资源条件下大语言模型的参数高效微调方法",
+      "method": "baseline",
+      "params": {
+        "search_query": "all:\"parameter efficient fine tuning large language models\"",
+        "start": 0,
+        "max_results": 10,
+        "sortBy": "relevance",
+        "sortOrder": "descending"
+      },
+      "request_count": 1,
+      "started_at": "2026-10-23T05:34:52.064012+00:00",
+      "status": "ok",
+      "returned_count": 0,
+      "papers": [],
+      "http_status": 200,
+      "request_url": "https://export.arxiv.org/api/query?search_query=all%3A%22parameter+efficient+fine+tuning+large+language+models%22&start=0&max_results=10&sortBy=relevance&sortOrder=descending",
+      "total_results": 0,
+      "request_seconds": 4.033
+    },
+    {
+      "query_id": "q01",
+      "idea": "研究低资源条件下大语言模型的参数高效微调方法",
+      "method": "concept",
+      "params": {
+        "search_query": "(all:\"parameter efficient\" OR all:\"low rank adaptation\" OR all:\"LoRA\") AND (all:\"large language model\" OR all:\"large language models\" OR all:\"LLM\")",
+        "start": 0,
+        "max_results": 10,
+        "sortBy": "relevance",
+        "sortOrder": "descending"
+      },
+      "request_count": 1,
+      "started_at": "2026-10-23T05:34:59.202421+00:00",
+      "status": "ok",
+      "returned_count": 10,
+      "papers": [
+        {
+          "stable_id": "arxiv:2407.12036",
+          "arxiv_id": "2407.12036v2",
+          "title": "Exploring Advanced Large Language Models with LLMsuite",
+          "abstract": "This tutorial explores the advancements and challenges in the development of Large Language Models (LLMs) such as ChatGPT and Gemini. It addresses inherent limitations like temporal knowledge cutoffs, mathematical inaccuracies, and the generation of incorrect information, proposing solutions like Retrieval Augmented Generation (RAG), Program-Aided Language Models (PAL), and frameworks such as ReAct and LangChain. The integration of these techniques enhances LLM performance and reliability, especially in multi-step reasoning and complex task execution. The paper also covers fine-tuning strategies, including instruction fine-tuning, parameter-efficient methods like LoRA, and Reinforcement Learning from Human Feedback (RLHF) as well as Reinforced Self-Training (ReST). Additionally, it provides a comprehensive survey of transformer architectures and training techniques for LLMs. The source code can be accessed by contacting the author via email for a request.",
+          "authors": [
+            "Giorgio Roffo"
+          ],
+          "url": "https://arxiv.org/abs/2407.12036v2"
+        },
+        {
+          "stable_id": "arxiv:2408.04556",
+          "arxiv_id": "2408.04556v8",
+          "title": "BA-LoRA: Bias-Alleviating Low-Rank Adaptation to Mitigate Catastrophic Inheritance in Large Language Models",
+          "abstract": "Parameter-efficient fine-tuning (PEFT) has become a de facto standard for adapting large language models (LLMs). However, we identify a critical vulnerability within popular low-rank adaptation methods such as LoRA: they can exacerbate \"Catastrophic Inheritance\" - the unchecked propagation of biases, noise, and data imbalances from pre-training. This phenomenon can degrade model robustness and fairness, undermining the benefits of efficient adaptation. To address this, we introduce Bias-Alleviating Low-Rank Adaptation (BA-LoRA). Our approach is founded on a principled decomposition of Catastrophic Inheritance into three core challenges: Knowledge Drift, Representation Collapse, and Overfitting to Noise. BA-LoRA systematically mitigates these issues by incorporating a trio of targeted regularizers: consistency, diversity, and an SVD-based term, designed to preserve core knowledge, promote representational richness, and encourage robust, low-rank output representations, respectively. We conduct comprehensive evaluations on a suite of Natural Language Generation (NLG) and Natural Language Understanding (NLU) tasks using diverse, prominent open-source language models (e.g., LLaMA-2-7B and DeBERTa-v3-base). Our results show that BA-LoRA not only outperforms state-of-the-art LoRA variants in terms of performance and stability, but also demonstrates superior robustness and bias mitigation on targeted evaluations. These results provide evidence that BA-LoRA can counteract the adverse effects of Catastrophic Inheritance.",
+          "authors": [
+            "Yupeng Chang",
+            "Yi Chang",
+            "Yuan Wu"
+          ],
+          "url": "https://arxiv.org/abs/2408.04556v8"
+        },
+        {
+          "stable_id": "arxiv:2309.14717",
+          "arxiv_id": "2309.14717v2",
+          "title": "QA-LoRA: Quantization-Aware Low-Rank Adaptation of Large Language Models",
+          "abstract": "Recently years have witnessed a rapid development of large language models (LLMs). Despite the strong ability in many language-understanding tasks, the heavy computational burden largely restricts the application of LLMs especially when one needs to deploy them onto edge devices. In this paper, we propose a quantization-aware low-rank adaptation (QA-LoRA) algorithm. The motivation lies in the imbalanced degrees of freedom of quantization and adaptation, and the solution is to use group-wise operators which increase the degree of freedom of quantization meanwhile decreasing that of adaptation. QA-LoRA is easily implemented with a few lines of code, and it equips the original LoRA with two-fold abilities: (i) during fine-tuning, the LLM's weights are quantized (e.g., into INT4) to reduce time and memory usage; (ii) after fine-tuning, the LLM and auxiliary weights are naturally integrated into a quantized model without loss of accuracy. We apply QA-LoRA to the LLaMA and LLaMA2 model families and validate its effectiveness in different fine-tuning datasets and downstream scenarios. Code will be made available at https://github.com/yuhuixu1993/qa-lora.",
+          "authors": [
+            "Yuhui Xu",
+            "Lingxi Xie",
+            "Xiaotao Gu",
+            "Xin Chen",
+            "Heng Chang",
+            "Hengheng Zhang",
+            "Zhengsu Chen",
+            "Xiaopeng Zhang",
+            "Qi Tian"
+          ],
+          "url": "https://arxiv.org/abs/2309.14717v2"
+        },
+        {
+          "stable_id": "arxiv:2505.17773",
+          "arxiv_id": "2505.17773v3",
+          "title": "C-LoRA: Contextual Low-Rank Adaptation for Uncertainty Estimation in Large Language Models",
+          "abstract": "Low-Rank Adaptation (LoRA) offers a cost-effective solution for fine-tuning large language models (LLMs), but it often produces overconfident predictions in data-scarce few-shot settings. To address this issue, several classical statistical learning approaches have been repurposed for scalable uncertainty-aware LoRA fine-tuning. However, these approaches neglect how input characteristics affect the predictive uncertainty estimates. To address this limitation, we propose Contextual Low-Rank Adaptation (C-LoRA) as a novel uncertainty-aware and parameter efficient fine-tuning approach, by developing new lightweight LoRA modules contextualized to each input data sample to dynamically adapt uncertainty estimates. Incorporating data-driven contexts into the parameter posteriors, C-LoRA mitigates overfitting, achieves well-calibrated uncertainties, and yields robust predictions. Extensive experiments on LLaMA2-7B models demonstrate that C-LoRA consistently outperforms the state-of-the-art uncertainty-aware LoRA methods in both uncertainty quantification and model generalization. Ablation studies further confirm the critical role of our contextual modules in capturing sample-specific uncertainties. C-LoRA sets a new standard for robust, uncertainty-aware LLM fine-tuning in few-shot regimes. Although our experiments are limited to 7B models, our method is architecture-agnostic and, in principle, applies beyond this scale; studying its scaling to larger models remains an open problem. Our code is available at https://github.com/ahra99/c_lora.",
+          "authors": [
+            "Amir Hossein Rahmati",
+            "Sanket Jantre",
+            "Weifeng Zhang",
+            "Yucheng Wang",
+            "Byung-Jun Yoon",
+            "Nathan M. Urban",
+            "Xiaoning Qian"
+          ],
+          "url": "https://arxiv.org/abs/2505.17773v3"
+        },
+        {
+          "stable_id": "arxiv:2411.06839",
+          "arxiv_id": "2411.06839v2",
+          "title": "LLM-NEO: Parameter Efficient Knowledge Distillation for Large Language Models",
+          "abstract": "Knowledge distillation (KD) has been a predominant method for compressing Large Language Models (LLMs). In this paper, we first revisit KD and Low-Rank Adaption (LoRA) and demonstrate that they follow the same paradigm. Inspired by this observation, we propose a parameter-efficient knowledge distillation method, LLM-NEO, which integrates LoRA into KD to improve the efficiency of knowledge transfer. After that, we summarize some valuable guidelines for the hyperparameters in LLM-NEO. Experimental results on compressing Llama 2 and Llama 3.2 show that LLM-NEO outperforms various baselines. Further analysis demonstrates the robustness of the proposed LLM-NEO on variants of LoRA. The code and trained models are available at [Github](https://github.com/yang3121099/LLM-Neo).",
+          "authors": [
+            "Runming Yang",
+            "Taiqiang Wu",
+            "Jiahao Wang",
+            "Pengfei Hu",
+            "Yik-Chung Wu",
+            "Ngai Wong",
+            "Yujiu Yang"
+          ],
+          "url": "https://arxiv.org/abs/2411.06839v2"
+        },
+        {
+          "stable_id": "arxiv:2604.18124",
+          "arxiv_id": "2604.18124v1",
+          "title": "TLoRA: Task-aware Low Rank Adaptation of Large Language Models",
+          "abstract": "Low-Rank Adaptation (LoRA) has become a widely adopted parameter-efficient fine-tuning method for large language models, with its effectiveness largely influenced by the allocation of ranks and scaling factors, as well as initialization. Existing LoRA variants typically address only one of these factors, often at the cost of increased training complexity or reduced practical efficiency. In this work, we present Task-aware Low-Rank Adaptation (TLoRA), a unified framework that jointly optimizes initialization and resource allocation at the outset of training. TLoRA introduces a data-driven initialization strategy that aligns the LoRA $A$ matrix with task-relevant subspaces by performing singular value decomposition on the product of pre-trained weights and input activation covariance. After this, the $A$ matrix is frozen, and only the $B$ matrix is trained. Furthermore, TLoRA employs a sensitivity-based importance metric to adaptively allocate ranks and scaling factors across layers under a fixed parameter budget. We conduct extensive experiments that demonstrate TLoRA consistently performs excellently across various tasks, including natural language understanding, commonsense reasoning, math reasoning, code generation, and chat generation, while significantly reducing the number of trainable parameters.",
+          "authors": [
+            "Weicheng Lin",
+            "Yi Zhang",
+            "Jiawei Dang",
+            "Liang-Jie Zhang"
+          ],
+          "url": "https://arxiv.org/abs/2604.18124v1"
+        },
+        {
+          "stable_id": "arxiv:2408.10774",
+          "arxiv_id": "2408.10774v5",
+          "title": "Flexora: Flexible Low Rank Adaptation for Large Language Models",
+          "abstract": "Large Language Models (LLMs) are driving advancements in artificial intelligence by increasing the scale of model parameters, which has significantly enhanced generalization ability and unlocked new capabilities in practice. However, their performance in specific downstream tasks is usually hindered by their knowledge boundaries on these tasks. Thus, fine-tuning techniques, especially the widely used Low-Rank Adaptation (LoRA) method, have been introduced to expand the boundaries on these tasks, whereas LoRA would underperform on certain tasks owing to its potential overfitting on these tasks. To overcome this overfitting and improve the performance of LoRA, we propose the flexible low rank adaptation (Flexora) method to automatically and flexibly select the most important layers needing to be fine-tuned to achieve the best performance on different downstream tasks. Specifically, Flexora firstly frames this layer selection problem as a well-defined hyperparameter optimization (HPO) problem, then addresses it using the unrolled differentiation (UD) method, and finally selects the most useful layers based on the optimized hyperparameters. Our extensive experiments on many pretrained models and natural language tasks show that Flexora is able to consistently improve over the existing baselines, indicating the effectiveness of our Flexora in practice. We additionally provide insightful theoretical results and many ablation studies to deliver a comprehensive understanding of our Flexora.",
+          "authors": [
+            "Chenxing Wei",
+            "Yao Shu",
+            "Ying Tiffany He",
+            "Fei Richard Yu"
+          ],
+          "url": "https://arxiv.org/abs/2408.10774v5"
+        },
+        {
+          "stable_id": "arxiv:2505.15424",
+          "arxiv_id": "2505.15424v2",
+          "title": "Gated Integration of Low-Rank Adaptation for Continual Learning of Large Language Models",
+          "abstract": "Continual learning (CL), which requires the model to learn multiple tasks sequentially, is crucial for large language models (LLMs). Recently, low-rank adaptation~(LoRA), one of the most representative parameter-efficient fine-tuning (PEFT) methods, has gained increasing attention in CL of LLMs. However, most existing CL methods based on LoRA typically expand a new LoRA branch to learn each new task and force the new and old LoRA branches to influence old tasks equally, potentially leading to forgetting. In this work, we propose a new method, called gated integration of low-rank adaptation (GainLoRA), for CL of LLMs. GainLoRA expands a new LoRA branch for each new task and introduces gating modules to integrate the new and old LoRA branches. Furthermore, GainLoRA leverages the new gating module to minimize the influence from the new LoRA branch to old tasks, effectively mitigating forgetting and improving the model's overall performance. Experimental results on CL benchmarks demonstrate that GainLoRA outperforms existing state-of-the-art methods.",
+          "authors": [
+            "Yan-Shuo Liang",
+            "Jia-Rui Chen",
+            "Wu-Jun Li"
+          ],
+          "url": "https://arxiv.org/abs/2505.15424v2"
+        },
+        {
+          "stable_id": "arxiv:2406.01775",
+          "arxiv_id": "2406.01775v2",
+          "title": "OLoRA: Orthonormal Low-Rank Adaptation of Large Language Models",
+          "abstract": "The advent of large language models (LLMs) has revolutionized natural language processing, enabling unprecedented capabilities in understanding and generating human-like text. However, the computational cost and convergence times associated with fine-tuning these models remain significant challenges. Low-Rank Adaptation (LoRA) has emerged as a promising method to mitigate these issues by introducing efficient fine-tuning techniques with a reduced number of trainable parameters. In this paper, we present OLoRA, an enhancement to the LoRA method that leverages orthonormal matrix initialization through QR decomposition. OLoRA significantly accelerates the convergence of LLM training while preserving the efficiency benefits of LoRA, such as the number of trainable parameters and GPU memory footprint. Our empirical evaluations demonstrate that OLoRA not only converges faster but also exhibits improved performance compared to standard LoRA across a variety of language modeling tasks. This advancement opens new avenues for more efficient and accessible fine-tuning of LLMs, potentially enabling broader adoption and innovation in natural language applications.",
+          "authors": [
+            "Kerim Büyükakyüz"
+          ],
+          "url": "https://arxiv.org/abs/2406.01775v2"
+        },
+        {
+          "stable_id": "arxiv:2403.16187",
+          "arxiv_id": "2403.16187v2",
+          "title": "ALoRA: Allocating Low-Rank Adaptation for Fine-tuning Large Language Models",
+          "abstract": "Parameter-efficient fine-tuning (PEFT) is widely studied for its effectiveness and efficiency in the era of large language models. Low-rank adaptation (LoRA) has demonstrated commendable performance as a popular and representative method. However, it is implemented with a fixed intrinsic rank that might not be the ideal setting for the downstream tasks. Recognizing the need for more flexible downstream task adaptation, we extend the methodology of LoRA to an innovative approach we call allocating low-rank adaptation (ALoRA) that enables dynamic adjustments to the intrinsic rank during the adaptation process. First, we propose a novel method, AB-LoRA, that can effectively estimate the importance score of each LoRA rank. Second, guided by AB-LoRA, we gradually prune abundant and negatively impacting LoRA ranks and allocate the pruned LoRA budgets to important Transformer modules needing higher ranks. We have conducted experiments on various tasks, and the experimental results demonstrate that our ALoRA method can outperform the recent baselines with comparable tunable parameters.",
+          "authors": [
+            "Zequan Liu",
+            "Jiawen Lyn",
+            "Wei Zhu",
+            "Xing Tian",
+            "Yvette Graham"
+          ],
+          "url": "https://arxiv.org/abs/2403.16187v2"
+        }
+      ],
+      "http_status": 200,
+      "request_url": "https://export.arxiv.org/api/query?search_query=%28all%3A%22parameter+efficient%22+OR+all%3A%22low+rank+adaptation%22+OR+all%3A%22LoRA%22%29+AND+%28all%3A%22large+language+model%22+OR+all%3A%22large+language+models%22+OR+all%3A%22LLM%22%29&start=0&max_results=10&sortBy=relevance&sortOrder=descending",
+      "total_results": 3073,
+      "request_seconds": 1.251
+    },
+    {
+      "query_id": "q02",
+      "idea": "研究检索增强生成中降低幻觉的方法",
+      "method": "concept",
+      "params": {
+        "search_query": "(all:\"retrieval augmented generation\" OR all:\"RAG\") AND (all:\"hallucination\" OR all:\"hallucinations\" OR all:\"factuality\")",
+        "start": 0,
+        "max_results": 10,
+        "sortBy": "relevance",
+        "sortOrder": "descending"
+      },
+      "request_count": 1,
+      "started_at": "2026-10-23T05:35:03.558153+00:00",
+      "status": "ok",
+      "returned_count": 10,
+      "papers": [
+        {
+          "stable_id": "arxiv:2510.22344",
+          "arxiv_id": "2510.22344v1",
+          "title": "FAIR-RAG: Faithful Adaptive Iterative Refinement for Retrieval-Augmented Generation",
+          "abstract": "While Retrieval-Augmented Generation (RAG) mitigates hallucination and knowledge staleness in Large Language Models (LLMs), existing frameworks often falter on complex, multi-hop queries that require synthesizing information from disparate sources. Current advanced RAG methods, employing iterative or adaptive strategies, lack a robust mechanism to systematically identify and fill evidence gaps, often propagating noise or failing to gather a comprehensive context. We introduce FAIR-RAG, a novel agentic framework that transforms the standard RAG pipeline into a dynamic, evidence-driven reasoning process. At its core is an Iterative Refinement Cycle governed by a module we term Structured Evidence Assessment (SEA). The SEA acts as an analytical gating mechanism: it deconstructs the initial query into a checklist of required findings and audits the aggregated evidence to identify confirmed facts and, critically, explicit informational gaps. These gaps provide a precise signal to an Adaptive Query Refinement agent, which generates new, targeted sub-queries to retrieve missing information. This cycle repeats until the evidence is verified as sufficient, ensuring a comprehensive context for a final, strictly faithful generation. We conducted experiments on challenging multi-hop QA benchmarks, including HotpotQA, 2WikiMultiHopQA, and MusiQue. In a unified experimental setup, FAIR-RAG significantly outperforms strong baselines. On HotpotQA, it achieves an F1-score of 0.453 -- an absolute improvement of 8.3 points over the strongest iterative baseline -- establishing a new state-of-the-art for this class of methods on these benchmarks. Our work demonstrates that a structured, evidence-driven refinement process with explicit gap analysis is crucial for unlocking reliable and accurate reasoning in advanced RAG systems for complex, knowledge-intensive tasks.",
+          "authors": [
+            "Mohammad Aghajani Asl",
+            "Majid Asgari-Bidhendi",
+            "Behrooz Minaei-Bidgoli"
+          ],
+          "url": "https://arxiv.org/abs/2510.22344v1"
+        },
+        {
+          "stable_id": "arxiv:2506.09886",
+          "arxiv_id": "2506.09886v2",
+          "title": "Probabilistic distances-based hallucination detection in LLMs with RAG",
+          "abstract": "Detecting hallucinations in large language models (LLMs) is critical for their safety in many applications. Without proper detection, these systems often provide harmful, unreliable answers. In recent years, LLMs have been actively used in retrieval-augmented generation (RAG) settings. However, hallucinations remain even in this setting, and while numerous hallucination detection methods have been proposed, most approaches are not specifically designed for RAG systems. To overcome this limitation, we introduce a hallucination detection method based on estimating the distances between the distributions of prompt token embeddings and language model response token embeddings. The method examines the geometric structure of token hidden states to reliably extract a signal of factuality in text, while remaining friendly to long sequences. Extensive experiments demonstrate that our method achieves state-of-the-art or competitive performance. It also has transferability from solving the NLI task to the hallucination detection task, making it a fully unsupervised and efficient method with a competitive performance on the final task.",
+          "authors": [
+            "Rodion Oblovatny",
+            "Alexandra Kuleshova",
+            "Konstantin Polev",
+            "Alexey Zaytsev"
+          ],
+          "url": "https://arxiv.org/abs/2506.09886v2"
+        },
+        {
+          "stable_id": "arxiv:2504.08758",
+          "arxiv_id": "2504.08758v1",
+          "title": "Hyper-RAG: Combating LLM Hallucinations using Hypergraph-Driven Retrieval-Augmented Generation",
+          "abstract": "Large language models (LLMs) have transformed various sectors, including education, finance, and medicine, by enhancing content generation and decision-making processes. However, their integration into the medical field is cautious due to hallucinations, instances where generated content deviates from factual accuracy, potentially leading to adverse outcomes. To address this, we introduce Hyper-RAG, a hypergraph-driven Retrieval-Augmented Generation method that comprehensively captures both pairwise and beyond-pairwise correlations in domain-specific knowledge, thereby mitigating hallucinations. Experiments on the NeurologyCrop dataset with six prominent LLMs demonstrated that Hyper-RAG improves accuracy by an average of 12.3% over direct LLM use and outperforms Graph RAG and Light RAG by 6.3% and 6.0%, respectively. Additionally, Hyper-RAG maintained stable performance with increasing query complexity, unlike existing methods which declined. Further validation across nine diverse datasets showed a 35.5% performance improvement over Light RAG using a selection-based assessment. The lightweight variant, Hyper-RAG-Lite, achieved twice the retrieval speed and a 3.3% performance boost compared with Light RAG. These results confirm Hyper-RAG's effectiveness in enhancing LLM reliability and reducing hallucinations, making it a robust solution for high-stakes applications like medical diagnostics.",
+          "authors": [
+            "Yifan Feng",
+            "Hao Hu",
+            "Xingliang Hou",
+            "Shiquan Liu",
+            "Shihui Ying",
+            "Shaoyi Du",
+            "Han Hu",
+            "Yue Gao"
+          ],
+          "url": "https://arxiv.org/abs/2504.08758v1"
+        },
+        {
+          "stable_id": "arxiv:2404.08189",
+          "arxiv_id": "2404.08189v1",
+          "title": "Reducing hallucination in structured outputs via Retrieval-Augmented Generation",
+          "abstract": "A common and fundamental limitation of Generative AI (GenAI) is its propensity to hallucinate. While large language models (LLM) have taken the world by storm, without eliminating or at least reducing hallucinations, real-world GenAI systems may face challenges in user adoption. In the process of deploying an enterprise application that produces workflows based on natural language requirements, we devised a system leveraging Retrieval Augmented Generation (RAG) to greatly improve the quality of the structured output that represents such workflows. Thanks to our implementation of RAG, our proposed system significantly reduces hallucinations in the output and improves the generalization of our LLM in out-of-domain settings. In addition, we show that using a small, well-trained retriever encoder can reduce the size of the accompanying LLM, thereby making deployments of LLM-based systems less resource-intensive.",
+          "authors": [
+            "Patrice Béchard",
+            "Orlando Marquez Ayala"
+          ],
+          "url": "https://arxiv.org/abs/2404.08189v1"
+        },
+        {
+          "stable_id": "arxiv:2505.10792",
+          "arxiv_id": "2505.10792v3",
+          "title": "Finetune-RAG: Fine-Tuning Language Models to Resist Hallucination in Retrieval-Augmented Generation",
+          "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a powerful framework to improve factuality in large language models (LLMs) by grounding their outputs in retrieved documents. However, ensuring perfect retrieval of relevant information remains challenging, and when irrelevant content is passed downstream to an LLM, it can lead to hallucinations. In this work, we propose Finetune-RAG, a simple and effective fine-tuning approach that features the first-of-its-kind RAG training dataset constructed to mimic real-world imperfections. Experimental results show that Finetune-RAG improves factual accuracy by 21.2% over the base model. We also propose Bench-RAG, an LLM-as-a-judge evaluation pipeline that stress tests models under realistic imperfect retrieval scenarios. Our codebase and dataset are fully open sourced for community use.",
+          "authors": [
+            "Zhan Peng Lee",
+            "Andre Lin",
+            "Calvin Tan"
+          ],
+          "url": "https://arxiv.org/abs/2505.10792v3"
+        },
+        {
+          "stable_id": "arxiv:2505.18581",
+          "arxiv_id": "2505.18581v1",
+          "title": "Removal of Hallucination on Hallucination: Debate-Augmented RAG",
+          "abstract": "Retrieval-Augmented Generation (RAG) enhances factual accuracy by integrating external knowledge, yet it introduces a critical issue: erroneous or biased retrieval can mislead generation, compounding hallucinations, a phenomenon we term Hallucination on Hallucination. To address this, we propose Debate-Augmented RAG (DRAG), a training-free framework that integrates Multi-Agent Debate (MAD) mechanisms into both retrieval and generation stages. In retrieval, DRAG employs structured debates among proponents, opponents, and judges to refine retrieval quality and ensure factual reliability. In generation, DRAG introduces asymmetric information roles and adversarial debates, enhancing reasoning robustness and mitigating factual inconsistencies. Evaluations across multiple tasks demonstrate that DRAG improves retrieval reliability, reduces RAG-induced hallucinations, and significantly enhances overall factual accuracy. Our code is available at https://github.com/Huenao/Debate-Augmented-RAG.",
+          "authors": [
+            "Wentao Hu",
+            "Wengyu Zhang",
+            "Yiyang Jiang",
+            "Chen Jason Zhang",
+            "Xiaoyong Wei",
+            "Qing Li"
+          ],
+          "url": "https://arxiv.org/abs/2505.18581v1"
+        },
+        {
+          "stable_id": "arxiv:2508.03553",
+          "arxiv_id": "2508.03553v1",
+          "title": "MultiRAG: A Knowledge-guided Framework for Mitigating Hallucination in Multi-source Retrieval Augmented Generation",
+          "abstract": "Retrieval Augmented Generation (RAG) has emerged as a promising solution to address hallucination issues in Large Language Models (LLMs). However, the integration of multiple retrieval sources, while potentially more informative, introduces new challenges that can paradoxically exacerbate hallucination problems. These challenges manifest primarily in two aspects: the sparse distribution of multi-source data that hinders the capture of logical relationships and the inherent inconsistencies among different sources that lead to information conflicts. To address these challenges, we propose MultiRAG, a novel framework designed to mitigate hallucination in multi-source retrieval-augmented generation through knowledge-guided approaches. Our framework introduces two key innovations: (1) a knowledge construction module that employs multi-source line graphs to efficiently aggregate logical relationships across different knowledge sources, effectively addressing the sparse data distribution issue; and (2) a sophisticated retrieval module that implements a multi-level confidence calculation mechanism, performing both graph-level and node-level assessments to identify and eliminate unreliable information nodes, thereby reducing hallucinations caused by inter-source inconsistencies. Extensive experiments on four multi-domain query datasets and two multi-hop QA datasets demonstrate that MultiRAG significantly enhances the reliability and efficiency of knowledge retrieval in complex multi-source scenarios. \\textcolor{blue}{Our code is available in https://github.com/wuwenlong123/MultiRAG.",
+          "authors": [
+            "Wenlong Wu",
+            "Haofen Wang",
+            "Bohan Li",
+            "Peixuan Huang",
+            "Xinzhe Zhao",
+            "Lei Liang"
+          ],
+          "url": "https://arxiv.org/abs/2508.03553v1"
+        },
+        {
+          "stable_id": "arxiv:2401.15391",
+          "arxiv_id": "2401.15391v1",
+          "title": "MultiHop-RAG: Benchmarking Retrieval-Augmented Generation for Multi-Hop Queries",
+          "abstract": "Retrieval-augmented generation (RAG) augments large language models (LLM) by retrieving relevant knowledge, showing promising potential in mitigating LLM hallucinations and enhancing response quality, thereby facilitating the great adoption of LLMs in practice. However, we find that existing RAG systems are inadequate in answering multi-hop queries, which require retrieving and reasoning over multiple pieces of supporting evidence. Furthermore, to our knowledge, no existing RAG benchmarking dataset focuses on multi-hop queries. In this paper, we develop a novel dataset, MultiHop-RAG, which consists of a knowledge base, a large collection of multi-hop queries, their ground-truth answers, and the associated supporting evidence. We detail the procedure of building the dataset, utilizing an English news article dataset as the underlying RAG knowledge base. We demonstrate the benchmarking utility of MultiHop-RAG in two experiments. The first experiment compares different embedding models for retrieving evidence for multi-hop queries. In the second experiment, we examine the capabilities of various state-of-the-art LLMs, including GPT-4, PaLM, and Llama2-70B, in reasoning and answering multi-hop queries given the evidence. Both experiments reveal that existing RAG methods perform unsatisfactorily in retrieving and answering multi-hop queries. We hope MultiHop-RAG will be a valuable resource for the community in developing effective RAG systems, thereby facilitating greater adoption of LLMs in practice. The MultiHop-RAG and implemented RAG system is publicly available at https://github.com/yixuantt/MultiHop-RAG/.",
+          "authors": [
+            "Yixuan Tang",
+            "Yi Yang"
+          ],
+          "url": "https://arxiv.org/abs/2401.15391v1"
+        },
+        {
+          "stable_id": "arxiv:2601.02993",
+          "arxiv_id": "2601.02993v4",
+          "title": "Stable-RAG: Mitigating Retrieval-Permutation-Induced Hallucinations in Retrieval-Augmented Generation",
+          "abstract": "Retrieval-Augmented Generation (RAG) has become a key paradigm for reducing factual hallucinations in Large Language Models (LLMs), yet little is known about how the order of retrieved documents affects model behavior. We empirically show that under a Top-5 retrieval setting with the gold document included, LLM answers vary substantially across permutations of the retrieved set, even when the gold document is fixed in the first position. This reveals a previously underexplored sensitivity to retrieval permutations. Although existing robust RAG methods focus primarily on enhancing LLM robustness to low-quality retrieval and mitigating positional bias to distribute attention fairly over long contexts, neither approach directly addresses permutation sensitivity. In this paper, we propose Stable-RAG, which exploits permutation sensitivity estimation to mitigate permutation-induced hallucinations. Stable-RAG runs the generator under multiple retrieval orders, clusters hidden states, and decodes from a cluster-center representation that captures the dominant reasoning pattern. It then uses these reasoning results to align hallucinated outputs toward the correct answer, encouraging the model to produce consistent and accurate predictions across document permutations. Experiments on three QA datasets show that Stable-RAG improves answer accuracy, reasoning consistency, and generalization across datasets, retrievers, and input lengths compared with strong baselines.",
+          "authors": [
+            "Qianchi Zhang",
+            "Hainan Zhang",
+            "Liang Pang",
+            "Hongwei Zheng",
+            "Zhiming Zheng"
+          ],
+          "url": "https://arxiv.org/abs/2601.02993v4"
+        },
+        {
+          "stable_id": "arxiv:2410.11414",
+          "arxiv_id": "2410.11414v2",
+          "title": "ReDeEP: Detecting Hallucination in Retrieval-Augmented Generation via Mechanistic Interpretability",
+          "abstract": "Retrieval-Augmented Generation (RAG) models are designed to incorporate external knowledge, reducing hallucinations caused by insufficient parametric (internal) knowledge. However, even with accurate and relevant retrieved content, RAG models can still produce hallucinations by generating outputs that conflict with the retrieved information. Detecting such hallucinations requires disentangling how Large Language Models (LLMs) utilize external and parametric knowledge. Current detection methods often focus on one of these mechanisms or without decoupling their intertwined effects, making accurate detection difficult. In this paper, we investigate the internal mechanisms behind hallucinations in RAG scenarios. We discover hallucinations occur when the Knowledge FFNs in LLMs overemphasize parametric knowledge in the residual stream, while Copying Heads fail to effectively retain or integrate external knowledge from retrieved content. Based on these findings, we propose ReDeEP, a novel method that detects hallucinations by decoupling LLM's utilization of external context and parametric knowledge. Our experiments show that ReDeEP significantly improves RAG hallucination detection accuracy. Additionally, we introduce AARF, which mitigates hallucinations by modulating the contributions of Knowledge FFNs and Copying Heads.",
+          "authors": [
+            "Zhongxiang Sun",
+            "Xiaoxue Zang",
+            "Kai Zheng",
+            "Yang Song",
+            "Jun Xu",
+            "Xiao Zhang",
+            "Weijie Yu",
+            "Yang Song",
+            "Han Li"
+          ],
+          "url": "https://arxiv.org/abs/2410.11414v2"
+        }
+      ],
+      "http_status": 200,
+      "request_url": "https://export.arxiv.org/api/query?search_query=%28all%3A%22retrieval+augmented+generation%22+OR+all%3A%22RAG%22%29+AND+%28all%3A%22hallucination%22+OR+all%3A%22hallucinations%22+OR+all%3A%22factuality%22%29&start=0&max_results=10&sortBy=relevance&sortOrder=descending",
+      "total_results": 1602,
+      "request_seconds": 1.216
+    },
+    {
+      "query_id": "q02",
+      "idea": "研究检索增强生成中降低幻觉的方法",
+      "method": "baseline",
+      "params": {
+        "search_query": "all:\"retrieval augmented generation hallucination\"",
+        "start": 0,
+        "max_results": 10,
+        "sortBy": "relevance",
+        "sortOrder": "descending"
+      },
+      "request_count": 1,
+      "started_at": "2026-10-23T05:35:07.882989+00:00",
+      "status": "ok",
+      "returned_count": 1,
+      "papers": [
+        {
+          "stable_id": "arxiv:2507.22915",
+          "arxiv_id": "2507.22915v1",
+          "title": "Theoretical Foundations and Mitigation of Hallucination in Large Language Models",
+          "abstract": "Hallucination in Large Language Models (LLMs) refers to the generation of content that is not faithful to the input or the real-world facts. This paper provides a rigorous treatment of hallucination in LLMs, including formal definitions and theoretical analyses. We distinguish between intrinsic and extrinsic hallucinations, and define a \\textit{hallucination risk} for models. We derive bounds on this risk using learning-theoretic frameworks (PAC-Bayes and Rademacher complexity). We then survey detection strategies for hallucinations, such as token-level uncertainty estimation, confidence calibration, and attention alignment checks. On the mitigation side, we discuss approaches including retrieval-augmented generation, hallucination-aware fine-tuning, logit calibration, and the incorporation of fact-verification modules. We propose a unified detection and mitigation workflow, illustrated with a diagram, to integrate these strategies. Finally, we outline evaluation protocols for hallucination, recommending datasets, metrics, and experimental setups to quantify and reduce hallucinations. Our work lays a theoretical foundation and practical guidelines for addressing the crucial challenge of hallucination in LLMs.",
+          "authors": [
+            "Esmail Gumaan"
+          ],
+          "url": "https://arxiv.org/abs/2507.22915v1"
+        }
+      ],
+      "http_status": 200,
+      "request_url": "https://export.arxiv.org/api/query?search_query=all%3A%22retrieval+augmented+generation+hallucination%22&start=0&max_results=10&sortBy=relevance&sortOrder=descending",
+      "total_results": 1,
+      "request_seconds": 0.752
+    },
+    {
+      "query_id": "q03",
+      "idea": "研究大语言模型多智能体协作完成复杂任务的方法",
+      "method": "baseline",
+      "params": {
+        "search_query": "all:\"large language model multi agent collaboration\"",
+        "start": 0,
+        "max_results": 10,
+        "sortBy": "relevance",
+        "sortOrder": "descending"
+      },
+      "request_count": 1,
+      "started_at": "2026-10-23T05:35:11.742055+00:00",
+      "status": "ok",
+      "returned_count": 3,
+      "papers": [
+        {
+          "stable_id": "arxiv:2402.04268",
+          "arxiv_id": "2402.04268v1",
+          "title": "ProtAgents: Protein discovery via large language model multi-agent collaborations combining physics and machine learning",
+          "abstract": "Designing de novo proteins beyond those found in nature holds significant promise for advancements in both scientific and engineering applications. Current methodologies for protein design often rely on AI-based models, such as surrogate models that address end-to-end problems by linking protein structure to material properties or vice versa. However, these models frequently focus on specific material objectives or structural properties, limiting their flexibility when incorporating out-of-domain knowledge into the design process or comprehensive data analysis is required. In this study, we introduce ProtAgents, a platform for de novo protein design based on Large Language Models (LLMs), where multiple AI agents with distinct capabilities collaboratively address complex tasks within a dynamic environment. The versatility in agent development allows for expertise in diverse domains, including knowledge retrieval, protein structure analysis, physics-based simulations, and results analysis. The dynamic collaboration between agents, empowered by LLMs, provides a versatile approach to tackling protein design and analysis problems, as demonstrated through diverse examples in this study. The problems of interest encompass designing new proteins, analyzing protein structures and obtaining new first-principles data -- natural vibrational frequencies -- via physics simulations. The concerted effort of the system allows for powerful automated and synergistic design of de novo proteins with targeted mechanical properties. The flexibility in designing the agents, on one hand, and their capacity in autonomous collaboration through the dynamic LLM-based multi-agent environment on the other hand, unleashes great potentials of LLMs in addressing multi-objective materials problems and opens up new avenues for autonomous materials discovery and design.",
+          "authors": [
+            "A. Ghafarollahi",
+            "M. J. Buehler"
+          ],
+          "url": "https://arxiv.org/abs/2402.04268v1"
+        },
+        {
+          "stable_id": "arxiv:2311.08166",
+          "arxiv_id": "2311.08166v1",
+          "title": "MechAgents: Large language model multi-agent collaborations can solve mechanics problems, generate new data, and integrate knowledge",
+          "abstract": "Solving mechanics problems using numerical methods requires comprehensive intelligent capability of retrieving relevant knowledge and theory, constructing and executing codes, analyzing the results, a task that has thus far mainly been reserved for humans. While emerging AI methods can provide effective approaches to solve end-to-end problems, for instance via the use of deep surrogate models or various data analytics strategies, they often lack physical intuition since knowledge is baked into the parametric complement through training, offering less flexibility when it comes to incorporating mathematical or physical insights. By leveraging diverse capabilities of multiple dynamically interacting large language models (LLMs), we can overcome the limitations of conventional approaches and develop a new class of physics-inspired generative machine learning platform, here referred to as MechAgents. A set of AI agents can solve mechanics tasks, here demonstrated for elasticity problems, via autonomous collaborations. A two-agent team can effectively write, execute and self-correct code, in order to apply finite element methods to solve classical elasticity problems in various flavors (different boundary conditions, domain geometries, meshes, small/finite deformation and linear/hyper-elastic constitutive laws, and others). For more complex tasks, we construct a larger group of agents with enhanced division of labor among planning, formulating, coding, executing and criticizing the process and results. The agents mutually correct each other to improve the overall team-work performance in understanding, formulating and validating the solution. Our framework shows the potential of synergizing the intelligence of language models, the reliability of physics-based modeling, and the dynamic collaborations among diverse agents, opening novel avenues for automation of solving engineering problems.",
+          "authors": [
+            "Bo Ni",
+            "Markus J. Buehler"
+          ],
+          "url": "https://arxiv.org/abs/2311.08166v1"
+        },
+        {
+          "stable_id": "arxiv:2512.21360",
+          "arxiv_id": "2512.21360v1",
+          "title": "From Visual Perception to Deep Empathy: An Automated Assessment Framework for House-Tree-Person Drawings Using Multimodal LLMs and Multi-Agent Collaboration",
+          "abstract": "Background: The House-Tree-Person (HTP) drawing test, introduced by John Buck in 1948, remains a widely used projective technique in clinical psychology. However, it has long faced challenges such as heterogeneous scoring standards, reliance on examiners subjective experience, and a lack of a unified quantitative coding system. Results: Quantitative experiments showed that the mean semantic similarity between Multimodal Large Language Model (MLLM) interpretations and human expert interpretations was approximately 0.75 (standard deviation about 0.05). In structurally oriented expert data sets, this similarity rose to 0.85, indicating expert-level baseline comprehension. Qualitative analyses demonstrated that the multi-agent system, by integrating social-psychological perspectives and destigmatizing narratives, effectively corrected visual hallucinations and produced psychological reports with high ecological validity and internal coherence. Conclusions: The findings confirm the potential of multimodal large models as standardized tools for projective assessment. The proposed multi-agent framework, by dividing roles, decouples feature recognition from psychological inference and offers a new paradigm for digital mental-health services. Keywords: House-Tree-Person test; multimodal large language model; multi-agent collaboration; cosine similarity; computational psychology; artificial intelligence",
+          "authors": [
+            "Shuide Wen",
+            "Yu Sun",
+            "Beier Ku",
+            "Zhi Gao",
+            "Lijun Ma",
+            "Yang Yang",
+            "Can Jiao"
+          ],
+          "url": "https://arxiv.org/abs/2512.21360v1"
+        }
+      ],
+      "http_status": 200,
+      "request_url": "https://export.arxiv.org/api/query?search_query=all%3A%22large+language+model+multi+agent+collaboration%22&start=0&max_results=10&sortBy=relevance&sortOrder=descending",
+      "total_results": 3,
+      "request_seconds": 0.649
+    },
+    {
+      "query_id": "q03",
+      "idea": "研究大语言模型多智能体协作完成复杂任务的方法",
+      "method": "concept",
+      "params": {
+        "search_query": "(all:\"large language model\" OR all:\"large language models\" OR all:\"LLM\") AND (all:\"multi agent\" OR all:\"multi-agent\") AND (all:\"collaboration\" OR all:\"cooperation\" OR all:\"coordination\")",
+        "start": 0,
+        "max_results": 10,
+        "sortBy": "relevance",
+        "sortOrder": "descending"
+      },
+      "request_count": 1,
+      "started_at": "2026-10-23T05:35:15.501009+00:00",
+      "status": "ok",
+      "returned_count": 10,
+      "papers": [
+        {
+          "stable_id": "arxiv:2412.05449",
+          "arxiv_id": "2412.05449v1",
+          "title": "Towards Effective GenAI Multi-Agent Collaboration: Design and Evaluation for Enterprise Applications",
+          "abstract": "AI agents powered by large language models (LLMs) have shown strong capabilities in problem solving. Through combining many intelligent agents, multi-agent collaboration has emerged as a promising approach to tackle complex, multi-faceted problems that exceed the capabilities of single AI agents. However, designing the collaboration protocols and evaluating the effectiveness of these systems remains a significant challenge, especially for enterprise applications. This report addresses these challenges by presenting a comprehensive evaluation of coordination and routing capabilities in a novel multi-agent collaboration framework. We evaluate two key operational modes: (1) a coordination mode enabling complex task completion through parallel communication and payload referencing, and (2) a routing mode for efficient message forwarding between agents. We benchmark on a set of handcrafted scenarios from three enterprise domains, which are publicly released with the report. For coordination capabilities, we demonstrate the effectiveness of inter-agent communication and payload referencing mechanisms, achieving end-to-end goal success rates of 90%. Our analysis yields several key findings: multi-agent collaboration enhances goal success rates by up to 70% compared to single-agent approaches in our benchmarks; payload referencing improves performance on code-intensive tasks by 23%; latency can be substantially reduced with a routing mechanism that selectively bypasses agent orchestration. These findings offer valuable guidance for enterprise deployments of multi-agent systems and advance the development of scalable, efficient multi-agent collaboration frameworks.",
+          "authors": [
+            "Raphael Shu",
+            "Nilaksh Das",
+            "Michelle Yuan",
+            "Monica Sunkara",
+            "Yi Zhang"
+          ],
+          "url": "https://arxiv.org/abs/2412.05449v1"
+        },
+        {
+          "stable_id": "arxiv:2512.13930",
+          "arxiv_id": "2512.13930v1",
+          "title": "Hierarchical Multi-agent Large Language Model Reasoning for Autonomous Functional Materials Discovery",
+          "abstract": "Artificial intelligence is reshaping scientific exploration, but most methods automate procedural tasks without engaging in scientific reasoning, limiting autonomy in discovery. We introduce Materials Agents for Simulation and Theory in Electronic-structure Reasoning (MASTER), an active learning framework where large language models autonomously design, execute, and interpret atomistic simulations. In MASTER, a multimodal system translates natural language into density functional theory workflows, while higher-level reasoning agents guide discovery through a hierarchy of strategies, including a single agent baseline and three multi-agent approaches: peer review, triage-ranking, and triage-forms. Across two chemical applications, CO adsorption on Cu-surface transition metal (M) adatoms and on M-N-C catalysts, reasoning-driven exploration reduces required atomistic simulations by up to 90% relative to trial-and-error selection. Reasoning trajectories reveal chemically grounded decisions that cannot be explained by stochastic sampling or semantic bias. Altogether, multi-agent collaboration accelerates materials discovery and marks a new paradigm for autonomous scientific exploration.",
+          "authors": [
+            "Samuel Rothfarb",
+            "Megan C. Davis",
+            "Ivana Matanovic",
+            "Baikun Li",
+            "Edward F. Holby",
+            "Wilton J. M. Kort-Kamp"
+          ],
+          "url": "https://arxiv.org/abs/2512.13930v1"
+        },
+        {
+          "stable_id": "arxiv:2609.38327",
+          "arxiv_id": "2609.38327v2",
+          "title": "Absorbing State Phase Transitions in Multi-Agent Search",
+          "abstract": "Nontrivial dynamics can emerge in large language model (LLM)-based multi-agent systems, and preliminary evidence exists that formalisms from statistical mechanics can be effective at modeling and predicting such behaviors. In parallel, designing multi-agent communication topology for optimal task-solving is an active research question. In this paper, we focus on predicting the success of multi-agent search tasks using the formalism of absorbing state phase transitions. We first taxonomize search tasks into four types, informed by classical results in combinatorial search. We then theoretically derive a critical communication degree $d_c$, the minimum number of agents each agent can communicate with, above which incorrect hypotheses do not proliferate uncontrollably and the search enters the solved state. Finally, we evaluate frontier LLM-based multi-agent systems on real-world search and discovery tasks, software configuration debugging and physical mechanism discovery, and find that agreement with theory is mixed. LLM agents may not communicate with their neighbors and can develop strategies that are individually beneficial but limits the benefits of collaboration.",
+          "authors": [
+            "Wenwen Zheng",
+            "Yuzhe Yang",
+            "Helen Qu",
+            "Xin Eric Wang",
+            "Haewon Jeong"
+          ],
+          "url": "https://arxiv.org/abs/2609.38327v2"
+        },
+        {
+          "stable_id": "arxiv:2412.20138",
+          "arxiv_id": "2412.20138v7",
+          "title": "TradingAgents: Multi-Agents LLM Financial Trading Framework",
+          "abstract": "Significant progress has been made in automated problem-solving using societies of agents powered by large language models (LLMs). In finance, efforts have largely focused on single-agent systems handling specific tasks or multi-agent frameworks independently gathering data. However, the multi-agent systems' potential to replicate real-world trading firms' collaborative dynamics remains underexplored. TradingAgents proposes a novel stock trading framework inspired by trading firms, featuring LLM-powered agents in specialized roles such as fundamental analysts, sentiment analysts, technical analysts, and traders with varied risk profiles. The framework includes Bull and Bear researcher agents assessing market conditions, a risk management team monitoring exposure, and traders synthesizing insights from debates and historical data to make informed decisions. By simulating a dynamic, collaborative trading environment, this framework aims to improve trading performance. Detailed architecture and extensive experiments reveal its superiority over baseline models, with notable improvements in cumulative returns, Sharpe ratio, and maximum drawdown, highlighting the potential of multi-agent LLM frameworks in financial trading. TradingAgents is available at https://github.com/TauricResearch/TradingAgents.",
+          "authors": [
+            "Yijia Xiao",
+            "Edward Sun",
+            "Di Luo",
+            "Wei Wang"
+          ],
+          "url": "https://arxiv.org/abs/2412.20138v7"
+        },
+        {
+          "stable_id": "arxiv:2502.07165",
+          "arxiv_id": "2502.07165v1",
+          "title": "Don't Just Demo, Teach Me the Principles: A Principle-Based Multi-Agent Prompting Strategy for Text Classification",
+          "abstract": "We present PRINCIPLE-BASED PROMPTING, a simple but effective multi-agent prompting strategy for text classification. It first asks multiple LLM agents to independently generate candidate principles based on analysis of demonstration samples with or without labels, consolidates them into final principles via a finalizer agent, and then sends them to a classifier agent to perform downstream classification tasks. Extensive experiments on binary and multi-class classification datasets with different sizes of LLMs show that our approach not only achieves substantial performance gains (1.55% - 19.37%) over zero-shot prompting on macro-F1 score but also outperforms other strong baselines (CoT and stepback prompting). Principles generated by our approach help LLMs perform better on classification tasks than human crafted principles on two private datasets. Our multi-agent PRINCIPLE-BASED PROMPTING approach also shows on-par or better performance compared to demonstration-based few-shot prompting approaches, yet with substantially lower inference costs. Ablation studies show that label information and the multi-agent cooperative LLM framework play an important role in generating high-quality principles to facilitate downstream classification tasks.",
+          "authors": [
+            "Peipei Wei",
+            "Dimitris Dimitriadis",
+            "Yan Xu",
+            "Mingwei Shen"
+          ],
+          "url": "https://arxiv.org/abs/2502.07165v1"
+        },
+        {
+          "stable_id": "arxiv:2512.06196",
+          "arxiv_id": "2512.06196v1",
+          "title": "ARCANE: A Multi-Agent Framework for Interpretable and Configurable Alignment",
+          "abstract": "As agents based on large language models are increasingly deployed to long-horizon tasks, maintaining their alignment with stakeholder preferences becomes critical. Effective alignment in such settings requires reward models that are interpretable so that stakeholders can understand and audit model objectives. Moreover, reward models must be capable of steering agents at interaction time, allowing preference shifts to be incorporated without retraining. We introduce ARCANE, a framework that frames alignment as a multi-agent collaboration problem that dynamically represents stakeholder preferences as natural-language rubrics: weighted sets of verifiable criteria that can be generated on-the-fly from task context. Inspired by utility theory, we formulate rubric learning as a reconstruction problem and apply a regularized Group-Sequence Policy Optimization (GSPO) procedure that balances interpretability, faithfulness, and computational efficiency. Using a corpus of 219 labeled rubrics derived from the GDPVal benchmark, we evaluate ARCANE on challenging tasks requiring multi-step reasoning and tool use. The learned rubrics produce compact, legible evaluations and enable configurable trade-offs (e.g., correctness vs. conciseness) without retraining. Our results show that rubric-based reward models offer a promising path toward interpretable, test-time adaptive alignment for complex, long-horizon AI systems.",
+          "authors": [
+            "Charlie Masters",
+            "Marta Grześkiewicz",
+            "Stefano V. Albrecht"
+          ],
+          "url": "https://arxiv.org/abs/2512.06196v1"
+        },
+        {
+          "stable_id": "arxiv:2405.16887",
+          "arxiv_id": "2405.16887v2",
+          "title": "A Large Language Model-based multi-agent manufacturing system for intelligent shopfloor",
+          "abstract": "As customer demand for multi-variety and small-batch production increases, dynamic disturbances place greater demands on manufacturing systems. To address such challenges, researchers proposed the multi-agent manufacturing system. However, conventional agent negotiation typically relies on pre-defined and fixed heuristic rules, which are ill-suited to managing complex and fluctuating disturbances. In current implementations, mainstream approaches based on reinforcement learning require the development of simulators and training models specific to a given shopfloor, necessitating substantial computational resources and lacking scalability. To overcome this limitation, the present study proposes a Large Language Model-based (LLM-based) multi-agent manufacturing system for intelligent shopfloor management. By defining the diverse modules of agents and their collaborative methods, this system facilitates the processing of all workpieces with minimal human intervention. The agents in this system consist of the Machine Server Module (MSM), Bid Inviter Module (BIM), Bidder Module (BM), Thinking Module (TM), and Decision Module (DM). By harnessing the reasoning capabilities of LLMs, these modules enable agents to dynamically analyze shopfloor information and select appropriate processing machines. The LLM-based modules, predefined by system prompts, provide dynamic functionality for the system without the need for pre-training. Extensive experiments were conducted in physical shopfloor settings. The results demonstrate that the proposed system exhibits strong adaptability, and achieves superior performance (makespan) and stability (as measured by sample standard deviation) compared to other approaches without requiring pre-training.",
+          "authors": [
+            "Zhen Zhao",
+            "Dunbing Tang",
+            "Changchun Liu",
+            "Liping Wang",
+            "Zequn Zhang",
+            "Haihua Zhu",
+            "Kai Chen",
+            "Qingwei Nie",
+            "Yuchen Ji"
+          ],
+          "url": "https://arxiv.org/abs/2405.16887v2"
+        },
+        {
+          "stable_id": "arxiv:2310.03903",
+          "arxiv_id": "2310.03903v3",
+          "title": "LLM-Coordination: Evaluating and Analyzing Multi-agent Coordination Abilities in Large Language Models",
+          "abstract": "Large Language Models (LLMs) have demonstrated emergent common-sense reasoning and Theory of Mind (ToM) capabilities, making them promising candidates for developing coordination agents. This study introduces the LLM-Coordination Benchmark, a novel benchmark for analyzing LLMs in the context of Pure Coordination Settings, where agents must cooperate to maximize gains. Our benchmark evaluates LLMs through two distinct tasks. The first is Agentic Coordination, where LLMs act as proactive participants in four pure coordination games. The second is Coordination Question Answering (CoordQA), which tests LLMs on 198 multiple-choice questions across these games to evaluate three key abilities: Environment Comprehension, ToM Reasoning, and Joint Planning. Results from Agentic Coordination experiments reveal that LLM-Agents excel in multi-agent coordination settings where decision-making primarily relies on environmental variables but face challenges in scenarios requiring active consideration of partners' beliefs and intentions. The CoordQA experiments further highlight significant room for improvement in LLMs' Theory of Mind reasoning and joint planning capabilities. Zero-Shot Coordination (ZSC) experiments in the Agentic Coordination setting demonstrate that LLM agents, unlike RL methods, exhibit robustness to unseen partners. These findings indicate the potential of LLMs as Agents in pure coordination setups and underscore areas for improvement. Code Available at https://github.com/eric-ai-lab/llm_coordination.",
+          "authors": [
+            "Saaket Agashe",
+            "Yue Fan",
+            "Anthony Reyna",
+            "Xin Eric Wang"
+          ],
+          "url": "https://arxiv.org/abs/2310.03903v3"
+        },
+        {
+          "stable_id": "arxiv:2407.12532",
+          "arxiv_id": "2407.12532v1",
+          "title": "Towards Collaborative Intelligence: Propagating Intentions and Reasoning for Multi-Agent Coordination with Large Language Models",
+          "abstract": "Effective collaboration in multi-agent systems requires communicating goals and intentions between agents. Current agent frameworks often suffer from dependencies on single-agent execution and lack robust inter-module communication, frequently leading to suboptimal multi-agent reinforcement learning (MARL) policies and inadequate task coordination. To address these challenges, we present a framework for training large language models (LLMs) as collaborative agents to enable coordinated behaviors in cooperative MARL. Each agent maintains a private intention consisting of its current goal and associated sub-tasks. Agents broadcast their intentions periodically, allowing other agents to infer coordination tasks. A propagation network transforms broadcast intentions into teammate-specific communication messages, sharing relevant goals with designated teammates. The architecture of our framework is structured into planning, grounding, and execution modules. During execution, multiple agents interact in a downstream environment and communicate intentions to enable coordinated behaviors. The grounding module dynamically adapts comprehension strategies based on emerging coordination patterns, while feedback from execution agents influnces the planning module, enabling the dynamic re-planning of sub-tasks. Results in collaborative environment simulation demonstrate intention propagation reduces miscoordination errors by aligning sub-task dependencies between agents. Agents learn when to communicate intentions and which teammates require task details, resulting in emergent coordinated behaviors. This demonstrates the efficacy of intention sharing for cooperative multi-agent RL based on LLMs.",
+          "authors": [
+            "Xihe Qiu",
+            "Haoyu Wang",
+            "Xiaoyu Tan",
+            "Chao Qu",
+            "Yujie Xiong",
+            "Yuan Cheng",
+            "Yinghui Xu",
+            "Wei Chu",
+            "Yuan Qi"
+          ],
+          "url": "https://arxiv.org/abs/2407.12532v1"
+        },
+        {
+          "stable_id": "arxiv:2410.12532",
+          "arxiv_id": "2410.12532v3",
+          "title": "MedAide: Information Fusion and Anatomy of Medical Intents via LLM-based Agent Collaboration",
+          "abstract": "In healthcare intelligence, the ability to fuse heterogeneous, multi-intent information from diverse clinical sources is fundamental to building reliable decision-making systems. Large Language Model (LLM)-driven information interaction systems currently showing potential promise in the healthcare domain. Nevertheless, they often suffer from information redundancy and coupling when dealing with complex medical intents, leading to severe hallucinations and performance bottlenecks. To this end, we propose MedAide, an LLM-based medical multi-agent collaboration framework designed to enable intent-aware information fusion and coordinated reasoning across specialized healthcare domains. Specifically, we introduce a regularization-guided module that combines syntactic constraints with retrieval augmented generation to decompose complex queries into structured representations, facilitating fine-grained clinical information fusion and intent resolution. Additionally, a dynamic intent prototype matching module is proposed to utilize dynamic prototype representation with a semantic similarity matching mechanism to achieve adaptive recognition and updating of the agent's intent in multi-round healthcare dialogues. Ultimately, we design a rotation agent collaboration mechanism that introduces dynamic role rotation and decision-level information fusion across specialized medical agents. Extensive experiments are conducted on four medical benchmarks with composite intents. Experimental results from automated metrics and expert doctor evaluations show that MedAide outperforms current LLMs and improves their medical proficiency and strategic reasoning.",
+          "authors": [
+            "Dingkang Yang",
+            "Jinjie Wei",
+            "Mingcheng Li",
+            "Jiyao Liu",
+            "Lihao Liu",
+            "Ming Hu",
+            "Junjun He",
+            "Yakun Ju",
+            "Wei Zhou",
+            "Yang Liu",
+            "Lihua Zhang"
+          ],
+          "url": "https://arxiv.org/abs/2410.12532v3"
+        }
+      ],
+      "http_status": 200,
+      "request_url": "https://export.arxiv.org/api/query?search_query=%28all%3A%22large+language+model%22+OR+all%3A%22large+language+models%22+OR+all%3A%22LLM%22%29+AND+%28all%3A%22multi+agent%22+OR+all%3A%22multi-agent%22%29+AND+%28all%3A%22collaboration%22+OR+all%3A%22cooperation%22+OR+all%3A%22coordination%22%29&start=0&max_results=10&sortBy=relevance&sortOrder=descending",
+      "total_results": 2251,
+      "request_seconds": 2.577
+    }
+  ]
+}

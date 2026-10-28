@@ -1,0 +1,99 @@
+{
+  "query_id": "q02",
+  "idea": "研究检索增强生成中降低幻觉的方法",
+  "rubric": {
+    "0": "无关",
+    "1": "部分相关",
+    "2": "高度相关"
+  },
+  "papers": [
+    {
+      "stable_id": "arxiv:2401.15391",
+      "title": "MultiHop-RAG: Benchmarking Retrieval-Augmented Generation for Multi-Hop Queries",
+      "abstract": "Retrieval-augmented generation (RAG) augments large language models (LLM) by retrieving relevant knowledge, showing promising potential in mitigating LLM hallucinations and enhancing response quality, thereby facilitating the great adoption of LLMs in practice. However, we find that existing RAG systems are inadequate in answering multi-hop queries, which require retrieving and reasoning over multiple pieces of supporting evidence. Furthermore, to our knowledge, no existing RAG benchmarking dataset focuses on multi-hop queries. In this paper, we develop a novel dataset, MultiHop-RAG, which consists of a knowledge base, a large collection of multi-hop queries, their ground-truth answers, and the associated supporting evidence. We detail the procedure of building the dataset, utilizing an English news article dataset as the underlying RAG knowledge base. We demonstrate the benchmarking utility of MultiHop-RAG in two experiments. The first experiment compares different embedding models for retrieving evidence for multi-hop queries. In the second experiment, we examine the capabilities of various state-of-the-art LLMs, including GPT-4, PaLM, and Llama2-70B, in reasoning and answering multi-hop queries given the evidence. Both experiments reveal that existing RAG methods perform unsatisfactorily in retrieving and answering multi-hop queries. We hope MultiHop-RAG will be a valuable resource for the community in developing effective RAG systems, thereby facilitating greater adoption of LLMs in practice. The MultiHop-RAG and implemented RAG system is publicly available at https://github.com/yixuantt/MultiHop-RAG/.",
+      "url": "https://arxiv.org/abs/2401.15391v1",
+      "label": 1,
+      "reason": "主要涉及 RAG 系统在多跳查询（复杂推理和检索）任务中的性能基准测试与数据集构建。虽然文章在背景中提到了 RAG 可以缓解幻觉，并且其对模型事实性和推理能力的评估与减少幻觉有一定关联，但其核心贡献并非直接提出降低 RAG 幻觉的方法，也不是专门针对幻觉的检测或评估指标，因此与“降低 RAG 幻觉”这一核心目标的联系较为间接。"
+    },
+    {
+      "stable_id": "arxiv:2404.08189",
+      "title": "Reducing hallucination in structured outputs via Retrieval-Augmented Generation",
+      "abstract": "A common and fundamental limitation of Generative AI (GenAI) is its propensity to hallucinate. While large language models (LLM) have taken the world by storm, without eliminating or at least reducing hallucinations, real-world GenAI systems may face challenges in user adoption. In the process of deploying an enterprise application that produces workflows based on natural language requirements, we devised a system leveraging Retrieval Augmented Generation (RAG) to greatly improve the quality of the structured output that represents such workflows. Thanks to our implementation of RAG, our proposed system significantly reduces hallucinations in the output and improves the generalization of our LLM in out-of-domain settings. In addition, we show that using a small, well-trained retriever encoder can reduce the size of the accompanying LLM, thereby making deployments of LLM-based systems less resource-intensive.",
+      "url": "https://arxiv.org/abs/2404.08189v1",
+      "label": 2,
+      "reason": "文章明确针对大模型在生成结构化输出时的幻觉问题，提出并实现了一个特定的 RAG 系统架构来显著降低幻觉的发生。文章的核心贡献直接围绕“利用/优化 RAG 系统来减少幻觉”展开"
+    },
+    {
+      "stable_id": "arxiv:2410.11414",
+      "title": "ReDeEP: Detecting Hallucination in Retrieval-Augmented Generation via Mechanistic Interpretability",
+      "abstract": "Retrieval-Augmented Generation (RAG) models are designed to incorporate external knowledge, reducing hallucinations caused by insufficient parametric (internal) knowledge. However, even with accurate and relevant retrieved content, RAG models can still produce hallucinations by generating outputs that conflict with the retrieved information. Detecting such hallucinations requires disentangling how Large Language Models (LLMs) utilize external and parametric knowledge. Current detection methods often focus on one of these mechanisms or without decoupling their intertwined effects, making accurate detection difficult. In this paper, we investigate the internal mechanisms behind hallucinations in RAG scenarios. We discover hallucinations occur when the Knowledge FFNs in LLMs overemphasize parametric knowledge in the residual stream, while Copying Heads fail to effectively retain or integrate external knowledge from retrieved content. Based on these findings, we propose ReDeEP, a novel method that detects hallucinations by decoupling LLM's utilization of external context and parametric knowledge. Our experiments show that ReDeEP significantly improves RAG hallucination detection accuracy. Additionally, we introduce AARF, which mitigates hallucinations by modulating the contributions of Knowledge FFNs and Copying Heads.",
+      "url": "https://arxiv.org/abs/2410.11414v2",
+      "label": 2,
+      "reason": "文章不仅直接提出了能够支撑降低幻觉的检测方法（ReDeEP），而且还在最后明确提出了一种减轻（降低）幻觉的方法（AARF），符合“直接研究 RAG 幻觉的降低方法"
+    },
+    {
+      "stable_id": "arxiv:2504.08758",
+      "title": "Hyper-RAG: Combating LLM Hallucinations using Hypergraph-Driven Retrieval-Augmented Generation",
+      "abstract": "Large language models (LLMs) have transformed various sectors, including education, finance, and medicine, by enhancing content generation and decision-making processes. However, their integration into the medical field is cautious due to hallucinations, instances where generated content deviates from factual accuracy, potentially leading to adverse outcomes. To address this, we introduce Hyper-RAG, a hypergraph-driven Retrieval-Augmented Generation method that comprehensively captures both pairwise and beyond-pairwise correlations in domain-specific knowledge, thereby mitigating hallucinations. Experiments on the NeurologyCrop dataset with six prominent LLMs demonstrated that Hyper-RAG improves accuracy by an average of 12.3% over direct LLM use and outperforms Graph RAG and Light RAG by 6.3% and 6.0%, respectively. Additionally, Hyper-RAG maintained stable performance with increasing query complexity, unlike existing methods which declined. Further validation across nine diverse datasets showed a 35.5% performance improvement over Light RAG using a selection-based assessment. The lightweight variant, Hyper-RAG-Lite, achieved twice the retrieval speed and a 3.3% performance boost compared with Light RAG. These results confirm Hyper-RAG's effectiveness in enhancing LLM reliability and reducing hallucinations, making it a robust solution for high-stakes applications like medical diagnostics.",
+      "url": "https://arxiv.org/abs/2504.08758v1",
+      "label": 2,
+      "reason": "文章直接提出了一种名为 Hyper-RAG 的创新方法，其核心研究目标和实验验证都明确指向“对抗”和“减轻”大模型生成中的幻觉问题。"
+    },
+    {
+      "stable_id": "arxiv:2505.10792",
+      "title": "Finetune-RAG: Fine-Tuning Language Models to Resist Hallucination in Retrieval-Augmented Generation",
+      "abstract": "Retrieval-Augmented Generation (RAG) has emerged as a powerful framework to improve factuality in large language models (LLMs) by grounding their outputs in retrieved documents. However, ensuring perfect retrieval of relevant information remains challenging, and when irrelevant content is passed downstream to an LLM, it can lead to hallucinations. In this work, we propose Finetune-RAG, a simple and effective fine-tuning approach that features the first-of-its-kind RAG training dataset constructed to mimic real-world imperfections. Experimental results show that Finetune-RAG improves factual accuracy by 21.2% over the base model. We also propose Bench-RAG, an LLM-as-a-judge evaluation pipeline that stress tests models under realistic imperfect retrieval scenarios. Our codebase and dataset are fully open sourced for community use.",
+      "url": "https://arxiv.org/abs/2505.10792v3",
+      "label": 2,
+      "reason": "文章直接提出了一种名为 Finetune-RAG 的微调方法来抵抗（降低）RAG 系统中因检索不完美而导致的幻觉，同时还提出了一个专门的评估管道（Bench-RAG）来进行压力测试。"
+    },
+    {
+      "stable_id": "arxiv:2505.18581",
+      "title": "Removal of Hallucination on Hallucination: Debate-Augmented RAG",
+      "abstract": "Retrieval-Augmented Generation (RAG) enhances factual accuracy by integrating external knowledge, yet it introduces a critical issue: erroneous or biased retrieval can mislead generation, compounding hallucinations, a phenomenon we term Hallucination on Hallucination. To address this, we propose Debate-Augmented RAG (DRAG), a training-free framework that integrates Multi-Agent Debate (MAD) mechanisms into both retrieval and generation stages. In retrieval, DRAG employs structured debates among proponents, opponents, and judges to refine retrieval quality and ensure factual reliability. In generation, DRAG introduces asymmetric information roles and adversarial debates, enhancing reasoning robustness and mitigating factual inconsistencies. Evaluations across multiple tasks demonstrate that DRAG improves retrieval reliability, reduces RAG-induced hallucinations, and significantly enhances overall factual accuracy. Our code is available at https://github.com/Huenao/Debate-Augmented-RAG.",
+      "url": "https://arxiv.org/abs/2505.18581v1",
+      "label": 2,
+      "reason": "文章直接指出了 RAG 场景下由于检索错误导致的“幻觉叠加幻觉”问题，并明确提出了一种名为 DRAG 的辩论增强框架来专门解决这一问题。文章的实验结果也直接证明了该方法能够减少 RAG 引发的幻觉"
+    },
+    {
+      "stable_id": "arxiv:2506.09886",
+      "title": "Probabilistic distances-based hallucination detection in LLMs with RAG",
+      "abstract": "Detecting hallucinations in large language models (LLMs) is critical for their safety in many applications. Without proper detection, these systems often provide harmful, unreliable answers. In recent years, LLMs have been actively used in retrieval-augmented generation (RAG) settings. However, hallucinations remain even in this setting, and while numerous hallucination detection methods have been proposed, most approaches are not specifically designed for RAG systems. To overcome this limitation, we introduce a hallucination detection method based on estimating the distances between the distributions of prompt token embeddings and language model response token embeddings. The method examines the geometric structure of token hidden states to reliably extract a signal of factuality in text, while remaining friendly to long sequences. Extensive experiments demonstrate that our method achieves state-of-the-art or competitive performance. It also has transferability from solving the NLI task to the hallucination detection task, making it a fully unsupervised and efficient method with a competitive performance on the final task.",
+      "url": "https://arxiv.org/abs/2506.09886v2",
+      "label": 2,
+      "reason": "文章明确提出了一种专门针对 RAG 系统的幻觉检测方法（基于概率距离）。根据您的判断标准，能够直接支撑降低幻觉的“检测、评估方法”被归类为最高相关性。"
+    },
+    {
+      "stable_id": "arxiv:2507.22915",
+      "title": "Theoretical Foundations and Mitigation of Hallucination in Large Language Models",
+      "abstract": "Hallucination in Large Language Models (LLMs) refers to the generation of content that is not faithful to the input or the real-world facts. This paper provides a rigorous treatment of hallucination in LLMs, including formal definitions and theoretical analyses. We distinguish between intrinsic and extrinsic hallucinations, and define a \\textit{hallucination risk} for models. We derive bounds on this risk using learning-theoretic frameworks (PAC-Bayes and Rademacher complexity). We then survey detection strategies for hallucinations, such as token-level uncertainty estimation, confidence calibration, and attention alignment checks. On the mitigation side, we discuss approaches including retrieval-augmented generation, hallucination-aware fine-tuning, logit calibration, and the incorporation of fact-verification modules. We propose a unified detection and mitigation workflow, illustrated with a diagram, to integrate these strategies. Finally, we outline evaluation protocols for hallucination, recommending datasets, metrics, and experimental setups to quantify and reduce hallucinations. Our work lays a theoretical foundation and practical guidelines for addressing the crucial challenge of hallucination in LLMs.",
+      "url": "https://arxiv.org/abs/2507.22915v1",
+      "label": 1,
+      "reason": "文章在缓解策略中提及了检索增强生成（RAG），并且深入探讨了模型事实性，但其核心是利用 RAG 等手段来缓解 LLM 的幻觉，而不是专门研究如何降低 RAG 系统本身的幻觉。"
+    },
+    {
+      "stable_id": "arxiv:2508.03553",
+      "title": "MultiRAG: A Knowledge-guided Framework for Mitigating Hallucination in Multi-source Retrieval Augmented Generation",
+      "abstract": "Retrieval Augmented Generation (RAG) has emerged as a promising solution to address hallucination issues in Large Language Models (LLMs). However, the integration of multiple retrieval sources, while potentially more informative, introduces new challenges that can paradoxically exacerbate hallucination problems. These challenges manifest primarily in two aspects: the sparse distribution of multi-source data that hinders the capture of logical relationships and the inherent inconsistencies among different sources that lead to information conflicts. To address these challenges, we propose MultiRAG, a novel framework designed to mitigate hallucination in multi-source retrieval-augmented generation through knowledge-guided approaches. Our framework introduces two key innovations: (1) a knowledge construction module that employs multi-source line graphs to efficiently aggregate logical relationships across different knowledge sources, effectively addressing the sparse data distribution issue; and (2) a sophisticated retrieval module that implements a multi-level confidence calculation mechanism, performing both graph-level and node-level assessments to identify and eliminate unreliable information nodes, thereby reducing hallucinations caused by inter-source inconsistencies. Extensive experiments on four multi-domain query datasets and two multi-hop QA datasets demonstrate that MultiRAG significantly enhances the reliability and efficiency of knowledge retrieval in complex multi-source scenarios. \\textcolor{blue}{Our code is available in https://github.com/wuwenlong123/MultiRAG.",
+      "url": "https://arxiv.org/abs/2508.03553v1",
+      "label": 2,
+      "reason": "文章明确指出了多源 RAG 场景下自身会引入和加剧幻觉的问题（由于信息冲突等原因），并直接提出了一种名为 MultiRAG 的新框架来专门“缓解多源检索增强生成中的幻觉”。"
+    },
+    {
+      "stable_id": "arxiv:2510.22344",
+      "title": "FAIR-RAG: Faithful Adaptive Iterative Refinement for Retrieval-Augmented Generation",
+      "abstract": "While Retrieval-Augmented Generation (RAG) mitigates hallucination and knowledge staleness in Large Language Models (LLMs), existing frameworks often falter on complex, multi-hop queries that require synthesizing information from disparate sources. Current advanced RAG methods, employing iterative or adaptive strategies, lack a robust mechanism to systematically identify and fill evidence gaps, often propagating noise or failing to gather a comprehensive context. We introduce FAIR-RAG, a novel agentic framework that transforms the standard RAG pipeline into a dynamic, evidence-driven reasoning process. At its core is an Iterative Refinement Cycle governed by a module we term Structured Evidence Assessment (SEA). The SEA acts as an analytical gating mechanism: it deconstructs the initial query into a checklist of required findings and audits the aggregated evidence to identify confirmed facts and, critically, explicit informational gaps. These gaps provide a precise signal to an Adaptive Query Refinement agent, which generates new, targeted sub-queries to retrieve missing information. This cycle repeats until the evidence is verified as sufficient, ensuring a comprehensive context for a final, strictly faithful generation. We conducted experiments on challenging multi-hop QA benchmarks, including HotpotQA, 2WikiMultiHopQA, and MusiQue. In a unified experimental setup, FAIR-RAG significantly outperforms strong baselines. On HotpotQA, it achieves an F1-score of 0.453 -- an absolute improvement of 8.3 points over the strongest iterative baseline -- establishing a new state-of-the-art for this class of methods on these benchmarks. Our work demonstrates that a structured, evidence-driven refinement process with explicit gap analysis is crucial for unlocking reliable and accurate reasoning in advanced RAG systems for complex, knowledge-intensive tasks.",
+      "url": "https://arxiv.org/abs/2510.22344v1",
+      "label": 2,
+      "reason": "该文章明确指出现有 RAG 方法在复杂查询中“会传播噪声或未能收集全面的上下文”（这是导致 RAG 幻觉的直接原因），并提出 FAIR-RAG 框架来确保最终的“严格忠实的生成”（strictly faithful generation）。在生成任务中，“忠实”（faithful）是“幻觉”（hallucination）的直接反义词，通过填补证据空白和分析门控机制来确保生成的忠实性，本质上就是一种直接研究降低 RAG 幻觉的方法。这符合最高相关性标准。"
+    },
+    {
+      "stable_id": "arxiv:2601.02993",
+      "title": "Stable-RAG: Mitigating Retrieval-Permutation-Induced Hallucinations in Retrieval-Augmented Generation",
+      "abstract": "Retrieval-Augmented Generation (RAG) has become a key paradigm for reducing factual hallucinations in Large Language Models (LLMs), yet little is known about how the order of retrieved documents affects model behavior. We empirically show that under a Top-5 retrieval setting with the gold document included, LLM answers vary substantially across permutations of the retrieved set, even when the gold document is fixed in the first position. This reveals a previously underexplored sensitivity to retrieval permutations. Although existing robust RAG methods focus primarily on enhancing LLM robustness to low-quality retrieval and mitigating positional bias to distribute attention fairly over long contexts, neither approach directly addresses permutation sensitivity. In this paper, we propose Stable-RAG, which exploits permutation sensitivity estimation to mitigate permutation-induced hallucinations. Stable-RAG runs the generator under multiple retrieval orders, clusters hidden states, and decodes from a cluster-center representation that captures the dominant reasoning pattern. It then uses these reasoning results to align hallucinated outputs toward the correct answer, encouraging the model to produce consistent and accurate predictions across document permutations. Experiments on three QA datasets show that Stable-RAG improves answer accuracy, reasoning consistency, and generalization across datasets, retrievers, and input lengths compared with strong baselines.",
+      "url": "https://arxiv.org/abs/2601.02993v4",
+      "label": 2,
+      "reason": "文章明确指出了 RAG 系统中由于“检索文档排列顺序”会导致模型产生幻觉，并直接提出了一种名为 Stable-RAG 的新方法来专门缓解这种由排列引起的幻觉。文章的核心贡献和实验验证都直接围绕“降低 RAG 幻觉”这一目标展开，完全符合“直接研究 RAG 幻觉的降低方法”这一最高判断标准。"
+    }
+  ]
+}

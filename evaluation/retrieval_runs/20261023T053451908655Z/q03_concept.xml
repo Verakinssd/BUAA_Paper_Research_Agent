@@ -1,0 +1,324 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/pBwGlHxfkYSctGM07Rtx0nRuprc</id>
+  <title>arXiv Query: search_query=(all:"large language model" OR all:"large language models" OR all:"LLM") AND (all:"multi agent" OR all:"multi-agent") AND (all:"collaboration" OR all:"cooperation" OR all:"coordination")&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-10-23T05:35:15Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=(all:%22large+language+model%22+OR+(all:%22large+language+models%22+OR+all:%22LLM%22))+AND+((all:%22multi+agent%22+OR+all:%22multi-agent%22)+AND+(all:%22collaboration%22+OR+(all:%22cooperation%22+OR+all:%22coordination%22)))&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>2251</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2412.05449v1</id>
+    <title>Towards Effective GenAI Multi-Agent Collaboration: Design and Evaluation for Enterprise Applications</title>
+    <updated>2024-12-06T22:14:17Z</updated>
+    <link href="https://arxiv.org/abs/2412.05449v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2412.05449v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>AI agents powered by large language models (LLMs) have shown strong capabilities in problem solving. Through combining many intelligent agents, multi-agent collaboration has emerged as a promising approach to tackle complex, multi-faceted problems that exceed the capabilities of single AI agents. However, designing the collaboration protocols and evaluating the effectiveness of these systems remains a significant challenge, especially for enterprise applications. This report addresses these challenges by presenting a comprehensive evaluation of coordination and routing capabilities in a novel multi-agent collaboration framework. We evaluate two key operational modes: (1) a coordination mode enabling complex task completion through parallel communication and payload referencing, and (2) a routing mode for efficient message forwarding between agents. We benchmark on a set of handcrafted scenarios from three enterprise domains, which are publicly released with the report. For coordination capabilities, we demonstrate the effectiveness of inter-agent communication and payload referencing mechanisms, achieving end-to-end goal success rates of 90%. Our analysis yields several key findings: multi-agent collaboration enhances goal success rates by up to 70% compared to single-agent approaches in our benchmarks; payload referencing improves performance on code-intensive tasks by 23%; latency can be substantially reduced with a routing mechanism that selectively bypasses agent orchestration. These findings offer valuable guidance for enterprise deployments of multi-agent systems and advance the development of scalable, efficient multi-agent collaboration frameworks.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-12-06T22:14:17Z</published>
+    <arxiv:comment>Technical report for multi-agent collaboration on AWS Bedrock Agents</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Raphael Shu</name>
+    </author>
+    <author>
+      <name>Nilaksh Das</name>
+    </author>
+    <author>
+      <name>Michelle Yuan</name>
+    </author>
+    <author>
+      <name>Monica Sunkara</name>
+    </author>
+    <author>
+      <name>Yi Zhang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2512.13930v1</id>
+    <title>Hierarchical Multi-agent Large Language Model Reasoning for Autonomous Functional Materials Discovery</title>
+    <updated>2025-12-15T22:08:18Z</updated>
+    <link href="https://arxiv.org/abs/2512.13930v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2512.13930v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Artificial intelligence is reshaping scientific exploration, but most methods automate procedural tasks without engaging in scientific reasoning, limiting autonomy in discovery. We introduce Materials Agents for Simulation and Theory in Electronic-structure Reasoning (MASTER), an active learning framework where large language models autonomously design, execute, and interpret atomistic simulations. In MASTER, a multimodal system translates natural language into density functional theory workflows, while higher-level reasoning agents guide discovery through a hierarchy of strategies, including a single agent baseline and three multi-agent approaches: peer review, triage-ranking, and triage-forms. Across two chemical applications, CO adsorption on Cu-surface transition metal (M) adatoms and on M-N-C catalysts, reasoning-driven exploration reduces required atomistic simulations by up to 90% relative to trial-and-error selection. Reasoning trajectories reveal chemically grounded decisions that cannot be explained by stochastic sampling or semantic bias. Altogether, multi-agent collaboration accelerates materials discovery and marks a new paradigm for autonomous scientific exploration.</summary>
+    <category term="cond-mat.mtrl-sci" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-12-15T22:08:18Z</published>
+    <arxiv:comment>Keywords: Multi-agent reasoning; Large language models; Active learning; AI-driven simulation; Materials discovery; Density functional theory; Surface chemistry</arxiv:comment>
+    <arxiv:primary_category term="cond-mat.mtrl-sci"/>
+    <author>
+      <name>Samuel Rothfarb</name>
+    </author>
+    <author>
+      <name>Megan C. Davis</name>
+    </author>
+    <author>
+      <name>Ivana Matanovic</name>
+    </author>
+    <author>
+      <name>Baikun Li</name>
+    </author>
+    <author>
+      <name>Edward F. Holby</name>
+    </author>
+    <author>
+      <name>Wilton J. M. Kort-Kamp</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2609.38327v2</id>
+    <title>Absorbing State Phase Transitions in Multi-Agent Search</title>
+    <updated>2026-10-07T17:19:56Z</updated>
+    <link href="https://arxiv.org/abs/2609.38327v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2609.38327v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Nontrivial dynamics can emerge in large language model (LLM)-based multi-agent systems, and preliminary evidence exists that formalisms from statistical mechanics can be effective at modeling and predicting such behaviors. In parallel, designing multi-agent communication topology for optimal task-solving is an active research question. In this paper, we focus on predicting the success of multi-agent search tasks using the formalism of absorbing state phase transitions. We first taxonomize search tasks into four types, informed by classical results in combinatorial search. We then theoretically derive a critical communication degree $d_c$, the minimum number of agents each agent can communicate with, above which incorrect hypotheses do not proliferate uncontrollably and the search enters the solved state. Finally, we evaluate frontier LLM-based multi-agent systems on real-world search and discovery tasks, software configuration debugging and physical mechanism discovery, and find that agreement with theory is mixed. LLM agents may not communicate with their neighbors and can develop strategies that are individually beneficial but limits the benefits of collaboration.</summary>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-09-29T18:00:49Z</published>
+    <arxiv:comment>Code: https://github.com/wenwenzheng-gif/absorbing-state-multi-agent-search</arxiv:comment>
+    <arxiv:primary_category term="cs.MA"/>
+    <author>
+      <name>Wenwen Zheng</name>
+    </author>
+    <author>
+      <name>Yuzhe Yang</name>
+    </author>
+    <author>
+      <name>Helen Qu</name>
+    </author>
+    <author>
+      <name>Xin Eric Wang</name>
+    </author>
+    <author>
+      <name>Haewon Jeong</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2412.20138v7</id>
+    <title>TradingAgents: Multi-Agents LLM Financial Trading Framework</title>
+    <updated>2025-06-03T05:45:06Z</updated>
+    <link href="https://arxiv.org/abs/2412.20138v7" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2412.20138v7" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Significant progress has been made in automated problem-solving using societies of agents powered by large language models (LLMs). In finance, efforts have largely focused on single-agent systems handling specific tasks or multi-agent frameworks independently gathering data. However, the multi-agent systems' potential to replicate real-world trading firms' collaborative dynamics remains underexplored. TradingAgents proposes a novel stock trading framework inspired by trading firms, featuring LLM-powered agents in specialized roles such as fundamental analysts, sentiment analysts, technical analysts, and traders with varied risk profiles. The framework includes Bull and Bear researcher agents assessing market conditions, a risk management team monitoring exposure, and traders synthesizing insights from debates and historical data to make informed decisions. By simulating a dynamic, collaborative trading environment, this framework aims to improve trading performance. Detailed architecture and extensive experiments reveal its superiority over baseline models, with notable improvements in cumulative returns, Sharpe ratio, and maximum drawdown, highlighting the potential of multi-agent LLM frameworks in financial trading. TradingAgents is available at https://github.com/TauricResearch/TradingAgents.</summary>
+    <category term="q-fin.TR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CE" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-12-28T12:54:06Z</published>
+    <arxiv:comment>Tauric Research @ https://github.com/TauricResearch; Oral @ Multi-Agent AI in the Real World</arxiv:comment>
+    <arxiv:primary_category term="q-fin.TR"/>
+    <author>
+      <name>Yijia Xiao</name>
+    </author>
+    <author>
+      <name>Edward Sun</name>
+    </author>
+    <author>
+      <name>Di Luo</name>
+    </author>
+    <author>
+      <name>Wei Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2502.07165v1</id>
+    <title>Don't Just Demo, Teach Me the Principles: A Principle-Based Multi-Agent Prompting Strategy for Text Classification</title>
+    <updated>2025-02-11T01:10:13Z</updated>
+    <link href="https://arxiv.org/abs/2502.07165v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2502.07165v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>We present PRINCIPLE-BASED PROMPTING, a simple but effective multi-agent prompting strategy for text classification. It first asks multiple LLM agents to independently generate candidate principles based on analysis of demonstration samples with or without labels, consolidates them into final principles via a finalizer agent, and then sends them to a classifier agent to perform downstream classification tasks. Extensive experiments on binary and multi-class classification datasets with different sizes of LLMs show that our approach not only achieves substantial performance gains (1.55% - 19.37%) over zero-shot prompting on macro-F1 score but also outperforms other strong baselines (CoT and stepback prompting). Principles generated by our approach help LLMs perform better on classification tasks than human crafted principles on two private datasets. Our multi-agent PRINCIPLE-BASED PROMPTING approach also shows on-par or better performance compared to demonstration-based few-shot prompting approaches, yet with substantially lower inference costs. Ablation studies show that label information and the multi-agent cooperative LLM framework play an important role in generating high-quality principles to facilitate downstream classification tasks.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-02-11T01:10:13Z</published>
+    <arxiv:comment>To be published in AAAI 2025 Workshop on Advancing LLM-Based Multi-Agent Collaboration</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Peipei Wei</name>
+    </author>
+    <author>
+      <name>Dimitris Dimitriadis</name>
+    </author>
+    <author>
+      <name>Yan Xu</name>
+    </author>
+    <author>
+      <name>Mingwei Shen</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2512.06196v1</id>
+    <title>ARCANE: A Multi-Agent Framework for Interpretable and Configurable Alignment</title>
+    <updated>2025-12-05T22:39:54Z</updated>
+    <link href="https://arxiv.org/abs/2512.06196v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2512.06196v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As agents based on large language models are increasingly deployed to long-horizon tasks, maintaining their alignment with stakeholder preferences becomes critical. Effective alignment in such settings requires reward models that are interpretable so that stakeholders can understand and audit model objectives. Moreover, reward models must be capable of steering agents at interaction time, allowing preference shifts to be incorporated without retraining. We introduce ARCANE, a framework that frames alignment as a multi-agent collaboration problem that dynamically represents stakeholder preferences as natural-language rubrics: weighted sets of verifiable criteria that can be generated on-the-fly from task context. Inspired by utility theory, we formulate rubric learning as a reconstruction problem and apply a regularized Group-Sequence Policy Optimization (GSPO) procedure that balances interpretability, faithfulness, and computational efficiency. Using a corpus of 219 labeled rubrics derived from the GDPVal benchmark, we evaluate ARCANE on challenging tasks requiring multi-step reasoning and tool use. The learned rubrics produce compact, legible evaluations and enable configurable trade-offs (e.g., correctness vs. conciseness) without retraining. Our results show that rubric-based reward models offer a promising path toward interpretable, test-time adaptive alignment for complex, long-horizon AI systems.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-12-05T22:39:54Z</published>
+    <arxiv:comment>Accepted to the AAAI 2026 LLAMAS Workshop (Large Language Model Agents for Multi-Agent Systems)</arxiv:comment>
+    <arxiv:primary_category term="cs.AI"/>
+    <author>
+      <name>Charlie Masters</name>
+    </author>
+    <author>
+      <name>Marta Grześkiewicz</name>
+    </author>
+    <author>
+      <name>Stefano V. Albrecht</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2405.16887v2</id>
+    <title>A Large Language Model-based multi-agent manufacturing system for intelligent shopfloor</title>
+    <updated>2025-09-22T13:20:33Z</updated>
+    <link href="https://arxiv.org/abs/2405.16887v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2405.16887v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>As customer demand for multi-variety and small-batch production increases, dynamic disturbances place greater demands on manufacturing systems. To address such challenges, researchers proposed the multi-agent manufacturing system. However, conventional agent negotiation typically relies on pre-defined and fixed heuristic rules, which are ill-suited to managing complex and fluctuating disturbances. In current implementations, mainstream approaches based on reinforcement learning require the development of simulators and training models specific to a given shopfloor, necessitating substantial computational resources and lacking scalability. To overcome this limitation, the present study proposes a Large Language Model-based (LLM-based) multi-agent manufacturing system for intelligent shopfloor management. By defining the diverse modules of agents and their collaborative methods, this system facilitates the processing of all workpieces with minimal human intervention. The agents in this system consist of the Machine Server Module (MSM), Bid Inviter Module (BIM), Bidder Module (BM), Thinking Module (TM), and Decision Module (DM). By harnessing the reasoning capabilities of LLMs, these modules enable agents to dynamically analyze shopfloor information and select appropriate processing machines. The LLM-based modules, predefined by system prompts, provide dynamic functionality for the system without the need for pre-training. Extensive experiments were conducted in physical shopfloor settings. The results demonstrate that the proposed system exhibits strong adaptability, and achieves superior performance (makespan) and stability (as measured by sample standard deviation) compared to other approaches without requiring pre-training.</summary>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.RO" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-05-27T07:10:04Z</published>
+    <arxiv:primary_category term="cs.AI"/>
+    <arxiv:journal_ref>Zhao Z, Tang D, Liu C, et al. A Large language model-based multi-agent manufacturing system for intelligent shopfloors[J]. Advanced Engineering Informatics, 2026, 69: 103888</arxiv:journal_ref>
+    <author>
+      <name>Zhen Zhao</name>
+    </author>
+    <author>
+      <name>Dunbing Tang</name>
+    </author>
+    <author>
+      <name>Changchun Liu</name>
+    </author>
+    <author>
+      <name>Liping Wang</name>
+    </author>
+    <author>
+      <name>Zequn Zhang</name>
+    </author>
+    <author>
+      <name>Haihua Zhu</name>
+    </author>
+    <author>
+      <name>Kai Chen</name>
+    </author>
+    <author>
+      <name>Qingwei Nie</name>
+    </author>
+    <author>
+      <name>Yuchen Ji</name>
+    </author>
+    <arxiv:doi>10.1016/j.aei.2025.103888</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1016/j.aei.2025.103888" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2310.03903v3</id>
+    <title>LLM-Coordination: Evaluating and Analyzing Multi-agent Coordination Abilities in Large Language Models</title>
+    <updated>2025-04-28T20:21:54Z</updated>
+    <link href="https://arxiv.org/abs/2310.03903v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2310.03903v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large Language Models (LLMs) have demonstrated emergent common-sense reasoning and Theory of Mind (ToM) capabilities, making them promising candidates for developing coordination agents. This study introduces the LLM-Coordination Benchmark, a novel benchmark for analyzing LLMs in the context of Pure Coordination Settings, where agents must cooperate to maximize gains. Our benchmark evaluates LLMs through two distinct tasks. The first is Agentic Coordination, where LLMs act as proactive participants in four pure coordination games. The second is Coordination Question Answering (CoordQA), which tests LLMs on 198 multiple-choice questions across these games to evaluate three key abilities: Environment Comprehension, ToM Reasoning, and Joint Planning. Results from Agentic Coordination experiments reveal that LLM-Agents excel in multi-agent coordination settings where decision-making primarily relies on environmental variables but face challenges in scenarios requiring active consideration of partners' beliefs and intentions. The CoordQA experiments further highlight significant room for improvement in LLMs' Theory of Mind reasoning and joint planning capabilities. Zero-Shot Coordination (ZSC) experiments in the Agentic Coordination setting demonstrate that LLM agents, unlike RL methods, exhibit robustness to unseen partners. These findings indicate the potential of LLMs as Agents in pure coordination setups and underscore areas for improvement. Code Available at https://github.com/eric-ai-lab/llm_coordination.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.MA" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2023-10-05T21:18:15Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Saaket Agashe</name>
+    </author>
+    <author>
+      <name>Yue Fan</name>
+    </author>
+    <author>
+      <name>Anthony Reyna</name>
+    </author>
+    <author>
+      <name>Xin Eric Wang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2407.12532v1</id>
+    <title>Towards Collaborative Intelligence: Propagating Intentions and Reasoning for Multi-Agent Coordination with Large Language Models</title>
+    <updated>2024-07-17T13:14:00Z</updated>
+    <link href="https://arxiv.org/abs/2407.12532v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2407.12532v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Effective collaboration in multi-agent systems requires communicating goals and intentions between agents. Current agent frameworks often suffer from dependencies on single-agent execution and lack robust inter-module communication, frequently leading to suboptimal multi-agent reinforcement learning (MARL) policies and inadequate task coordination. To address these challenges, we present a framework for training large language models (LLMs) as collaborative agents to enable coordinated behaviors in cooperative MARL. Each agent maintains a private intention consisting of its current goal and associated sub-tasks. Agents broadcast their intentions periodically, allowing other agents to infer coordination tasks. A propagation network transforms broadcast intentions into teammate-specific communication messages, sharing relevant goals with designated teammates. The architecture of our framework is structured into planning, grounding, and execution modules. During execution, multiple agents interact in a downstream environment and communicate intentions to enable coordinated behaviors. The grounding module dynamically adapts comprehension strategies based on emerging coordination patterns, while feedback from execution agents influnces the planning module, enabling the dynamic re-planning of sub-tasks. Results in collaborative environment simulation demonstrate intention propagation reduces miscoordination errors by aligning sub-task dependencies between agents. Agents learn when to communicate intentions and which teammates require task details, resulting in emergent coordinated behaviors. This demonstrates the efficacy of intention sharing for cooperative multi-agent RL based on LLMs.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-07-17T13:14:00Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Xihe Qiu</name>
+    </author>
+    <author>
+      <name>Haoyu Wang</name>
+    </author>
+    <author>
+      <name>Xiaoyu Tan</name>
+    </author>
+    <author>
+      <name>Chao Qu</name>
+    </author>
+    <author>
+      <name>Yujie Xiong</name>
+    </author>
+    <author>
+      <name>Yuan Cheng</name>
+    </author>
+    <author>
+      <name>Yinghui Xu</name>
+    </author>
+    <author>
+      <name>Wei Chu</name>
+    </author>
+    <author>
+      <name>Yuan Qi</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2410.12532v3</id>
+    <title>MedAide: Information Fusion and Anatomy of Medical Intents via LLM-based Agent Collaboration</title>
+    <updated>2025-07-03T13:02:30Z</updated>
+    <link href="https://arxiv.org/abs/2410.12532v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.12532v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>In healthcare intelligence, the ability to fuse heterogeneous, multi-intent information from diverse clinical sources is fundamental to building reliable decision-making systems. Large Language Model (LLM)-driven information interaction systems currently showing potential promise in the healthcare domain. Nevertheless, they often suffer from information redundancy and coupling when dealing with complex medical intents, leading to severe hallucinations and performance bottlenecks. To this end, we propose MedAide, an LLM-based medical multi-agent collaboration framework designed to enable intent-aware information fusion and coordinated reasoning across specialized healthcare domains. Specifically, we introduce a regularization-guided module that combines syntactic constraints with retrieval augmented generation to decompose complex queries into structured representations, facilitating fine-grained clinical information fusion and intent resolution. Additionally, a dynamic intent prototype matching module is proposed to utilize dynamic prototype representation with a semantic similarity matching mechanism to achieve adaptive recognition and updating of the agent's intent in multi-round healthcare dialogues. Ultimately, we design a rotation agent collaboration mechanism that introduces dynamic role rotation and decision-level information fusion across specialized medical agents. Extensive experiments are conducted on four medical benchmarks with composite intents. Experimental results from automated metrics and expert doctor evaluations show that MedAide outperforms current LLMs and improves their medical proficiency and strategic reasoning.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-16T13:10:27Z</published>
+    <arxiv:comment>LLM-based Multi-Agent Collaboration for Medical Applications</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Dingkang Yang</name>
+    </author>
+    <author>
+      <name>Jinjie Wei</name>
+    </author>
+    <author>
+      <name>Mingcheng Li</name>
+    </author>
+    <author>
+      <name>Jiyao Liu</name>
+    </author>
+    <author>
+      <name>Lihao Liu</name>
+    </author>
+    <author>
+      <name>Ming Hu</name>
+    </author>
+    <author>
+      <name>Junjun He</name>
+    </author>
+    <author>
+      <name>Yakun Ju</name>
+    </author>
+    <author>
+      <name>Wei Zhou</name>
+    </author>
+    <author>
+      <name>Yang Liu</name>
+    </author>
+    <author>
+      <name>Lihua Zhang</name>
+    </author>
+  </entry>
+</feed>

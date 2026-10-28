@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/KCjJEcnwIxPntCr8VtdR9Pfn1IE</id>
+  <title>arXiv Query: search_query=all:"retrieval augmented generation hallucination"&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-10-23T05:35:07Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=all:%22retrieval+augmented+generation+hallucination%22&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2507.22915v1</id>
+    <title>Theoretical Foundations and Mitigation of Hallucination in Large Language Models</title>
+    <updated>2025-07-20T15:22:34Z</updated>
+    <link href="https://arxiv.org/abs/2507.22915v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2507.22915v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Hallucination in Large Language Models (LLMs) refers to the generation of content that is not faithful to the input or the real-world facts. This paper provides a rigorous treatment of hallucination in LLMs, including formal definitions and theoretical analyses. We distinguish between intrinsic and extrinsic hallucinations, and define a \textit{hallucination risk} for models. We derive bounds on this risk using learning-theoretic frameworks (PAC-Bayes and Rademacher complexity). We then survey detection strategies for hallucinations, such as token-level uncertainty estimation, confidence calibration, and attention alignment checks. On the mitigation side, we discuss approaches including retrieval-augmented generation, hallucination-aware fine-tuning, logit calibration, and the incorporation of fact-verification modules. We propose a unified detection and mitigation workflow, illustrated with a diagram, to integrate these strategies. Finally, we outline evaluation protocols for hallucination, recommending datasets, metrics, and experimental setups to quantify and reduce hallucinations. Our work lays a theoretical foundation and practical guidelines for addressing the crucial challenge of hallucination in LLMs.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-07-20T15:22:34Z</published>
+    <arxiv:comment>12 pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Esmail Gumaan</name>
+    </author>
+  </entry>
+</feed>

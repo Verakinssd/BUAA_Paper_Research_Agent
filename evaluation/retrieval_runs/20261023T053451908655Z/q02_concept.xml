@@ -1,0 +1,287 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<feed xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/" xmlns:arxiv="http://arxiv.org/schemas/atom" xmlns="http://www.w3.org/2005/Atom">
+  <id>https://arxiv.org/api/0VzybXNPBUwG38URiuEP/j+u08Y</id>
+  <title>arXiv Query: search_query=(all:"retrieval augmented generation" OR all:"RAG") AND (all:"hallucination" OR all:"hallucinations" OR all:"factuality")&amp;id_list=&amp;start=0&amp;max_results=10</title>
+  <updated>2026-10-23T05:35:03Z</updated>
+  <link href="https://arxiv.org/api/query?search_query=(all:%22retrieval+augmented+generation%22+OR+all:%22RAG%22)+AND+(all:%22hallucination%22+OR+(all:%22hallucinations%22+OR+all:%22factuality%22))&amp;start=0&amp;max_results=10&amp;id_list=" type="application/atom+xml"/>
+  <opensearch:itemsPerPage>10</opensearch:itemsPerPage>
+  <opensearch:totalResults>1602</opensearch:totalResults>
+  <opensearch:startIndex>0</opensearch:startIndex>
+  <entry>
+    <id>http://arxiv.org/abs/2510.22344v1</id>
+    <title>FAIR-RAG: Faithful Adaptive Iterative Refinement for Retrieval-Augmented Generation</title>
+    <updated>2025-10-25T15:59:33Z</updated>
+    <link href="https://arxiv.org/abs/2510.22344v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2510.22344v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>While Retrieval-Augmented Generation (RAG) mitigates hallucination and knowledge staleness in Large Language Models (LLMs), existing frameworks often falter on complex, multi-hop queries that require synthesizing information from disparate sources. Current advanced RAG methods, employing iterative or adaptive strategies, lack a robust mechanism to systematically identify and fill evidence gaps, often propagating noise or failing to gather a comprehensive context. We introduce FAIR-RAG, a novel agentic framework that transforms the standard RAG pipeline into a dynamic, evidence-driven reasoning process. At its core is an Iterative Refinement Cycle governed by a module we term Structured Evidence Assessment (SEA). The SEA acts as an analytical gating mechanism: it deconstructs the initial query into a checklist of required findings and audits the aggregated evidence to identify confirmed facts and, critically, explicit informational gaps. These gaps provide a precise signal to an Adaptive Query Refinement agent, which generates new, targeted sub-queries to retrieve missing information. This cycle repeats until the evidence is verified as sufficient, ensuring a comprehensive context for a final, strictly faithful generation. We conducted experiments on challenging multi-hop QA benchmarks, including HotpotQA, 2WikiMultiHopQA, and MusiQue. In a unified experimental setup, FAIR-RAG significantly outperforms strong baselines. On HotpotQA, it achieves an F1-score of 0.453 -- an absolute improvement of 8.3 points over the strongest iterative baseline -- establishing a new state-of-the-art for this class of methods on these benchmarks. Our work demonstrates that a structured, evidence-driven refinement process with explicit gap analysis is crucial for unlocking reliable and accurate reasoning in advanced RAG systems for complex, knowledge-intensive tasks.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-10-25T15:59:33Z</published>
+    <arxiv:comment>30 pages, 5 figures, 5 tables. Keywords: Retrieval-Augmented Generation (RAG), Large Language Models (LLMs), Agentic AI, Multi-hop Question Answering, Faithfulness</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Mohammad Aghajani Asl</name>
+    </author>
+    <author>
+      <name>Majid Asgari-Bidhendi</name>
+    </author>
+    <author>
+      <name>Behrooz Minaei-Bidgoli</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2506.09886v2</id>
+    <title>Probabilistic distances-based hallucination detection in LLMs with RAG</title>
+    <updated>2026-02-24T19:13:55Z</updated>
+    <link href="https://arxiv.org/abs/2506.09886v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2506.09886v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Detecting hallucinations in large language models (LLMs) is critical for their safety in many applications. Without proper detection, these systems often provide harmful, unreliable answers. In recent years, LLMs have been actively used in retrieval-augmented generation (RAG) settings. However, hallucinations remain even in this setting, and while numerous hallucination detection methods have been proposed, most approaches are not specifically designed for RAG systems. To overcome this limitation, we introduce a hallucination detection method based on estimating the distances between the distributions of prompt token embeddings and language model response token embeddings. The method examines the geometric structure of token hidden states to reliably extract a signal of factuality in text, while remaining friendly to long sequences. Extensive experiments demonstrate that our method achieves state-of-the-art or competitive performance. It also has transferability from solving the NLI task to the hallucination detection task, making it a fully unsupervised and efficient method with a competitive performance on the final task.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-06-11T15:59:15Z</published>
+    <arxiv:comment>Updated approach to constructing a hallucination detection score. Added results from experiments with the NLI task. The approach with trainable deep kernels has been removed, with a focus on the unsupervised approach</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Rodion Oblovatny</name>
+    </author>
+    <author>
+      <name>Alexandra Kuleshova</name>
+    </author>
+    <author>
+      <name>Konstantin Polev</name>
+    </author>
+    <author>
+      <name>Alexey Zaytsev</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2504.08758v1</id>
+    <title>Hyper-RAG: Combating LLM Hallucinations using Hypergraph-Driven Retrieval-Augmented Generation</title>
+    <updated>2025-03-30T12:39:14Z</updated>
+    <link href="https://arxiv.org/abs/2504.08758v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2504.08758v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Large language models (LLMs) have transformed various sectors, including education, finance, and medicine, by enhancing content generation and decision-making processes. However, their integration into the medical field is cautious due to hallucinations, instances where generated content deviates from factual accuracy, potentially leading to adverse outcomes. To address this, we introduce Hyper-RAG, a hypergraph-driven Retrieval-Augmented Generation method that comprehensively captures both pairwise and beyond-pairwise correlations in domain-specific knowledge, thereby mitigating hallucinations. Experiments on the NeurologyCrop dataset with six prominent LLMs demonstrated that Hyper-RAG improves accuracy by an average of 12.3% over direct LLM use and outperforms Graph RAG and Light RAG by 6.3% and 6.0%, respectively. Additionally, Hyper-RAG maintained stable performance with increasing query complexity, unlike existing methods which declined. Further validation across nine diverse datasets showed a 35.5% performance improvement over Light RAG using a selection-based assessment. The lightweight variant, Hyper-RAG-Lite, achieved twice the retrieval speed and a 3.3% performance boost compared with Light RAG. These results confirm Hyper-RAG's effectiveness in enhancing LLM reliability and reducing hallucinations, making it a robust solution for high-stakes applications like medical diagnostics.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-03-30T12:39:14Z</published>
+    <arxiv:primary_category term="cs.IR"/>
+    <author>
+      <name>Yifan Feng</name>
+    </author>
+    <author>
+      <name>Hao Hu</name>
+    </author>
+    <author>
+      <name>Xingliang Hou</name>
+    </author>
+    <author>
+      <name>Shiquan Liu</name>
+    </author>
+    <author>
+      <name>Shihui Ying</name>
+    </author>
+    <author>
+      <name>Shaoyi Du</name>
+    </author>
+    <author>
+      <name>Han Hu</name>
+    </author>
+    <author>
+      <name>Yue Gao</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2404.08189v1</id>
+    <title>Reducing hallucination in structured outputs via Retrieval-Augmented Generation</title>
+    <updated>2024-04-12T01:42:09Z</updated>
+    <link href="https://arxiv.org/abs/2404.08189v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2404.08189v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>A common and fundamental limitation of Generative AI (GenAI) is its propensity to hallucinate. While large language models (LLM) have taken the world by storm, without eliminating or at least reducing hallucinations, real-world GenAI systems may face challenges in user adoption. In the process of deploying an enterprise application that produces workflows based on natural language requirements, we devised a system leveraging Retrieval Augmented Generation (RAG) to greatly improve the quality of the structured output that represents such workflows. Thanks to our implementation of RAG, our proposed system significantly reduces hallucinations in the output and improves the generalization of our LLM in out-of-domain settings. In addition, we show that using a small, well-trained retriever encoder can reduce the size of the accompanying LLM, thereby making deployments of LLM-based systems less resource-intensive.</summary>
+    <category term="cs.LG" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-04-12T01:42:09Z</published>
+    <arxiv:comment>To be presented at NAACL 2024. 11 pages and 4 figures</arxiv:comment>
+    <arxiv:primary_category term="cs.LG"/>
+    <arxiv:journal_ref>2024.naacl-industry.19</arxiv:journal_ref>
+    <author>
+      <name>Patrice Béchard</name>
+    </author>
+    <author>
+      <name>Orlando Marquez Ayala</name>
+    </author>
+    <arxiv:doi>10.18653/v1/2024.naacl-industry.19</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.18653/v1/2024.naacl-industry.19" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2505.10792v3</id>
+    <title>Finetune-RAG: Fine-Tuning Language Models to Resist Hallucination in Retrieval-Augmented Generation</title>
+    <updated>2025-12-03T07:17:35Z</updated>
+    <link href="https://arxiv.org/abs/2505.10792v3" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2505.10792v3" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval-Augmented Generation (RAG) has emerged as a powerful framework to improve factuality in large language models (LLMs) by grounding their outputs in retrieved documents. However, ensuring perfect retrieval of relevant information remains challenging, and when irrelevant content is passed downstream to an LLM, it can lead to hallucinations. In this work, we propose Finetune-RAG, a simple and effective fine-tuning approach that features the first-of-its-kind RAG training dataset constructed to mimic real-world imperfections. Experimental results show that Finetune-RAG improves factual accuracy by 21.2% over the base model. We also propose Bench-RAG, an LLM-as-a-judge evaluation pipeline that stress tests models under realistic imperfect retrieval scenarios. Our codebase and dataset are fully open sourced for community use.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-05-16T02:06:06Z</published>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Zhan Peng Lee</name>
+    </author>
+    <author>
+      <name>Andre Lin</name>
+    </author>
+    <author>
+      <name>Calvin Tan</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2505.18581v1</id>
+    <title>Removal of Hallucination on Hallucination: Debate-Augmented RAG</title>
+    <updated>2025-05-24T08:15:22Z</updated>
+    <link href="https://arxiv.org/abs/2505.18581v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2505.18581v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval-Augmented Generation (RAG) enhances factual accuracy by integrating external knowledge, yet it introduces a critical issue: erroneous or biased retrieval can mislead generation, compounding hallucinations, a phenomenon we term Hallucination on Hallucination. To address this, we propose Debate-Augmented RAG (DRAG), a training-free framework that integrates Multi-Agent Debate (MAD) mechanisms into both retrieval and generation stages. In retrieval, DRAG employs structured debates among proponents, opponents, and judges to refine retrieval quality and ensure factual reliability. In generation, DRAG introduces asymmetric information roles and adversarial debates, enhancing reasoning robustness and mitigating factual inconsistencies. Evaluations across multiple tasks demonstrate that DRAG improves retrieval reliability, reduces RAG-induced hallucinations, and significantly enhances overall factual accuracy. Our code is available at https://github.com/Huenao/Debate-Augmented-RAG.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.AI" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-05-24T08:15:22Z</published>
+    <arxiv:comment>Accepted by ACL 2025</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Wentao Hu</name>
+    </author>
+    <author>
+      <name>Wengyu Zhang</name>
+    </author>
+    <author>
+      <name>Yiyang Jiang</name>
+    </author>
+    <author>
+      <name>Chen Jason Zhang</name>
+    </author>
+    <author>
+      <name>Xiaoyong Wei</name>
+    </author>
+    <author>
+      <name>Qing Li</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2508.03553v1</id>
+    <title>MultiRAG: A Knowledge-guided Framework for Mitigating Hallucination in Multi-source Retrieval Augmented Generation</title>
+    <updated>2025-08-05T15:20:52Z</updated>
+    <link href="https://arxiv.org/abs/2508.03553v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2508.03553v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval Augmented Generation (RAG) has emerged as a promising solution to address hallucination issues in Large Language Models (LLMs). However, the integration of multiple retrieval sources, while potentially more informative, introduces new challenges that can paradoxically exacerbate hallucination problems. These challenges manifest primarily in two aspects: the sparse distribution of multi-source data that hinders the capture of logical relationships and the inherent inconsistencies among different sources that lead to information conflicts. To address these challenges, we propose MultiRAG, a novel framework designed to mitigate hallucination in multi-source retrieval-augmented generation through knowledge-guided approaches. Our framework introduces two key innovations: (1) a knowledge construction module that employs multi-source line graphs to efficiently aggregate logical relationships across different knowledge sources, effectively addressing the sparse data distribution issue; and (2) a sophisticated retrieval module that implements a multi-level confidence calculation mechanism, performing both graph-level and node-level assessments to identify and eliminate unreliable information nodes, thereby reducing hallucinations caused by inter-source inconsistencies. Extensive experiments on four multi-domain query datasets and two multi-hop QA datasets demonstrate that MultiRAG significantly enhances the reliability and efficiency of knowledge retrieval in complex multi-source scenarios. \textcolor{blue}{Our code is available in https://github.com/wuwenlong123/MultiRAG.</summary>
+    <category term="cs.IR" scheme="http://arxiv.org/schemas/atom"/>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2025-08-05T15:20:52Z</published>
+    <arxiv:comment>Accepted by ICDE 2025 Research Paper</arxiv:comment>
+    <arxiv:primary_category term="cs.IR"/>
+    <arxiv:journal_ref>In 2025 IEEE 41st International Conference on Data Engineering (ICDE), Hong Kong, 2025, pp. 3070-3083</arxiv:journal_ref>
+    <author>
+      <name>Wenlong Wu</name>
+    </author>
+    <author>
+      <name>Haofen Wang</name>
+    </author>
+    <author>
+      <name>Bohan Li</name>
+    </author>
+    <author>
+      <name>Peixuan Huang</name>
+    </author>
+    <author>
+      <name>Xinzhe Zhao</name>
+    </author>
+    <author>
+      <name>Lei Liang</name>
+    </author>
+    <arxiv:doi>10.1109/ICDE65448.2025.00230</arxiv:doi>
+    <link rel="related" href="https://doi.org/10.1109/ICDE65448.2025.00230" title="doi"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2401.15391v1</id>
+    <title>MultiHop-RAG: Benchmarking Retrieval-Augmented Generation for Multi-Hop Queries</title>
+    <updated>2024-01-27T11:41:48Z</updated>
+    <link href="https://arxiv.org/abs/2401.15391v1" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2401.15391v1" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval-augmented generation (RAG) augments large language models (LLM) by retrieving relevant knowledge, showing promising potential in mitigating LLM hallucinations and enhancing response quality, thereby facilitating the great adoption of LLMs in practice. However, we find that existing RAG systems are inadequate in answering multi-hop queries, which require retrieving and reasoning over multiple pieces of supporting evidence. Furthermore, to our knowledge, no existing RAG benchmarking dataset focuses on multi-hop queries. In this paper, we develop a novel dataset, MultiHop-RAG, which consists of a knowledge base, a large collection of multi-hop queries, their ground-truth answers, and the associated supporting evidence. We detail the procedure of building the dataset, utilizing an English news article dataset as the underlying RAG knowledge base. We demonstrate the benchmarking utility of MultiHop-RAG in two experiments. The first experiment compares different embedding models for retrieving evidence for multi-hop queries. In the second experiment, we examine the capabilities of various state-of-the-art LLMs, including GPT-4, PaLM, and Llama2-70B, in reasoning and answering multi-hop queries given the evidence. Both experiments reveal that existing RAG methods perform unsatisfactorily in retrieving and answering multi-hop queries. We hope MultiHop-RAG will be a valuable resource for the community in developing effective RAG systems, thereby facilitating greater adoption of LLMs in practice. The MultiHop-RAG and implemented RAG system is publicly available at https://github.com/yixuantt/MultiHop-RAG/.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-01-27T11:41:48Z</published>
+    <arxiv:comment>Link: https://github.com/yixuantt/MultiHop-RAG/</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Yixuan Tang</name>
+    </author>
+    <author>
+      <name>Yi Yang</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2601.02993v4</id>
+    <title>Stable-RAG: Mitigating Retrieval-Permutation-Induced Hallucinations in Retrieval-Augmented Generation</title>
+    <updated>2026-04-21T04:50:04Z</updated>
+    <link href="https://arxiv.org/abs/2601.02993v4" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2601.02993v4" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval-Augmented Generation (RAG) has become a key paradigm for reducing factual hallucinations in Large Language Models (LLMs), yet little is known about how the order of retrieved documents affects model behavior. We empirically show that under a Top-5 retrieval setting with the gold document included, LLM answers vary substantially across permutations of the retrieved set, even when the gold document is fixed in the first position. This reveals a previously underexplored sensitivity to retrieval permutations. Although existing robust RAG methods focus primarily on enhancing LLM robustness to low-quality retrieval and mitigating positional bias to distribute attention fairly over long contexts, neither approach directly addresses permutation sensitivity. In this paper, we propose Stable-RAG, which exploits permutation sensitivity estimation to mitigate permutation-induced hallucinations. Stable-RAG runs the generator under multiple retrieval orders, clusters hidden states, and decodes from a cluster-center representation that captures the dominant reasoning pattern. It then uses these reasoning results to align hallucinated outputs toward the correct answer, encouraging the model to produce consistent and accurate predictions across document permutations. Experiments on three QA datasets show that Stable-RAG improves answer accuracy, reasoning consistency, and generalization across datasets, retrievers, and input lengths compared with strong baselines.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2026-01-06T13:07:38Z</published>
+    <arxiv:comment>Accepted to ACL 2026 Main</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Qianchi Zhang</name>
+    </author>
+    <author>
+      <name>Hainan Zhang</name>
+    </author>
+    <author>
+      <name>Liang Pang</name>
+    </author>
+    <author>
+      <name>Hongwei Zheng</name>
+    </author>
+    <author>
+      <name>Zhiming Zheng</name>
+    </author>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2410.11414v2</id>
+    <title>ReDeEP: Detecting Hallucination in Retrieval-Augmented Generation via Mechanistic Interpretability</title>
+    <updated>2025-01-21T16:05:30Z</updated>
+    <link href="https://arxiv.org/abs/2410.11414v2" rel="alternate" type="text/html"/>
+    <link href="https://arxiv.org/pdf/2410.11414v2" rel="related" type="application/pdf" title="pdf"/>
+    <summary>Retrieval-Augmented Generation (RAG) models are designed to incorporate external knowledge, reducing hallucinations caused by insufficient parametric (internal) knowledge. However, even with accurate and relevant retrieved content, RAG models can still produce hallucinations by generating outputs that conflict with the retrieved information. Detecting such hallucinations requires disentangling how Large Language Models (LLMs) utilize external and parametric knowledge. Current detection methods often focus on one of these mechanisms or without decoupling their intertwined effects, making accurate detection difficult. In this paper, we investigate the internal mechanisms behind hallucinations in RAG scenarios. We discover hallucinations occur when the Knowledge FFNs in LLMs overemphasize parametric knowledge in the residual stream, while Copying Heads fail to effectively retain or integrate external knowledge from retrieved content. Based on these findings, we propose ReDeEP, a novel method that detects hallucinations by decoupling LLM's utilization of external context and parametric knowledge. Our experiments show that ReDeEP significantly improves RAG hallucination detection accuracy. Additionally, we introduce AARF, which mitigates hallucinations by modulating the contributions of Knowledge FFNs and Copying Heads.</summary>
+    <category term="cs.CL" scheme="http://arxiv.org/schemas/atom"/>
+    <published>2024-10-15T09:02:09Z</published>
+    <arxiv:comment>23pages</arxiv:comment>
+    <arxiv:primary_category term="cs.CL"/>
+    <author>
+      <name>Zhongxiang Sun</name>
+    </author>
+    <author>
+      <name>Xiaoxue Zang</name>
+    </author>
+    <author>
+      <name>Kai Zheng</name>
+    </author>
+    <author>
+      <name>Yang Song</name>
+    </author>
+    <author>
+      <name>Jun Xu</name>
+    </author>
+    <author>
+      <name>Xiao Zhang</name>
+    </author>
+    <author>
+      <name>Weijie Yu</name>
+    </author>
+    <author>
+      <name>Yang Song</name>
+    </author>
+    <author>
+      <name>Han Li</name>
+    </author>
+  </entry>
+</feed>
